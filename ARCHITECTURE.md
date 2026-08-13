@@ -135,6 +135,10 @@ Paymob behind a payment-provider abstraction.
 - Keep one SQL Server migration history. Migrations are deployment operations and are never applied by API startup.
 - The current foundation has no product entities or relationships; these mapping rules become acceptance criteria when a vertical slice adds them.
 
+The customer-ordering slice implements these rules with `Categories`, `MenuItems`, `DeliveryAreas`, `Orders`, `OrderItems`, and ASP.NET Core Identity staff tables in schema `app`. `OrderItems` and delivery fields hold historical snapshots; `Orders.PublicCode` has a unique SQL Server index. The catalog and kitchen queue have targeted composite indexes. Category/menu and delivery/order relationships use `Restrict`; the order aggregate alone cascades to its item rows.
+
+Guest order creation accepts only item identifiers and quantities, reloads SQL Server state, computes money, and writes the complete aggregate in a single `SaveChanges` automatic transaction. SignalR notification follows the successful write. See ADR 0006.
+
 ## Reporting
 
 Operational writes stay in the primary transactional model initially.
@@ -162,6 +166,8 @@ Production implementation must include:
 Container-friendly deployment.
 Use environment-specific configuration and secret injection.
 CI should build/test frontend and backend and validate production builds.
+
+The Angular development proxy and production deployment are same-origin for `/api` and `/hubs`. This is required by the cookie-session decision and avoids a browser-token storage path.
 
 ## Future multi-branch readiness
 

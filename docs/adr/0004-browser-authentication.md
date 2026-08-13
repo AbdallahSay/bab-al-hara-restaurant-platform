@@ -23,3 +23,7 @@ When identity is implemented, use ASP.NET Core Identity with same-origin, `HttpO
 - Frontend and API should be served from the same site in production; cross-origin development requires explicit credentialed CORS and antiforgery configuration.
 - Native or third-party clients may require a separate standards-based token flow. That need must be documented in a new ADR rather than weakening browser storage rules.
 - Identity schema and policies will be introduced with the first authenticated vertical slice, not as fake foundation users or roles.
+
+## Implementation note — 2026-08-13
+
+The authenticated kitchen queue introduced the Identity schema and Kitchen policy. Browser sessions use the ASP.NET Core Identity application cookie with `HttpOnly`, `SameSite=Strict`, production `Secure`, eight-hour sliding expiration, supported password hashing/lockout, antiforgery validation, and a rate-limited sign-in endpoint. The SignalR hub and queue API require the same Kitchen role. The Angular client stores no session credential. Development uses the same-origin Angular proxy; deployed frontend and API remain same-origin.

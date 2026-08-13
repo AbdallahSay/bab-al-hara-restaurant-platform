@@ -1,0 +1,71 @@
+<main class="sign-in-shell">
+  <section class="sign-in-card" aria-labelledby="sign-in-title">
+    <div class="sign-in-topbar">
+      <a class="brand" routerLink="/">
+        <span aria-hidden="true">ب</span>
+        <strong>{{ copy().brand.name }}</strong>
+      </a>
+      <div class="language-switcher" role="group" [attr.aria-label]="copy().brand.languageLabel">
+        <button
+          type="button"
+          [class.is-active]="language.current() === 'ar'"
+          [attr.aria-pressed]="language.current() === 'ar'"
+          (click)="setLanguage('ar')"
+        >
+          {{ copy().brand.arabic }}
+        </button>
+        <button
+          type="button"
+          [class.is-active]="language.current() === 'en'"
+          [attr.aria-pressed]="language.current() === 'en'"
+          (click)="setLanguage('en')"
+        >
+          {{ copy().brand.english }}
+        </button>
+      </div>
+    </div>
+
+    <div class="sign-in-heading">
+      <h1 id="sign-in-title">{{ copy().staff.title }}</h1>
+      <p>{{ copy().staff.description }}</p>
+    </div>
+
+    @if (failed()) {
+      <p class="sign-in-error" role="alert">{{ copy().staff.error }}</p>
+    }
+
+    <form (submit)="signIn(); $event.preventDefault()" novalidate>
+      <div class="field-group">
+        <label for="staff-email">{{ copy().staff.email }}</label>
+        <input
+          id="staff-email"
+          type="email"
+          autocomplete="username"
+          [formControl]="form.controls.email"
+          [attr.aria-invalid]="submitted() && form.controls.email.invalid"
+        />
+        @if (submitted() && form.controls.email.invalid) {
+          <p class="field-error">{{ copy().checkout.required }}</p>
+        }
+      </div>
+      <div class="field-group">
+        <label for="staff-password">{{ copy().staff.password }}</label>
+        <input
+          id="staff-password"
+          type="password"
+          autocomplete="current-password"
+          [formControl]="form.controls.password"
+          [attr.aria-invalid]="submitted() && form.controls.password.invalid"
+        />
+        @if (submitted() && form.controls.password.invalid) {
+          <p class="field-error">{{ copy().checkout.required }}</p>
+        }
+      </div>
+      <button class="button button--primary button--wide" type="submit" [disabled]="sending()">
+        {{ sending() ? copy().staff.signingIn : copy().staff.signIn }}
+      </button>
+    </form>
+
+    <a class="customer-link" routerLink="/">{{ copy().staff.customerMenu }}</a>
+  </section>
+</main>

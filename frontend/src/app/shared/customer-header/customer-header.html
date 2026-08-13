@@ -1,0 +1,39 @@
+<header class="customer-header">
+  <div class="customer-header__content">
+    <a class="brand" routerLink="/" [attr.aria-label]="copy().brand.homeLabel">
+      <span class="brand__mark" aria-hidden="true">ب</span>
+      <span class="brand__text">
+        <strong>{{ copy().brand.name }}</strong>
+        <small>{{ copy().brand.tagline }}</small>
+      </span>
+    </a>
+
+    <div class="customer-header__actions">
+      <div class="language-switcher" role="group" [attr.aria-label]="copy().brand.languageLabel">
+        <button
+          type="button"
+          data-language="ar"
+          [class.is-active]="language.current() === 'ar'"
+          [attr.aria-pressed]="language.current() === 'ar'"
+          (click)="setLanguage('ar')"
+        >
+          {{ copy().brand.arabic }}
+        </button>
+        <button
+          type="button"
+          data-language="en"
+          [class.is-active]="language.current() === 'en'"
+          [attr.aria-pressed]="language.current() === 'en'"
+          (click)="setLanguage('en')"
+        >
+          {{ copy().brand.english }}
+        </button>
+      </div>
+
+      <a class="cart-link" routerLink="/cart">
+        <span>{{ copy().brand.cart }}</span>
+        <strong aria-live="polite">{{ cart.itemCount() }}</strong>
+      </a>
+    </div>
+  </div>
+</header>

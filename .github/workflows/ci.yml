@@ -77,6 +77,41 @@ jobs:
       - name: Build
         run: dotnet build backend/BabAlHara.sln --configuration Release --no-restore
 
+      - name: Start SQL Server for integration tests
+        shell: bash
+        env:
+          SQLSERVER_IMAGE: mcr.microsoft.com/mssql/server:2025-CU7-ubuntu-24.04@sha256:86cc6144ef39bb0fbed2329e1ad79b13ee82e7b2e4739213a0db0800e668a74a
+        run: |
+          set -euo pipefail
+          database_password="$(openssl rand -hex 24)Aa1!"
+          echo "MSSQL_TEST_PASSWORD=${database_password}" >> "${GITHUB_ENV}"
+          echo "BAB_AL_HARA_TEST_SQLSERVER=Server=localhost,1433;Database=master;User Id=sa;Password=${database_password};Encrypt=True;TrustServerCertificate=True;Connect Timeout=10" >> "${GITHUB_ENV}"
+
+          docker run \
+            --detach \
+            --name bab-al-hara-sqlserver-ci \
+            --env ACCEPT_EULA=Y \
+            --env MSSQL_PID=Developer \
+            --env "MSSQL_SA_PASSWORD=${database_password}" \
+            --publish 1433:1433 \
+            "${SQLSERVER_IMAGE}"
+
+          database_ready=false
+          for _ in {1..60}; do
+            if docker exec bab-al-hara-sqlserver-ci \
+              /opt/mssql-tools18/bin/sqlcmd \
+              -S localhost -U sa -P "${database_password}" -C -Q "SELECT 1" -b >/dev/null 2>&1; then
+              database_ready=true
+              break
+            fi
+            sleep 2
+          done
+
+          if [[ "${database_ready}" != "true" ]]; then
+            docker logs bab-al-hara-sqlserver-ci
+            exit 1
+          fi
+
       - name: Test
         run: dotnet test backend/BabAlHara.sln --configuration Release --no-build --no-restore
 
@@ -90,7 +125,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          database_password="$(openssl rand -hex 24)Aa1!"
+          database_password="${MSSQL_TEST_PASSWORD}"
           database_container="bab-al-hara-sqlserver-ci"
           api_log="${RUNNER_TEMP}/bab-al-hara-api.log"
 
@@ -101,31 +136,6 @@ jobs:
             docker rm --force "${database_container}" >/dev/null 2>&1 || true
           }
           trap cleanup EXIT
-
-          docker run \
-            --detach \
-            --name "${database_container}" \
-            --env ACCEPT_EULA=Y \
-            --env MSSQL_PID=Developer \
-            --env "MSSQL_SA_PASSWORD=${database_password}" \
-            --publish 1433:1433 \
-            "${SQLSERVER_IMAGE}"
-
-          database_ready=false
-          for _ in {1..60}; do
-            if docker exec "${database_container}" \
-              /opt/mssql-tools18/bin/sqlcmd \
-              -S localhost -U sa -P "${database_password}" -C -Q "SELECT 1" -b >/dev/null 2>&1; then
-              database_ready=true
-              break
-            fi
-            sleep 2
-          done
-
-          if [[ "${database_ready}" != "true" ]]; then
-            docker logs "${database_container}"
-            exit 1
-          fi
 
           export ASPNETCORE_ENVIRONMENT=Development
           export ConnectionStrings__Database="Server=localhost,1433;Database=bab_al_hara_ci;User Id=sa;Password=${database_password};Encrypt=True;TrustServerCertificate=True;Connect Timeout=5;Command Timeout=30"

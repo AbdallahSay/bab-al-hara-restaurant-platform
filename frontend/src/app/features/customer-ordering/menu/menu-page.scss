@@ -1,0 +1,232 @@
+:host {
+  display: block;
+  padding-block-end: 5.5rem;
+}
+
+.menu-shell {
+  max-inline-size: var(--content-width);
+  margin-inline: auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.menu-intro {
+  max-inline-size: 42rem;
+  margin-block-end: var(--space-5);
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 7vw, 3.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  > p:last-child {
+    max-inline-size: 35rem;
+    margin-block: var(--space-3) 0;
+    color: var(--color-ink-muted);
+  }
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.category-nav {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  margin-inline: calc(var(--space-4) * -1);
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  scrollbar-width: thin;
+
+  button {
+    flex: 0 0 auto;
+    min-block-size: 2.75rem;
+    padding-inline: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: 2rem;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .is-active {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+  }
+}
+
+.menu-grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.menu-item {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.menu-item__image-wrap {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--color-surface-subtle);
+}
+
+.menu-item__image {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.menu-item--unavailable .menu-item__image {
+  opacity: 0.55;
+  filter: grayscale(0.55);
+}
+
+.availability-label {
+  position: absolute;
+  inset-block-end: var(--space-3);
+  inset-inline-start: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: 2rem;
+  background: var(--color-ink);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.menu-item__body {
+  padding: var(--space-4);
+
+  > p {
+    min-block-size: 3.2rem;
+    margin: var(--space-2) 0 var(--space-4);
+    color: var(--color-ink-muted);
+  }
+}
+
+.menu-item__heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-3);
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    line-height: 1.35;
+  }
+
+  strong {
+    flex: 0 0 auto;
+    color: var(--color-primary);
+    white-space: nowrap;
+  }
+}
+
+.menu-item__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+
+  small {
+    color: var(--color-ink-muted);
+  }
+}
+
+.state-panel {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  min-block-size: 14rem;
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  text-align: center;
+
+  h2,
+  p {
+    margin: 0;
+  }
+}
+
+.state-panel--error {
+  border-color: color-mix(in srgb, var(--color-danger) 40%, var(--color-border));
+  background: var(--color-danger-soft);
+}
+
+.loader {
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border: 0.25rem solid var(--color-primary-soft);
+  border-block-start-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+.mobile-cart {
+  position: fixed;
+  z-index: 30;
+  inset-inline: var(--space-4);
+  inset-block-end: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-block-size: 3.5rem;
+  padding-inline: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  box-shadow: var(--shadow-subtle);
+  color: white;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (min-width: 42rem) {
+  :host {
+    padding-block-end: 0;
+  }
+
+  .menu-shell {
+    padding-block: var(--space-7);
+  }
+
+  .menu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mobile-cart {
+    display: none;
+  }
+}
+
+@media (min-width: 68rem) {
+  .menu-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    animation: none;
+  }
+}

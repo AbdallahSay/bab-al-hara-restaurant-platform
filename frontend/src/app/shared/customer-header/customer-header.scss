@@ -1,0 +1,119 @@
+:host {
+  display: block;
+}
+
+.customer-header {
+  position: sticky;
+  z-index: 20;
+  inset-block-start: 0;
+  border-block-end: 1px solid var(--color-border);
+  background: rgb(255 253 249 / 96%);
+  backdrop-filter: blur(0.75rem);
+}
+
+.customer-header__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  max-inline-size: var(--content-width);
+  min-block-size: 4.5rem;
+  margin-inline: auto;
+  padding: var(--space-2) var(--space-4);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.brand__mark {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.brand__text {
+  display: none;
+  line-height: 1.25;
+
+  strong,
+  small {
+    display: block;
+  }
+
+  small {
+    color: var(--color-ink-muted);
+    font-size: 0.75rem;
+  }
+}
+
+.customer-header__actions,
+.language-switcher {
+  display: flex;
+  align-items: center;
+}
+
+.customer-header__actions {
+  gap: var(--space-2);
+}
+
+.language-switcher {
+  padding: 0.1875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 2rem;
+
+  button {
+    min-block-size: 2.375rem;
+    padding-inline: 0.7rem;
+    border: 0;
+    border-radius: 2rem;
+    background: transparent;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+  }
+
+  .is-active {
+    background: var(--color-primary);
+    color: white;
+  }
+}
+
+.cart-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 2.75rem;
+  padding-inline: var(--space-3);
+  border-radius: 2rem;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 750;
+  text-decoration: none;
+
+  strong {
+    display: grid;
+    place-items: center;
+    min-inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: white;
+    font-size: 0.75rem;
+  }
+}
+
+@media (min-width: 42rem) {
+  .brand__text {
+    display: block;
+  }
+}

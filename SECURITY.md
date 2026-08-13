@@ -16,6 +16,8 @@
 - Passwords must be handled only through trusted identity/password hashing mechanisms.
 - Administrative roles require stronger operational controls and auditability.
 
+The current staff implementation uses ASP.NET Core Identity password hashing, lockout after five failed attempts, an eight-hour sliding browser session, `HttpOnly`/`SameSite=Strict` cookies, `Secure` cookies outside local Development, antiforgery validation on state-changing routes, and IP rate limiting on sign-in. The Kitchen policy protects both the queue API and SignalR hub. Development credentials are created only by the explicit Development seed command and the password comes from user secrets or environment configuration.
+
 ## Authorization
 
 - Role/policy authorization on every protected backend operation.
@@ -58,6 +60,8 @@ Avoid exposing them in logs, analytics, or unauthorized roles.
 - Rate limiting for public/login/order-tracking abuse-sensitive endpoints.
 - Request size limits.
 - Safe error responses without stack traces or secrets.
+
+Guest order creation is IP rate limited and antiforgery protected. Its DTO contains no monetary or lifecycle fields; SQL Server catalog and delivery data are authoritative. Kitchen realtime payloads omit phone numbers and internal database identifiers.
 
 ## Secrets
 

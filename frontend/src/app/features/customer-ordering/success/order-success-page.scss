@@ -1,0 +1,121 @@
+:host {
+  display: block;
+}
+
+.success-shell {
+  display: grid;
+  place-items: start center;
+  min-block-size: calc(100vh - 5rem);
+  padding: var(--space-6) var(--space-4);
+}
+
+.success-card {
+  inline-size: min(100%, 36rem);
+  padding: var(--space-6) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  text-align: center;
+
+  h1 {
+    margin: var(--space-2) 0;
+    font-size: clamp(1.8rem, 7vw, 2.75rem);
+    line-height: 1.2;
+  }
+
+  > p:not(.eyebrow, .price-notice, .fulfilment-note) {
+    margin-block: 0 var(--space-5);
+    color: var(--color-ink-muted);
+  }
+
+  dl {
+    margin: var(--space-5) 0;
+    text-align: start;
+  }
+
+  dl > div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: var(--space-2);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 700;
+    text-align: end;
+  }
+}
+
+.success-mark {
+  display: grid;
+  place-items: center;
+  inline-size: 4rem;
+  block-size: 4rem;
+  margin-inline: auto;
+  border-radius: 50%;
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.eyebrow {
+  margin: var(--space-4) 0 0;
+  color: var(--color-success);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.order-code {
+  padding: var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-soft);
+
+  span,
+  strong {
+    display: block;
+  }
+
+  span {
+    color: var(--color-ink-muted);
+    font-size: 0.82rem;
+  }
+
+  strong {
+    margin-block-start: var(--space-1);
+    color: var(--color-primary);
+    font-size: clamp(1.25rem, 6vw, 1.75rem);
+    letter-spacing: 0.06em;
+  }
+}
+
+.price-notice {
+  margin: var(--space-3) 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+  font-weight: 700;
+}
+
+.total-row {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.fulfilment-note {
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-subtle);
+  color: var(--color-ink-muted);
+}
+
+@media (min-width: 42rem) {
+  .success-shell {
+    padding-block: var(--space-7);
+  }
+}

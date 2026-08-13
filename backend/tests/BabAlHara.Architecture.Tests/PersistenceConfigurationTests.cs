@@ -28,7 +28,12 @@ public sealed class PersistenceConfigurationTests
 
         Assert.Equal("Microsoft.EntityFrameworkCore.SqlServer", dbContext.Database.ProviderName);
         Assert.Equal("app", dbContext.Model.GetDefaultSchema());
-        Assert.Empty(dbContext.Model.GetEntityTypes());
+        var entityTypes = dbContext.Model.GetEntityTypes().ToArray();
+        Assert.Contains(entityTypes, entity => entity.ClrType == typeof(Domain.Catalog.Category));
+        Assert.Contains(entityTypes, entity => entity.ClrType == typeof(Domain.Catalog.MenuItem));
+        Assert.Contains(entityTypes, entity => entity.ClrType == typeof(Domain.Delivery.DeliveryArea));
+        Assert.Contains(entityTypes, entity => entity.ClrType == typeof(Domain.Ordering.Order));
+        Assert.Contains(entityTypes, entity => entity.ClrType == typeof(Domain.Ordering.OrderItem));
         Assert.Equal(18, AppDbContext.DefaultDecimalPrecision);
         Assert.Equal(2, AppDbContext.DefaultDecimalScale);
     }

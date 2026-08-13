@@ -1,0 +1,182 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+
+import { formatMoney, localizedText } from '../../../core/i18n/formatters';
+import { LanguageService } from '../../../core/i18n/language.service';
+import { CustomerHeader } from '../../../shared/customer-header/customer-header';
+import { CartService } from '../cart/cart.service';
+import { CustomerApiService } from '../customer-api.service';
+import { CreateOrderRequest, DeliveryArea, OrderType, ProblemDetails } from '../order.models';
+import { OrderReceiptService } from '../success/order-receipt.service';
+
+type AreaState = 'loading' | 'ready' | 'error';
+
+@Component({
+  selector: 'app-checkout-page',
+  imports: [CustomerHeader, ReactiveFormsModule, RouterLink],
+  templateUrl: './checkout-page.html',
+  styleUrl: './checkout-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class CheckoutPage implements OnInit {
+  private readonly api = inject(CustomerApiService);
+  private readonly router = inject(Router);
+  private readonly receipt = inject(OrderReceiptService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  protected readonly language = inject(LanguageService);
+  protected readonly copy = this.language.copy;
+  protected readonly cart = inject(CartService);
+  protected readonly areaState = signal<AreaState>('loading');
+  protected readonly deliveryAreas = signal<readonly DeliveryArea[]>([]);
+  protected readonly submitted = signal(false);
+  protected readonly sending = signal(false);
+  protected readonly errorMessage = signal('');
+  protected readonly form = new FormGroup({
+    customerName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(120)],
+    }),
+    customerPhone: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.pattern(/^(?:\+20|0020|0)?1[0125]\d{8}$/)],
+    }),
+    orderType: new FormControl<OrderType>('Takeaway', { nonNullable: true }),
+    deliveryAreaId: new FormControl({ value: '', disabled: true }, { nonNullable: true }),
+    address: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(500)] }),
+    customerNote: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.maxLength(500)],
+    }),
+  });
+  protected readonly orderType = toSignal(this.form.controls.orderType.valueChanges, {
+    initialValue: this.form.controls.orderType.value,
+  });
+  protected readonly selectedAreaId = toSignal(this.form.controls.deliveryAreaId.valueChanges, {
+    initialValue: this.form.controls.deliveryAreaId.value,
+  });
+  protected readonly selectedArea = computed(() =>
+    this.deliveryAreas().find((area) => area.id === this.selectedAreaId()),
+  );
+  protected readonly displayedDeliveryFee = computed(() =>
+    this.orderType() === 'Delivery' ? (this.selectedArea()?.deliveryFee ?? 0) : 0,
+  );
+  protected readonly displayedTotal = computed(
+    () => this.cart.subtotal() + this.displayedDeliveryFee(),
+  );
+  protected readonly deliveryDetailsInvalid = computed(
+    () =>
+      this.submitted() &&
+      this.orderType() === 'Delivery' &&
+      (!this.selectedAreaId() || !this.form.controls.address.value.trim()),
+  );
+
+  ngOnInit(): void {
+    if (this.cart.items().length === 0) {
+      this.errorMessage.set(this.copy().checkout.emptyCart);
+    }
+    this.loadDeliveryAreas();
+  }
+
+  protected loadDeliveryAreas(): void {
+    this.areaState.set('loading');
+    this.form.controls.deliveryAreaId.disable({ emitEvent: false });
+    this.api
+      .getDeliveryAreas()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (areas) => {
+          this.deliveryAreas.set(areas);
+          this.areaState.set('ready');
+          this.form.controls.deliveryAreaId.enable({ emitEvent: false });
+        },
+        error: () => {
+          this.areaState.set('error');
+          this.form.controls.deliveryAreaId.enable({ emitEvent: false });
+        },
+      });
+  }
+
+  protected submit(): void {
+    this.submitted.set(true);
+    this.errorMessage.set('');
+    this.form.markAllAsTouched();
+
+    if (this.cart.items().length === 0) {
+      this.errorMessage.set(this.copy().checkout.emptyCart);
+      return;
+    }
+
+    if (
+      this.form.invalid ||
+      (this.orderType() === 'Delivery' &&
+        (!this.selectedAreaId() || !this.form.controls.address.value.trim()))
+    ) {
+      return;
+    }
+
+    const displayedTotal = this.displayedTotal();
+    const orderType = this.orderType();
+    const request: CreateOrderRequest = {
+      customerName: this.form.controls.customerName.value.trim(),
+      customerPhone: this.form.controls.customerPhone.value.trim(),
+      orderType,
+      deliveryAreaId: orderType === 'Delivery' ? this.selectedAreaId() : null,
+      address: orderType === 'Delivery' ? this.form.controls.address.value.trim() : null,
+      customerNote: this.form.controls.customerNote.value.trim() || null,
+      items: this.cart.items().map((item) => ({
+        menuItemId: item.menuItemId,
+        quantity: item.quantity,
+      })),
+    };
+
+    this.sending.set(true);
+    this.api
+      .createOrder(request)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (order) => {
+          this.receipt.save({
+            order,
+            displayedTotalChanged: Math.abs(order.total - displayedTotal) > 0.001,
+          });
+          this.cart.clear();
+          void this.router.navigate(['/order-confirmed']);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.sending.set(false);
+          const problem = error.error as ProblemDetails | undefined;
+          this.errorMessage.set(this.problemMessage(problem?.code));
+        },
+      });
+  }
+
+  protected areaName(area: DeliveryArea): string {
+    return localizedText(this.language.current(), area.nameAr, area.nameEn);
+  }
+
+  protected money(value: number): string {
+    return formatMoney(value, this.language.current());
+  }
+
+  private problemMessage(code?: string): string {
+    if (code === 'unavailable_menu_item' || code === 'inactive_menu_item') {
+      return this.copy().checkout.unavailableError;
+    }
+    if (code === 'inactive_delivery_area' || code === 'invalid_delivery_area') {
+      return this.copy().checkout.areaError;
+    }
+    return this.copy().checkout.orderError;
+  }
+}

@@ -2,7 +2,7 @@
 
 Production bilingual restaurant ordering and operations platform. Arabic is the default RTL language; English is a first-class LTR language.
 
-Phase 0 establishes the engineering and design foundation only. It intentionally contains no fake menu, order, dashboard, employee, payment, or reporting features.
+The first production vertical slice is implemented: bilingual customer menu, persistent cart, guest cash checkout, authoritative SQL Server order creation, and an authenticated realtime kitchen queue.
 
 ## Technology baseline
 
@@ -16,7 +16,7 @@ Important decisions are recorded in [`docs/adr`](docs/adr/README.md).
 ## Repository layout
 
 ```text
-frontend/       Angular application and bilingual design-token proof
+frontend/       Angular customer ordering and kitchen applications
 backend/src/    API, Application, Domain, and Infrastructure projects
 backend/tests/  Architecture and API integration tests
 infra/          Local dependency orchestration
@@ -45,8 +45,10 @@ Store the same local password in ASP.NET Core user secrets. The value below is d
 
 ```powershell
 dotnet user-secrets set "ConnectionStrings:Database" "Server=localhost,1433;Database=bab_al_hara;User Id=sa;Password=<the local password>;Encrypt=True;TrustServerCertificate=True;Connect Timeout=5;Command Timeout=30" --project backend/src/BabAlHara.Api
+dotnet user-secrets set "DevelopmentSeed:KitchenPassword" "<a strong local kitchen password>" --project backend/src/BabAlHara.Api
 dotnet tool restore
 dotnet ef database update --project backend/src/BabAlHara.Infrastructure --startup-project backend/src/BabAlHara.Api
+dotnet run --project backend/src/BabAlHara.Api -- --seed-data
 ```
 
 Production connection strings must come from the deployment secret store, use a least-privileged login, require trusted certificate validation, and never use the local `sa` account. The application never auto-applies migrations on startup. The Compose image and support rationale are documented in [`infra/README.md`](infra/README.md).
@@ -73,9 +75,20 @@ npm start
 
 Open `http://localhost:4200`. The shell persists the chosen language locally and updates both `lang` and `dir` on the document.
 
+Customer ordering starts at `http://localhost:4200/`. The protected kitchen screen is at `http://localhost:4200/kitchen`; its deterministic Development-only account is `kitchen@bab-al-hara.local` with the password supplied through `DevelopmentSeed:KitchenPassword`. No account or password is created in Production, and the seed command refuses to run outside Development.
+
+### Customer-to-kitchen realtime check
+
+1. Open `/kitchen`, sign in, and leave the kitchen queue visible. Choose **Enable sound alert** if an audible alert is wanted; browser policy requires this user gesture.
+2. In a second browser context, open `/`, add an available item, and continue through the cart.
+3. Complete guest checkout as Takeaway or Delivery and choose Cash (the only implemented payment method).
+4. Confirm that the success page shows a `BH-...` public code only after the API returns `201 Created`.
+5. Confirm that the same code appears on the kitchen screen without refresh.
+6. Refresh `/kitchen` and confirm that the order is recovered from `GET /api/kitchen/orders/active` and SQL Server.
+
 ## Quality gates
 
-The SQL Server model currently contains no product entities. Future entity mappings must explicitly review decimal precision, temporal types, bounded string lengths, GUID generation, indexes, unique constraints, and delete behavior. Monetary properties use `decimal` with intentional precision and never `float` or `double`; the foundation supplies a `decimal(18,2)` convention as a safety net.
+The SQL Server model contains catalog, delivery, ordering, order-item snapshot, and ASP.NET Core Identity tables. Monetary properties use explicit `decimal(18,2)` and never `float` or `double`; order timestamps use `datetimeoffset(7)`. Relationships, indexes, unique public codes, bounded strings, and delete behavior are explicit in the EF configuration.
 
 Verify the migration model without connecting to a database:
 
@@ -113,3 +126,5 @@ docker build --file backend/Dockerfile --tag bab-al-hara-api:local .
 ASP.NET Core follows its standard configuration precedence: committed settings, environment-specific settings, user secrets in Development, environment variables, and command-line arguments. Use `ConnectionStrings__Database` for injected deployment configuration. Never commit `.env`, local settings, access tokens, provider secrets, or production credentials.
 
 Frontend build-time defaults live in `frontend/src/environments`. They contain public routing configuration only; browser bundles must never contain secrets.
+
+The ordering integration tests require a reachable SQL Server. Locally they default to `Server=.\MSSQLSERVER01` with Windows integrated authentication. CI and other environments provide `BAB_AL_HARA_TEST_SQLSERVER`; the fixture creates and deletes an isolated database and applies real EF migrations.

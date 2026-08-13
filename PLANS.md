@@ -23,7 +23,7 @@ The database provider was permanently re-baselined to SQL Server on 2026-08-13 b
 
 ## Phase 1 — Shared design system + bilingual shell
 
-Status: READY TO START
+Status: COMPLETE AS PART OF THE FIRST VERTICAL SLICE — 2026-08-13
 
 Deliverables:
 
@@ -40,9 +40,11 @@ Acceptance:
 - components meet UX constitution
 - no generic dashboard template styling
 
-Note: Phase 0 includes only the minimal token/component proof required to validate the foundation. Phase 1 remains responsible for product-ready shared shell patterns and the complete interaction-state system.
+Delivered by the customer and kitchen surfaces: responsive customer header, operational kitchen shell, form/error/loading/empty patterns, Arabic/English runtime switching, direction-safe logical CSS, accessible status announcements, touch-sized actions, and production menu imagery.
 
 ## Phase 2 — Menu + customer ordering vertical slice
+
+Status: COMPLETE — 2026-08-13
 
 Deliverables end-to-end:
 
@@ -61,7 +63,11 @@ Deliverables end-to-end:
 Acceptance:
 A real order submitted in Angular exists in the database and can be queried server-side.
 
+Delivered with SQL Server authoritative pricing/fees/availability, order-item snapshots, guest Cash checkout, deterministic Development seed data, and required automated/live verification.
+
 ## Phase 3 — Kitchen real-time vertical slice
+
+Status: PARTIALLY COMPLETE — CURRENT QUEUE AND NEW-ORDER DELIVERY ONLY — 2026-08-13
 
 - Kitchen active orders screen
 - SignalR new-order event
@@ -74,6 +80,8 @@ A real order submitted in Angular exists in the database and can be queried serv
 
 Acceptance:
 Customer creates order -> kitchen receives it without refresh -> kitchen transitions persist correctly.
+
+Delivered now because the approved mission explicitly included the kitchen receipt path: protected active-order retrieval, post-commit `NewOrder`, visual/optional-audible alert, and reconnect/refetch recovery. Start Preparing, Mark Ready, item-availability mutation, and their concurrency/transition tests remain deferred; no placeholder controls were added.
 
 ## Phase 4 — Customer live tracking + notifications foundation
 
