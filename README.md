@@ -8,7 +8,7 @@ Phase 0 establishes the engineering and design foundation only. It intentionally
 
 - Angular 22.1 with standalone components, strict TypeScript, Vitest, ESLint, and Prettier
 - ASP.NET Core on .NET 10 LTS with OpenAPI, RFC 7807 errors, JSON logs, correlation IDs, and health checks
-- PostgreSQL 18 with EF Core 10 and reviewed migrations
+- Microsoft SQL Server 2025 with EF Core 10 and reviewed SQL Server-only migrations
 - GitHub Actions for locked frontend and backend build/test gates
 
 Important decisions are recorded in [`docs/adr`](docs/adr/README.md).
@@ -28,11 +28,11 @@ codex/          Task instructions
 - Node.js 24.19 or a compatible Node 24 release (`frontend/.nvmrc`)
 - npm 10.9 or later
 - .NET SDK 10.0.400 or a compatible 10.0 feature-band update (`global.json`)
-- Docker with Compose, only if using the supplied local PostgreSQL service
+- Docker with Compose on an x86-64 host with at least 2 GB available to the supplied SQL Server service
 
 ## Local setup
 
-### 1. Start PostgreSQL
+### 1. Start Microsoft SQL Server
 
 Copy the placeholder file, replace its value locally, and keep the resulting `.env` untracked.
 
@@ -44,12 +44,12 @@ docker compose --env-file .env -f infra/compose.dev.yaml up -d database
 Store the same local password in ASP.NET Core user secrets. The value below is deliberately a placeholder.
 
 ```powershell
-dotnet user-secrets set "ConnectionStrings:Database" "Host=localhost;Port=5432;Database=bab_al_hara;Username=bab_al_hara;Password=<the local password>;Include Error Detail=false" --project backend/src/BabAlHara.Api
+dotnet user-secrets set "ConnectionStrings:Database" "Server=localhost,1433;Database=bab_al_hara;User Id=sa;Password=<the local password>;Encrypt=True;TrustServerCertificate=True;Connect Timeout=5;Command Timeout=30" --project backend/src/BabAlHara.Api
 dotnet tool restore
 dotnet ef database update --project backend/src/BabAlHara.Infrastructure --startup-project backend/src/BabAlHara.Api
 ```
 
-Production connection strings must come from the deployment secret store. The application never auto-applies migrations on startup.
+Production connection strings must come from the deployment secret store, use a least-privileged login, require trusted certificate validation, and never use the local `sa` account. The application never auto-applies migrations on startup. The Compose image and support rationale are documented in [`infra/README.md`](infra/README.md).
 
 ### 2. Run the API
 
@@ -60,7 +60,7 @@ dotnet run --project backend/src/BabAlHara.Api
 Development endpoints:
 
 - liveness: `http://localhost:5181/health/live`
-- readiness, including PostgreSQL: `http://localhost:5181/health/ready`
+- readiness, including SQL Server connectivity: `http://localhost:5181/health/ready`
 - OpenAPI document: `http://localhost:5181/openapi/v1.json`
 
 ### 3. Run Angular
@@ -74,6 +74,16 @@ npm start
 Open `http://localhost:4200`. The shell persists the chosen language locally and updates both `lang` and `dir` on the document.
 
 ## Quality gates
+
+The SQL Server model currently contains no product entities. Future entity mappings must explicitly review decimal precision, temporal types, bounded string lengths, GUID generation, indexes, unique constraints, and delete behavior. Monetary properties use `decimal` with intentional precision and never `float` or `double`; the foundation supplies a `decimal(18,2)` convention as a safety net.
+
+Verify the migration model without connecting to a database:
+
+```powershell
+dotnet tool restore
+dotnet ef migrations has-pending-model-changes --project backend/src/BabAlHara.Infrastructure --startup-project backend/src/BabAlHara.Api
+dotnet ef migrations script --idempotent --project backend/src/BabAlHara.Infrastructure --startup-project backend/src/BabAlHara.Api --output migration.sql
+```
 
 Frontend:
 
@@ -89,6 +99,7 @@ dotnet restore backend/BabAlHara.sln --locked-mode
 dotnet format backend/BabAlHara.sln --no-restore --verify-no-changes
 dotnet build backend/BabAlHara.sln --configuration Release --no-restore
 dotnet test backend/BabAlHara.sln --configuration Release --no-build --no-restore
+dotnet list backend/BabAlHara.sln package --vulnerable --include-transitive
 ```
 
 Build the API container from the repository root:

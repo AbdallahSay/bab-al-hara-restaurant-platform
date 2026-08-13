@@ -38,5 +38,18 @@ public sealed class HealthEndpointTests(ApiFactory factory) : IClassFixture<ApiF
         Assert.Equal(correlationId, response.Headers.GetValues(CorrelationIdMiddleware.HeaderName).Single());
     }
 
+    [Fact]
+    public async Task ReadinessReturnsServiceUnavailableWhenSqlServerCannotBeReached()
+    {
+        using var response = await client.GetAsync("/health/ready");
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
+
+        var payload = await response.Content.ReadFromJsonAsync<HealthPayload>();
+        Assert.NotNull(payload);
+        Assert.Equal("Unhealthy", payload.Status);
+    }
+
     private sealed record HealthPayload(string Status);
 }

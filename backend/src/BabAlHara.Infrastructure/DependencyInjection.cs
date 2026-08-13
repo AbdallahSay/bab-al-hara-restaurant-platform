@@ -22,12 +22,12 @@ public static class DependencyInjection
         }
 
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(
+            options.UseSqlServer(
                 connectionString,
-                npgsql =>
+                sqlServer =>
                 {
-                    npgsql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
-                    npgsql.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+                    sqlServer.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                    sqlServer.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                 }));
 
         return services;

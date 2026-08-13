@@ -16,7 +16,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
                 new Dictionary<string, string?>
                 {
                     ["ConnectionStrings:Database"] =
-                        "Host=localhost;Port=5432;Database=bab_al_hara_tests;Username=test;Timeout=1",
+                        "Server=127.0.0.1,1;Database=bab_al_hara_tests;Integrated Security=True;Encrypt=False;Connect Timeout=1",
                 });
         });
     }

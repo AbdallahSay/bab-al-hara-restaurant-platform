@@ -29,7 +29,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services
     .AddHealthChecks()
     .AddDbContextCheck<AppDbContext>(
-        name: "postgresql",
+        name: "sql-server",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["ready"],
         customTestQuery: async (dbContext, cancellationToken) =>
