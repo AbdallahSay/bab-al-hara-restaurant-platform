@@ -1,0 +1,23 @@
+name: bab-al-hara-development
+
+services:
+  database:
+    image: postgres:18.4-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bab_al_hara
+      POSTGRES_USER: bab_al_hara
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in a local .env file}
+    ports:
+      - '5432:5432'
+    volumes:
+      - bab-al-hara-postgres:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bab_al_hara -d bab_al_hara']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  bab-al-hara-postgres:

@@ -4,28 +4,21 @@
 Build production-grade vertical slices. Do not create dozens of disconnected screens first.
 
 ## Phase 0 — Repository and engineering foundation
-Status: READY TO START
+Status: COMPLETE — 2026-08-13
 
-Deliverables:
-- Angular workspace
-- ASP.NET Core solution
-- production relational DB selection and migrations baseline
-- local development configuration
-- environment configuration conventions
-- CI build/test workflow
-- lint/format rules
-- OpenAPI
-- health checks
-- logging baseline
-- Docker/dev orchestration if appropriate
-- architecture decision records for key choices
+Delivered:
+- Angular 22 strict standalone workspace with routing, runtime Arabic RTL / English LTR switching, self-hosted typography, design tokens, and a minimal accessible component proof
+- .NET 10 modular-monolith solution with API, Application, Domain, Infrastructure, architecture tests, and API integration tests
+- PostgreSQL 18 / EF Core 10 foundation with an initial reviewed schema migration
+- OpenAPI, RFC 7807 global errors, correlation IDs, JSON logs, liveness/readiness health checks, and secure configuration conventions
+- locked npm/NuGet dependencies, formatting/linting, warnings-as-errors builds, GitHub Actions CI, local PostgreSQL Compose, and a non-root API container definition
+- architecture decision records and local development/run documentation
 
-Acceptance:
-- clean checkout builds frontend/backend
-- tests run
-- no business features faked as complete
+Acceptance evidence is recorded in the `chore/project-foundation` implementation commit. No business features or fake operational data were introduced.
 
 ## Phase 1 — Shared design system + bilingual shell
+Status: READY TO START
+
 Deliverables:
 - design tokens
 - typography/spacing/components
@@ -38,6 +31,8 @@ Acceptance:
 - Arabic and English both reviewed
 - components meet UX constitution
 - no generic dashboard template styling
+
+Note: Phase 0 includes only the minimal token/component proof required to validate the foundation. Phase 1 remains responsible for product-ready shared shell patterns and the complete interaction-state system.
 
 ## Phase 2 — Menu + customer ordering vertical slice
 Deliverables end-to-end:

@@ -1,0 +1,131 @@
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar__content">
+      <a class="brand" href="/" [attr.aria-label]="copy().homeLabel">
+        <span class="brand__mark" aria-hidden="true">ب</span>
+        <span>
+          <strong>{{ copy().brandName }}</strong>
+          <small>{{ copy().brandTagline }}</small>
+        </span>
+      </a>
+
+      <div class="language-switcher" role="group" [attr.aria-label]="copy().languageLabel">
+        <button
+          type="button"
+          data-language="ar"
+          [class.language-switcher__option--active]="language.current() === 'ar'"
+          [attr.aria-pressed]="language.current() === 'ar'"
+          (click)="setLanguage('ar')"
+        >
+          العربية
+        </button>
+        <button
+          type="button"
+          data-language="en"
+          [class.language-switcher__option--active]="language.current() === 'en'"
+          [attr.aria-pressed]="language.current() === 'en'"
+          (click)="setLanguage('en')"
+        >
+          English
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="introduction" aria-labelledby="foundation-title">
+      <p class="eyebrow">{{ copy().eyebrow }}</p>
+      <h1 id="foundation-title">{{ copy().heading }}</h1>
+      <p class="introduction__copy">{{ copy().introduction }}</p>
+    </section>
+
+    <section class="showcase" aria-labelledby="components-title">
+      <div class="showcase__heading">
+        <div>
+          <h2 id="components-title">{{ copy().componentTitle }}</h2>
+          <p>{{ copy().componentDescription }}</p>
+        </div>
+        <span class="status-badge">
+          <span class="status-badge__dot" aria-hidden="true"></span>
+          {{ copy().statusValue }}
+        </span>
+      </div>
+
+      <div class="showcase__grid">
+        <form class="form-proof" (submit)="saveExample(); $event.preventDefault()" novalidate>
+          <div class="field-group">
+            <label for="sample-name">{{ copy().fieldLabel }}</label>
+            <input
+              id="sample-name"
+              type="text"
+              maxlength="80"
+              autocomplete="off"
+              [formControl]="sampleName"
+              [placeholder]="copy().fieldPlaceholder"
+              [attr.aria-invalid]="submitted() && sampleName.invalid"
+              [attr.aria-describedby]="
+                submitted() && sampleName.invalid
+                  ? 'sample-name-hint sample-name-error'
+                  : 'sample-name-hint'
+              "
+            />
+            <p id="sample-name-hint" class="field-hint">{{ copy().fieldHint }}</p>
+            @if (submitted() && sampleName.invalid) {
+              <p id="sample-name-error" class="field-error">{{ copy().fieldRequired }}</p>
+            }
+          </div>
+
+          <div class="button-group" role="group" [attr.aria-label]="copy().buttonGroupLabel">
+            <button class="button button--primary" type="submit">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m5 12 4 4L19 6" />
+              </svg>
+              {{ copy().primaryAction }}
+            </button>
+            <button class="button button--secondary" type="button" (click)="resetExample()">
+              {{ copy().secondaryAction }}
+            </button>
+            <button class="button button--danger" type="button" (click)="clearExample()">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" />
+              </svg>
+              {{ copy().dangerAction }}
+            </button>
+            <button class="button button--quiet" type="button" (click)="showHelp()">
+              {{ copy().quietAction }}
+            </button>
+          </div>
+        </form>
+
+        <div class="state-proof">
+          <div class="state-proof__block">
+            <p class="state-proof__label">{{ copy().statusTitle }}</p>
+            <span class="status-badge status-badge--large">
+              <span class="status-badge__dot" aria-hidden="true"></span>
+              {{ copy().statusValue }}
+            </span>
+            <p>{{ copy().statusDescription }}</p>
+          </div>
+
+          <div
+            class="feedback"
+            [class.feedback--error]="feedbackState() === 'error'"
+            [class.feedback--success]="feedbackState() === 'success'"
+            role="status"
+            aria-live="polite"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm0-14v5m0 3h.01" />
+            </svg>
+            <div>
+              <strong>{{ copy().feedbackTitle }}</strong>
+              <p>{{ feedbackMessage() }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p class="foundation-note">{{ copy().foundationNote }}</p>
+  </main>
+</div>
