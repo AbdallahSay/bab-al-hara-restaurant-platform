@@ -1,0 +1,104 @@
+name: Deploy Bab Al Hara to MonsterASP.NET
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout application
+        uses: actions/checkout@v4
+        with:
+          ref: feature/customer-ordering
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build Angular production
+        working-directory: frontend
+        run: npm run build -- --configuration production
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Find and publish ASP.NET Core API
+        shell: pwsh
+        run: |
+          $apiProject = Get-ChildItem -Path backend -Recurse -Filter *.csproj |
+            Where-Object {
+              Select-String -Path $_.FullName -Pattern 'Microsoft.NET.Sdk.Web' -Quiet
+            } |
+            Select-Object -First 1
+
+          if (-not $apiProject) {
+            throw "ASP.NET Core Web project was not found."
+          }
+
+          Write-Host "Publishing $($apiProject.FullName)"
+
+          dotnet restore $apiProject.FullName --locked-mode
+          dotnet publish $apiProject.FullName `
+            --configuration Release `
+            --no-restore `
+            --output "$env:GITHUB_WORKSPACE\publish" `
+            --runtime win-x86 `
+            --self-contained false
+
+      - name: Copy Angular application into ASP.NET Core wwwroot
+        shell: pwsh
+        run: |
+          $indexFile = Get-ChildItem `
+            -Path "$env:GITHUB_WORKSPACE\frontend\dist" `
+            -Recurse `
+            -Filter index.html |
+            Select-Object -First 1
+
+          if (-not $indexFile) {
+            throw "Angular production index.html was not found."
+          }
+
+          $frontendOutput = $indexFile.Directory.FullName
+          $wwwroot = "$env:GITHUB_WORKSPACE\publish\wwwroot"
+
+          New-Item -ItemType Directory -Force -Path $wwwroot | Out-Null
+
+          Write-Host "Angular output: $frontendOutput"
+          Write-Host "Copying to: $wwwroot"
+
+          Copy-Item "$frontendOutput\*" $wwwroot -Recurse -Force
+
+      - name: Verify publish package
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "$env:GITHUB_WORKSPACE\publish\web.config")) {
+            throw "ASP.NET Core web.config is missing."
+          }
+
+          if (-not (Test-Path "$env:GITHUB_WORKSPACE\publish\wwwroot\index.html")) {
+            throw "Angular index.html is missing from published wwwroot."
+          }
+
+          Write-Host "Publish package verified successfully."
+
+      - name: Deploy to MonsterASP.NET
+        uses: rasmusbuchholdt/simply-web-deploy@2.1.0
+        with:
+          website-name: ${{ secrets.WEBSITE_NAME }}
+          server-computer-name: ${{ secrets.SERVER_COMPUTER_NAME }}
+          server-username: ${{ secrets.SERVER_USERNAME }}
+          server-password: ${{ secrets.SERVER_PASSWORD }}
+          source-path: '\publish\'
+          target-delete: true
