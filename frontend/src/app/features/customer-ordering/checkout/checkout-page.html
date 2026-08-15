@@ -1,0 +1,185 @@
+<app-customer-header />
+
+<main class="checkout-shell">
+  <a class="back-link" routerLink="/cart">← {{ copy().cart.title }}</a>
+  <h1>{{ copy().checkout.title }}</h1>
+
+  @if (errorMessage()) {
+    <div class="error-banner" role="alert">{{ errorMessage() }}</div>
+  }
+
+  <form (submit)="submit(); $event.preventDefault()" novalidate>
+    <div class="checkout-layout">
+      <div class="checkout-fields">
+        <section class="checkout-card" aria-labelledby="contact-title">
+          <h2 id="contact-title"><span>1</span>{{ copy().checkout.contactTitle }}</h2>
+          <div class="field-grid">
+            <div class="field-group">
+              <label for="customer-name">{{ copy().checkout.name }}</label>
+              <input
+                id="customer-name"
+                type="text"
+                autocomplete="name"
+                maxlength="120"
+                [formControl]="form.controls.customerName"
+                [placeholder]="copy().checkout.namePlaceholder"
+                [attr.aria-invalid]="submitted() && form.controls.customerName.invalid"
+                [attr.aria-describedby]="
+                  submitted() && form.controls.customerName.invalid ? 'customer-name-error' : null
+                "
+              />
+              @if (submitted() && form.controls.customerName.invalid) {
+                <p id="customer-name-error" class="field-error">{{ copy().checkout.required }}</p>
+              }
+            </div>
+
+            <div class="field-group">
+              <label for="customer-phone">{{ copy().checkout.phone }}</label>
+              <input
+                id="customer-phone"
+                type="tel"
+                inputmode="tel"
+                autocomplete="tel"
+                maxlength="20"
+                dir="ltr"
+                [formControl]="form.controls.customerPhone"
+                [placeholder]="copy().checkout.phonePlaceholder"
+                [attr.aria-invalid]="submitted() && form.controls.customerPhone.invalid"
+                [attr.aria-describedby]="
+                  submitted() && form.controls.customerPhone.invalid
+                    ? 'customer-phone-hint customer-phone-error'
+                    : 'customer-phone-hint'
+                "
+              />
+              <p id="customer-phone-hint" class="field-hint">{{ copy().checkout.phoneHint }}</p>
+              @if (submitted() && form.controls.customerPhone.invalid) {
+                <p id="customer-phone-error" class="field-error">
+                  {{ copy().checkout.invalidPhone }}
+                </p>
+              }
+            </div>
+          </div>
+        </section>
+
+        <section class="checkout-card" aria-labelledby="type-title">
+          <h2 id="type-title"><span>2</span>{{ copy().checkout.orderType }}</h2>
+          <div class="choice-grid">
+            <label class="choice-card" [class.is-selected]="orderType() === 'Takeaway'">
+              <input type="radio" value="Takeaway" [formControl]="form.controls.orderType" />
+              <strong>{{ copy().common.takeaway }}</strong>
+              <small>{{ copy().checkout.takeawayDescription }}</small>
+            </label>
+            <label class="choice-card" [class.is-selected]="orderType() === 'Delivery'">
+              <input type="radio" value="Delivery" [formControl]="form.controls.orderType" />
+              <strong>{{ copy().common.delivery }}</strong>
+              <small>{{ copy().checkout.deliveryDescription }}</small>
+            </label>
+          </div>
+
+          @if (orderType() === 'Delivery') {
+            <div class="delivery-fields">
+              <div class="field-group">
+                <label for="delivery-area">{{ copy().checkout.area }}</label>
+                @if (areaState() === 'error') {
+                  <div class="inline-error" role="alert">
+                    <span>{{ copy().checkout.areasError }}</span>
+                    <button type="button" (click)="loadDeliveryAreas()">
+                      {{ copy().common.retry }}
+                    </button>
+                  </div>
+                } @else {
+                  <select
+                    id="delivery-area"
+                    [formControl]="form.controls.deliveryAreaId"
+                    [attr.aria-invalid]="submitted() && !selectedAreaId()"
+                  >
+                    <option value="">{{ copy().checkout.chooseArea }}</option>
+                    @for (area of deliveryAreas(); track area.id) {
+                      <option [value]="area.id">
+                        {{ areaName(area) }} — {{ money(area.deliveryFee) }}
+                      </option>
+                    }
+                  </select>
+                  @if (submitted() && !selectedAreaId()) {
+                    <p class="field-error">{{ copy().checkout.chooseDeliveryArea }}</p>
+                  }
+                }
+              </div>
+
+              <div class="field-group">
+                <label for="delivery-address">{{ copy().checkout.address }}</label>
+                <textarea
+                  id="delivery-address"
+                  rows="3"
+                  maxlength="500"
+                  autocomplete="street-address"
+                  [formControl]="form.controls.address"
+                  [placeholder]="copy().checkout.addressPlaceholder"
+                  [attr.aria-invalid]="submitted() && !form.controls.address.value.trim()"
+                ></textarea>
+                @if (submitted() && !form.controls.address.value.trim()) {
+                  <p class="field-error">{{ copy().checkout.addressRequired }}</p>
+                }
+              </div>
+            </div>
+          }
+        </section>
+
+        <section class="checkout-card" aria-labelledby="payment-title">
+          <h2 id="payment-title"><span>3</span>{{ copy().checkout.payment }}</h2>
+          <div class="cash-method">
+            <strong>{{ copy().common.cash }}</strong>
+            <p>{{ copy().checkout.cashDescription }}</p>
+          </div>
+          <div class="field-group">
+            <label for="customer-note">{{ copy().checkout.note }}</label>
+            <textarea
+              id="customer-note"
+              rows="3"
+              maxlength="500"
+              [formControl]="form.controls.customerNote"
+              [placeholder]="copy().checkout.notePlaceholder"
+            ></textarea>
+          </div>
+        </section>
+      </div>
+
+      <aside class="checkout-summary" aria-labelledby="summary-title">
+        <h2 id="summary-title">{{ copy().checkout.summary }}</h2>
+        <ul>
+          @for (item of cart.items(); track item.menuItemId) {
+            <li>
+              <span
+                >{{ item.quantity }} ×
+                {{ language.current() === 'ar' ? item.nameAr : item.nameEn }}</span
+              >
+              <strong>{{ money(item.quantity * item.unitPrice) }}</strong>
+            </li>
+          }
+        </ul>
+        <dl>
+          <div>
+            <dt>{{ copy().common.subtotal }}</dt>
+            <dd>{{ money(cart.subtotal()) }}</dd>
+          </div>
+          <div>
+            <dt>{{ copy().common.deliveryFee }}</dt>
+            <dd>{{ money(displayedDeliveryFee()) }}</dd>
+          </div>
+          <div class="checkout-summary__total">
+            <dt>{{ copy().common.total }}</dt>
+            <dd>{{ money(displayedTotal()) }}</dd>
+          </div>
+        </dl>
+        <p class="authority-note">{{ copy().checkout.authoritativeNotice }}</p>
+        <button
+          class="button button--primary button--wide"
+          type="submit"
+          [disabled]="sending() || cart.items().length === 0"
+        >
+          {{ sending() ? copy().checkout.submitting : copy().checkout.submit }}
+        </button>
+      </aside>
+    </div>
+  </form>
+</main>

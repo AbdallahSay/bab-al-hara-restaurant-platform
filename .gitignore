@@ -21,6 +21,8 @@ TestResults/
 !.env.example
 appsettings.*.local.json
 secrets.json
+*.stdout.log
+*.stderr.log
 
 # OS
 .DS_Store

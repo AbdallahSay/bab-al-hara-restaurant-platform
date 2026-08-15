@@ -1,0 +1,90 @@
+<app-customer-header />
+
+<main class="cart-shell">
+  <a class="back-link" routerLink="/">← {{ copy().common.backToMenu }}</a>
+  <div class="cart-heading">
+    <h1>{{ copy().cart.title }}</h1>
+    <span>{{ cart.itemCount() }} {{ copy().cart.itemCount }}</span>
+  </div>
+
+  @if (cart.items().length === 0) {
+    <section class="empty-cart" role="status">
+      <div aria-hidden="true">۰</div>
+      <h2>{{ copy().cart.emptyTitle }}</h2>
+      <p>{{ copy().cart.emptyBody }}</p>
+      <a class="button button--primary" routerLink="/">{{ copy().cart.browseMenu }}</a>
+    </section>
+  } @else {
+    <div class="cart-layout">
+      <section class="cart-lines" [attr.aria-label]="copy().cart.itemsLabel">
+        @for (item of cart.items(); track item.menuItemId) {
+          <article class="cart-line" [class.cart-line--unavailable]="!item.isAvailable">
+            <img [src]="item.imageReference" [alt]="itemName(item)" width="144" height="108" />
+            <div class="cart-line__content">
+              <div class="cart-line__heading">
+                <div>
+                  <h2>{{ itemName(item) }}</h2>
+                  @if (!item.isAvailable) {
+                    <p role="alert">{{ copy().common.unavailable }}</p>
+                  }
+                </div>
+                <strong>{{ money(item.unitPrice * item.quantity) }}</strong>
+              </div>
+              <div class="cart-line__actions">
+                <div class="quantity-control" [attr.aria-label]="copy().common.quantity">
+                  <button
+                    type="button"
+                    [attr.aria-label]="copy().cart.decrease"
+                    (click)="cart.decrease(item.menuItemId)"
+                  >
+                    −
+                  </button>
+                  <span aria-live="polite">{{ item.quantity }}</span>
+                  <button
+                    type="button"
+                    [attr.aria-label]="copy().cart.increase"
+                    [disabled]="item.quantity >= 99 || !item.isAvailable"
+                    (click)="cart.increase(item.menuItemId)"
+                  >
+                    +
+                  </button>
+                </div>
+                <button class="remove-button" type="button" (click)="cart.remove(item.menuItemId)">
+                  {{ copy().common.remove }}
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </section>
+
+      <aside class="cart-summary" aria-labelledby="cart-summary-title">
+        <h2 id="cart-summary-title">{{ copy().checkout.summary }}</h2>
+        <dl>
+          <div>
+            <dt>{{ copy().common.subtotal }}</dt>
+            <dd>{{ money(cart.subtotal()) }}</dd>
+          </div>
+          <div>
+            <dt>{{ copy().common.deliveryFee }}</dt>
+            <dd>{{ copy().cart.deliveryAtCheckout }}</dd>
+          </div>
+          <div class="cart-summary__total">
+            <dt>{{ copy().common.total }}</dt>
+            <dd>{{ money(cart.subtotal()) }}</dd>
+          </div>
+        </dl>
+        <p>{{ copy().cart.totalsNotice }}</p>
+        @if (hasUnavailableItems()) {
+          <span class="button button--primary button--wide is-disabled" aria-disabled="true">
+            {{ copy().cart.checkout }}
+          </span>
+        } @else {
+          <a class="button button--primary button--wide" routerLink="/checkout">
+            {{ copy().cart.checkout }}
+          </a>
+        }
+      </aside>
+    </div>
+  }
+</main>

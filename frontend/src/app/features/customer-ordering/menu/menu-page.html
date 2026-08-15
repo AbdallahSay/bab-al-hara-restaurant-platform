@@ -1,0 +1,100 @@
+<app-customer-header />
+
+<main class="menu-shell">
+  <section class="menu-intro" aria-labelledby="menu-title">
+    <p class="eyebrow">{{ copy().menu.eyebrow }}</p>
+    <h1 id="menu-title">{{ copy().menu.title }}</h1>
+    <p>{{ copy().menu.introduction }}</p>
+  </section>
+
+  @if (state() === 'loading') {
+    <section class="state-panel" role="status" aria-live="polite">
+      <span class="loader" aria-hidden="true"></span>
+      <p>{{ copy().menu.loading }}</p>
+    </section>
+  } @else if (state() === 'error') {
+    <section class="state-panel state-panel--error" role="alert">
+      <h2>{{ copy().menu.errorTitle }}</h2>
+      <p>{{ copy().menu.errorBody }}</p>
+      <button class="button button--primary" type="button" (click)="loadMenu()">
+        {{ copy().common.retry }}
+      </button>
+    </section>
+  } @else {
+    <nav class="category-nav" [attr.aria-label]="copy().menu.categoriesLabel">
+      <button
+        type="button"
+        [class.is-active]="selectedCategoryId() === null"
+        [attr.aria-pressed]="selectedCategoryId() === null"
+        (click)="selectCategory(null)"
+      >
+        {{ copy().menu.allCategories }}
+      </button>
+      @for (category of categories(); track category.id) {
+        <button
+          type="button"
+          [class.is-active]="selectedCategoryId() === category.id"
+          [attr.aria-pressed]="selectedCategoryId() === category.id"
+          (click)="selectCategory(category.id)"
+        >
+          {{ categoryName(category) }}
+        </button>
+      }
+    </nav>
+
+    @if (visibleItems().length === 0) {
+      <section class="state-panel" role="status">
+        <p>{{ copy().menu.empty }}</p>
+      </section>
+    } @else {
+      <section class="menu-grid" [attr.aria-label]="copy().menu.title">
+        @for (item of visibleItems(); track item.id) {
+          <article class="menu-item" [class.menu-item--unavailable]="!item.isAvailable">
+            <div class="menu-item__image-wrap">
+              <img
+                class="menu-item__image"
+                [src]="item.imageReference"
+                [alt]="itemName(item)"
+                width="640"
+                height="480"
+              />
+              @if (!item.isAvailable) {
+                <span class="availability-label">{{ copy().common.unavailable }}</span>
+              }
+            </div>
+            <div class="menu-item__body">
+              <div class="menu-item__heading">
+                <h2>{{ itemName(item) }}</h2>
+                <strong>{{ money(item.price) }}</strong>
+              </div>
+              <p>{{ itemDescription(item) }}</p>
+              <div class="menu-item__footer">
+                <small>
+                  {{ copy().menu.preparation }}: {{ item.preparationMinutes }}
+                  {{ copy().menu.minutes }}
+                </small>
+                <button
+                  class="button button--primary"
+                  type="button"
+                  [disabled]="!item.isAvailable"
+                  (click)="addToCart(item)"
+                >
+                  {{ item.isAvailable ? copy().menu.add : copy().common.unavailable }}
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </section>
+    }
+  }
+
+  <p class="visually-hidden" role="status" aria-live="polite">{{ announcement() }}</p>
+</main>
+
+@if (cart.itemCount() > 0) {
+  <a class="mobile-cart" routerLink="/cart">
+    <span>{{ copy().menu.viewCart }} · {{ cart.itemCount() }}</span>
+    <strong>{{ money(cart.subtotal()) }}</strong>
+  </a>
+}

@@ -1,0 +1,184 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+      - "feature/**"
+      - "fix/**"
+      - "chore/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+
+      - name: Format, lint, test, and build
+        run: npm run check
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Scan for committed secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          secret_pattern='(AKIA|ASIA)[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9_]{30,}|sk-(proj-)?[A-Za-z0-9_-]{20,}|sk_(live|test)_[A-Za-z0-9]{20,}|AIza[0-9A-Za-z_-]{35}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|Password=[^<${;][^;"[:space:]]{7,}'
+          if rg --hidden --glob '!.git/**' --glob '!.env.example' "${secret_pattern}" .; then
+            echo "Potential committed secret detected."
+            exit 1
+          fi
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: backend/**/packages.lock.json
+
+      - name: Restore dependencies
+        run: dotnet restore backend/BabAlHara.sln --locked-mode
+
+      - name: Verify formatting
+        run: dotnet format backend/BabAlHara.sln --no-restore --verify-no-changes
+
+      - name: Build
+        run: dotnet build backend/BabAlHara.sln --configuration Release --no-restore
+
+      - name: Start SQL Server for integration tests
+        shell: bash
+        env:
+          SQLSERVER_IMAGE: mcr.microsoft.com/mssql/server:2025-CU7-ubuntu-24.04@sha256:86cc6144ef39bb0fbed2329e1ad79b13ee82e7b2e4739213a0db0800e668a74a
+        run: |
+          set -euo pipefail
+          database_password="$(openssl rand -hex 24)Aa1!"
+          echo "MSSQL_TEST_PASSWORD=${database_password}" >> "${GITHUB_ENV}"
+          echo "BAB_AL_HARA_TEST_SQLSERVER=Server=localhost,1433;Database=master;User Id=sa;Password=${database_password};Encrypt=True;TrustServerCertificate=True;Connect Timeout=10" >> "${GITHUB_ENV}"
+
+          docker run \
+            --detach \
+            --name bab-al-hara-sqlserver-ci \
+            --env ACCEPT_EULA=Y \
+            --env MSSQL_PID=Developer \
+            --env "MSSQL_SA_PASSWORD=${database_password}" \
+            --publish 1433:1433 \
+            "${SQLSERVER_IMAGE}"
+
+          database_ready=false
+          for _ in {1..60}; do
+            if docker exec bab-al-hara-sqlserver-ci \
+              /opt/mssql-tools18/bin/sqlcmd \
+              -S localhost -U sa -P "${database_password}" -C -Q "SELECT 1" -b >/dev/null 2>&1; then
+              database_ready=true
+              break
+            fi
+            sleep 2
+          done
+
+          if [[ "${database_ready}" != "true" ]]; then
+            docker logs bab-al-hara-sqlserver-ci
+            exit 1
+          fi
+
+      - name: Test
+        run: dotnet test backend/BabAlHara.sln --configuration Release --no-build --no-restore
+
+      - name: Audit dependencies
+        run: dotnet list backend/BabAlHara.sln package --vulnerable --include-transitive
+
+      - name: Verify SQL Server migration and health semantics
+        shell: bash
+        env:
+          SQLSERVER_IMAGE: mcr.microsoft.com/mssql/server:2025-CU7-ubuntu-24.04@sha256:86cc6144ef39bb0fbed2329e1ad79b13ee82e7b2e4739213a0db0800e668a74a
+        run: |
+          set -euo pipefail
+
+          database_password="${MSSQL_TEST_PASSWORD}"
+          database_container="bab-al-hara-sqlserver-ci"
+          api_log="${RUNNER_TEMP}/bab-al-hara-api.log"
+
+          cleanup() {
+            if [[ -n "${api_pid:-}" ]]; then
+              kill "${api_pid}" 2>/dev/null || true
+            fi
+            docker rm --force "${database_container}" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          export ASPNETCORE_ENVIRONMENT=Development
+          export ConnectionStrings__Database="Server=localhost,1433;Database=bab_al_hara_ci;User Id=sa;Password=${database_password};Encrypt=True;TrustServerCertificate=True;Connect Timeout=5;Command Timeout=30"
+
+          dotnet tool restore
+          dotnet ef migrations has-pending-model-changes \
+            --project backend/src/BabAlHara.Infrastructure \
+            --startup-project backend/src/BabAlHara.Api \
+            --configuration Release \
+            --no-build
+          dotnet ef migrations script --idempotent \
+            --project backend/src/BabAlHara.Infrastructure \
+            --startup-project backend/src/BabAlHara.Api \
+            --configuration Release \
+            --no-build \
+            --output "${RUNNER_TEMP}/bab-al-hara.sql"
+          dotnet ef database update \
+            --project backend/src/BabAlHara.Infrastructure \
+            --startup-project backend/src/BabAlHara.Api \
+            --configuration Release \
+            --no-build
+
+          dotnet run --project backend/src/BabAlHara.Api \
+            --configuration Release --no-build --no-restore \
+            -- --urls http://127.0.0.1:5181 >"${api_log}" 2>&1 &
+          api_pid=$!
+
+          for _ in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:5181/health/live >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl --fail --silent --show-error http://127.0.0.1:5181/health/live
+          curl --fail --silent --show-error http://127.0.0.1:5181/health/ready
+
+          docker stop --time 30 "${database_container}" >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:5181/health/live
+
+          unavailable_status="$(curl --silent --output "${RUNNER_TEMP}/readiness-unavailable.json" --write-out '%{http_code}' --max-time 15 http://127.0.0.1:5181/health/ready || true)"
+          if [[ "${unavailable_status}" != "503" ]]; then
+            cat "${api_log}"
+            cat "${RUNNER_TEMP}/readiness-unavailable.json" || true
+            exit 1
+          fi

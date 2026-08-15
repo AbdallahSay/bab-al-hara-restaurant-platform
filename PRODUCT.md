@@ -5,6 +5,20 @@ Build a bilingual Arabic/English restaurant ordering and operations platform tha
 
 The system must prioritize operational clarity, speed, and low training requirements.
 
+## Current production slice
+
+Implemented now:
+
+- bilingual category menu with availability and local product imagery
+- locally persistent guest cart
+- Takeaway or Delivery checkout with active SQL Server delivery areas
+- Cash only; no online-payment control is displayed
+- server-authoritative prices, fees, availability, subtotal, and total
+- historical order-item snapshots and non-sequential public order code
+- protected kitchen current-order queue with post-commit SignalR delivery and API recovery
+
+Order transitions, live customer tracking, WhatsApp, Paymob, cashier, driver, management, employee administration, and reporting remain later phases. The canonical statuses exist as domain rules, but this slice creates only `Pending` orders and does not expose speculative workflow controls.
+
 ## Primary user groups
 1. Guest customer
 2. Registered customer

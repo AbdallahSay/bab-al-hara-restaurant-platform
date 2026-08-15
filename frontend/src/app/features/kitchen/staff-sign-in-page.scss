@@ -1,0 +1,136 @@
+:host {
+  display: block;
+}
+
+.sign-in-shell {
+  display: grid;
+  place-items: center;
+  min-block-size: 100vh;
+  padding: var(--space-4);
+  background: var(--color-ink);
+}
+
+.sign-in-card {
+  inline-size: min(100%, 30rem);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.sign-in-topbar,
+.brand,
+.language-switcher {
+  display: flex;
+  align-items: center;
+}
+
+.sign-in-topbar {
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.brand {
+  gap: var(--space-2);
+  color: var(--color-ink);
+  text-decoration: none;
+
+  span {
+    display: grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 800;
+  }
+}
+
+.language-switcher {
+  padding: 0.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: 2rem;
+
+  button {
+    min-block-size: 2.25rem;
+    padding-inline: var(--space-2);
+    border: 0;
+    border-radius: 2rem;
+    background: transparent;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+  }
+
+  .is-active {
+    background: var(--color-primary);
+    color: white;
+  }
+}
+
+.sign-in-heading {
+  margin-block: var(--space-6) var(--space-4);
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  p {
+    margin: var(--space-2) 0 0;
+    color: var(--color-ink-muted);
+  }
+}
+
+form,
+.field-group {
+  display: grid;
+}
+
+form {
+  gap: var(--space-4);
+}
+
+.field-group {
+  gap: var(--space-2);
+
+  label {
+    font-weight: 750;
+  }
+
+  input {
+    min-block-size: 3rem;
+    padding-inline: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+
+  input[aria-invalid='true'] {
+    border-color: var(--color-danger);
+  }
+}
+
+.field-error,
+.sign-in-error {
+  color: var(--color-danger);
+}
+
+.field-error {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.sign-in-error {
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-soft);
+  font-weight: 700;
+}
+
+.customer-link {
+  display: block;
+  margin-block-start: var(--space-5);
+  color: var(--color-primary);
+  font-weight: 700;
+  text-align: center;
+}

@@ -1,0 +1,66 @@
+<app-customer-header />
+
+<main class="success-shell">
+  @if (receipt(); as confirmed) {
+    <section class="success-card" aria-labelledby="success-title">
+      <div class="success-mark" aria-hidden="true">✓</div>
+      <p class="eyebrow">{{ copy().success.eyebrow }}</p>
+      <h1 id="success-title">{{ copy().success.title }}</h1>
+      <p>{{ copy().success.message }}</p>
+
+      <div class="order-code">
+        <span>{{ copy().success.orderCode }}</span>
+        <strong dir="ltr">{{ confirmed.order.publicCode }}</strong>
+      </div>
+
+      @if (confirmed.displayedTotalChanged) {
+        <p class="price-notice" role="status">{{ copy().success.priceUpdated }}</p>
+      }
+
+      <dl>
+        <div>
+          <dt>{{ copy().checkout.orderType }}</dt>
+          <dd>
+            {{
+              confirmed.order.orderType === 'Takeaway'
+                ? copy().common.takeaway
+                : copy().common.delivery
+            }}
+          </dd>
+        </div>
+        @if (confirmed.order.orderType === 'Delivery') {
+          <div>
+            <dt>{{ copy().checkout.area }}</dt>
+            <dd>
+              {{ areaName(confirmed.order.deliveryAreaNameAr, confirmed.order.deliveryAreaNameEn) }}
+            </dd>
+          </div>
+        }
+        <div>
+          <dt>{{ copy().checkout.payment }}</dt>
+          <dd>{{ copy().common.cash }}</dd>
+        </div>
+        <div class="total-row">
+          <dt>{{ copy().common.total }}</dt>
+          <dd>{{ money(confirmed.order.total) }}</dd>
+        </div>
+      </dl>
+
+      <p class="fulfilment-note">
+        {{
+          confirmed.order.orderType === 'Takeaway'
+            ? copy().success.pickupMessage
+            : copy().success.deliveryMessage
+        }}
+      </p>
+      <a class="button button--primary button--wide" routerLink="/">
+        {{ copy().success.newOrder }}
+      </a>
+    </section>
+  } @else {
+    <section class="success-card" role="status">
+      <h1>{{ copy().success.missing }}</h1>
+      <a class="button button--primary" routerLink="/">{{ copy().common.backToMenu }}</a>
+    </section>
+  }
+</main>

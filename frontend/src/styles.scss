@@ -1,0 +1,131 @@
+:root {
+  color-scheme: light;
+  --font-family: 'Noto Sans Arabic Variable', 'Segoe UI', Tahoma, Arial, sans-serif;
+  --color-canvas: #f5f0ea;
+  --color-surface: #fffdf9;
+  --color-surface-subtle: #f9f5f0;
+  --color-ink: #241b1d;
+  --color-ink-muted: #665a5d;
+  --color-border: #d9cdcc;
+  --color-primary: #7a2838;
+  --color-primary-hover: #641e2c;
+  --color-primary-soft: #f4e8ea;
+  --color-danger: #a12c2a;
+  --color-danger-hover: #84201f;
+  --color-danger-soft: #f9e9e7;
+  --color-success: #276442;
+  --color-success-soft: #e9f4ed;
+  --color-warning: #7a5517;
+  --color-warning-soft: #fbf1d9;
+  --color-focus: #c55b6d;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --shadow-subtle: 0 0.5rem 1.5rem rgb(54 31 36 / 8%);
+  --content-width: 70rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-block-size: 100%;
+  background: var(--color-canvas);
+  font-family: var(--font-family);
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-block-size: 100%;
+  margin: 0;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+input,
+select,
+textarea,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 2.75rem;
+  padding: 0.65rem var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-weight: 750;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button--primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.button--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.button--wide {
+  inline-size: 100%;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  inline-size: 1px !important;
+  block-size: 1px !important;
+  overflow: hidden !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  white-space: nowrap !important;
+}
+
+:focus-visible {
+  outline: 0.1875rem solid var(--color-focus);
+  outline-offset: 0.1875rem;
+}
+
+::selection {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

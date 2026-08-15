@@ -1,0 +1,414 @@
+using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
+using BabAlHara.Api.Features.Catalog;
+using BabAlHara.Api.Features.Kitchen;
+using BabAlHara.Api.Features.Ordering;
+using BabAlHara.Api.Platform.Errors;
+using BabAlHara.Api.Platform.Health;
+using BabAlHara.Api.Platform.Observability;
+using BabAlHara.Api.Platform.Security;
+using BabAlHara.Application.Kitchen;
+using BabAlHara.Infrastructure;
+using BabAlHara.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+
+var builder = WebApplication.CreateBuilder(args);
+
+//
+// Logging
+//
+
+builder.Logging.ClearProviders();
+builder.Logging.AddJsonConsole(options =>
+{
+    options.IncludeScopes = true;
+    options.TimestampFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
+    options.UseUtcTimestamp = true;
+});
+
+//
+// Problem Details / Global Errors
+//
+
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Extensions["traceId"] =
+            context.HttpContext.TraceIdentifier;
+    };
+});
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+//
+// OpenAPI
+//
+
+builder.Services.AddOpenApi();
+
+//
+// Infrastructure / EF Core / Identity / SQL Server
+//
+
+builder.Services.AddInfrastructure(builder.Configuration);
+
+//
+// JSON
+//
+
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.Converters.Add(
+        new JsonStringEnumConverter());
+});
+
+//
+// Antiforgery
+//
+
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-XSRF-TOKEN";
+});
+
+//
+// SignalR
+//
+
+builder.Services
+    .AddSignalR()
+    .AddJsonProtocol(options =>
+    {
+        options.PayloadSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
+    });
+
+builder.Services.AddSingleton<INewOrderNotifier, SignalRNewOrderNotifier>();
+
+//
+// Authorization
+//
+
+builder.Services
+    .AddAuthorizationBuilder()
+    .AddPolicy(
+        AuthorizationPolicies.Kitchen,
+        policy =>
+            policy
+                .RequireAuthenticatedUser()
+                .RequireRole(DevelopmentDataSeeder.KitchenRole));
+
+//
+// Staff Authentication Cookie
+//
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = builder.Environment.IsDevelopment()
+        ? "BabAlHara.Staff"
+        : "__Host-BabAlHara-Staff";
+
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
+
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.SlidingExpiration = true;
+
+    options.Events = new CookieAuthenticationEvents
+    {
+        OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode =
+                StatusCodes.Status401Unauthorized;
+
+            return Task.CompletedTask;
+        },
+
+        OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode =
+                StatusCodes.Status403Forbidden;
+
+            return Task.CompletedTask;
+        },
+    };
+});
+
+//
+// Rate Limiting
+//
+
+builder.Services.AddRateLimiter(options =>
+{
+    var guestOrderPermitLimit =
+        builder.Configuration.GetValue(
+            "RateLimiting:GuestOrderPermitLimit",
+            12);
+
+    var staffSignInPermitLimit =
+        builder.Configuration.GetValue(
+            "RateLimiting:StaffSignInPermitLimit",
+            5);
+
+    options.RejectionStatusCode =
+        StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy(
+        "guest-order",
+        context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = guestOrderPermitLimit,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                }));
+
+    options.AddPolicy(
+        "staff-sign-in",
+        context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = staffSignInPermitLimit,
+                    Window = TimeSpan.FromMinutes(5),
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                }));
+});
+
+//
+// Health Checks
+//
+
+builder.Services
+    .AddHealthChecks()
+    .AddDbContextCheck<AppDbContext>(
+        name: "sql-server",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["ready"],
+        customTestQuery: async (
+            dbContext,
+            cancellationToken) =>
+        {
+            using var timeout =
+                CancellationTokenSource.CreateLinkedTokenSource(
+                    cancellationToken);
+
+            timeout.CancelAfter(TimeSpan.FromSeconds(5));
+
+            return await dbContext.Database.CanConnectAsync(
+                timeout.Token);
+        });
+
+//
+// Build Application
+//
+
+var app = builder.Build();
+
+//
+// Development Seed Command
+//
+
+if (args.Contains("--seed-data", StringComparer.Ordinal))
+{
+    if (!app.Environment.IsDevelopment())
+    {
+        throw new InvalidOperationException(
+            "--seed-data can only be used in Development.");
+    }
+
+    var kitchenPassword =
+        app.Configuration["DevelopmentSeed:KitchenPassword"];
+
+    if (string.IsNullOrWhiteSpace(kitchenPassword))
+    {
+        throw new InvalidOperationException(
+            "DevelopmentSeed:KitchenPassword must be supplied " +
+            "through an environment variable or user secret.");
+    }
+
+    await using var scope =
+        app.Services.CreateAsyncScope();
+
+    var seeder =
+        scope.ServiceProvider
+            .GetRequiredService<DevelopmentDataSeeder>();
+
+    await seeder.SeedAsync(
+        app.Environment.EnvironmentName,
+        kitchenPassword,
+        CancellationToken.None);
+
+    return;
+}
+
+//
+// Request Pipeline
+//
+
+app.UseMiddleware<CorrelationIdMiddleware>();
+
+app.UseExceptionHandler();
+
+//
+// Production Security
+//
+
+if (app.Environment.IsProduction())
+{
+    app.UseHsts();
+    app.UseHttpsRedirection();
+}
+
+//
+// Angular Static Files
+//
+// GitHub Actions copies Angular production output
+// into the ASP.NET Core publish/wwwroot directory.
+//
+
+app.UseStaticFiles();
+
+//
+// Rate Limiting / Authentication / Authorization
+//
+
+app.UseRateLimiter();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+app.UseAntiforgery();
+
+//
+// Development OpenAPI
+//
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
+//
+// Health Endpoints
+//
+
+app.MapHealthChecks(
+        "/health/live",
+        new HealthCheckOptions
+        {
+            Predicate = _ => false,
+            ResponseWriter =
+                HealthResponseWriter.WriteAsync,
+        })
+    .WithName("Liveness")
+    .WithTags("Health");
+
+app.MapHealthChecks(
+        "/health/ready",
+        new HealthCheckOptions
+        {
+            Predicate = registration =>
+                registration.Tags.Contains("ready"),
+            ResponseWriter =
+                HealthResponseWriter.WriteAsync,
+        })
+    .WithName("Readiness")
+    .WithTags("Health");
+
+//
+// API Endpoints
+//
+
+app.MapSecurityEndpoints();
+
+app.MapCatalogEndpoints();
+
+app.MapOrderEndpoints();
+
+app.MapKitchenEndpoints();
+
+//
+// SignalR
+//
+
+app.MapHub<KitchenHub>("/hubs/kitchen");
+
+//
+// Angular SPA Fallback
+//
+// Handles:
+// /
+// /cart
+// /checkout
+// /order-confirmed
+// /kitchen
+// /kitchen/sign-in
+//
+// But API, SignalR and health routes must remain real
+// backend routes and return 404 when no endpoint exists.
+//
+
+app.MapFallback(async context =>
+{
+    var path = context.Request.Path;
+
+    if (path.StartsWithSegments("/api")
+        || path.StartsWithSegments("/hubs")
+        || path.StartsWithSegments("/health"))
+    {
+        context.Response.StatusCode =
+            StatusCodes.Status404NotFound;
+
+        return;
+    }
+
+    var webRoot =
+        app.Environment.WebRootPath
+        ?? Path.Combine(
+            app.Environment.ContentRootPath,
+            "wwwroot");
+
+    var indexPath =
+        Path.Combine(
+            webRoot,
+            "index.html");
+
+    if (!File.Exists(indexPath))
+    {
+        context.Response.StatusCode =
+            StatusCodes.Status404NotFound;
+
+        return;
+    }
+
+    context.Response.ContentType =
+        "text/html; charset=utf-8";
+
+    await context.Response.SendFileAsync(indexPath);
+});
+
+//
+// Start
+//
+
+app.Run();
+
+public partial class Program;
