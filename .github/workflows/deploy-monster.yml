@@ -6,20 +6,35 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: monster-production
+  cancel-in-progress: false
+
 jobs:
   deploy:
+    name: Build, migrate and deploy
     runs-on: windows-latest
 
     steps:
+      # ============================================================
+      # SOURCE
+      # ============================================================
+
       - name: Checkout application
         uses: actions/checkout@v4
         with:
           ref: feature/customer-ordering
 
+      # ============================================================
+      # FRONTEND - ANGULAR
+      # ============================================================
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: "24.19.0"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -29,33 +44,89 @@ jobs:
         working-directory: frontend
         run: npm run build -- --configuration production
 
+      # ============================================================
+      # BACKEND - .NET
+      # ============================================================
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
 
-      - name: Find and publish ASP.NET Core API
+      - name: Restore backend dependencies
+        run: >
+          dotnet restore
+          backend/src/BabAlHara.Api/BabAlHara.Api.csproj
+          --locked-mode
+
+      - name: Build backend
+        run: >
+          dotnet build
+          backend/src/BabAlHara.Api/BabAlHara.Api.csproj
+          --configuration Release
+          --no-restore
+
+      # ============================================================
+      # EF CORE / SQL SERVER
+      # ============================================================
+
+      - name: Install EF Core CLI
         shell: pwsh
         run: |
-          $apiProject = Get-ChildItem -Path backend -Recurse -Filter *.csproj |
-            Where-Object {
-              Select-String -Path $_.FullName -Pattern 'Microsoft.NET.Sdk.Web' -Quiet
-            } |
-            Select-Object -First 1
+          dotnet tool install --global dotnet-ef --version 10.0.11
 
-          if (-not $apiProject) {
-            throw "ASP.NET Core Web project was not found."
+      - name: Apply EF Core migrations to Monster SQL Server
+        shell: pwsh
+        env:
+          DB_CONNECTION: ${{ secrets.DATABASE_CONNECTION_STRING }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:DB_CONNECTION)) {
+            throw "DATABASE_CONNECTION_STRING secret is missing."
           }
 
-          Write-Host "Publishing $($apiProject.FullName)"
+          Write-Host "Applying EF Core migrations to Monster SQL Server..."
 
-          dotnet restore $apiProject.FullName --locked-mode
-          dotnet publish $apiProject.FullName `
+          dotnet ef database update `
+            --project backend/src/BabAlHara.Infrastructure/BabAlHara.Infrastructure.csproj `
+            --startup-project backend/src/BabAlHara.Api/BabAlHara.Api.csproj `
             --configuration Release `
-            --no-restore `
-            --output "$env:GITHUB_WORKSPACE\publish" `
+            --no-build `
+            --connection "$env:DB_CONNECTION"
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "EF Core database migration failed."
+          }
+
+          Write-Host "Database migrations completed successfully."
+
+      # ============================================================
+      # PUBLISH ASP.NET CORE
+      # ============================================================
+
+      - name: Publish ASP.NET Core application
+        shell: pwsh
+        run: |
+          $publishPath = "$env:GITHUB_WORKSPACE\publish"
+
+          if (Test-Path $publishPath) {
+            Remove-Item $publishPath -Recurse -Force
+          }
+
+          dotnet publish `
+            backend/src/BabAlHara.Api/BabAlHara.Api.csproj `
+            --configuration Release `
+            --output "$publishPath" `
             --runtime win-x86 `
-            --self-contained false
+            --self-contained false `
+            -p:RestoreLockedMode=true
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "ASP.NET Core publish failed."
+          }
+
+      # ============================================================
+      # COPY ANGULAR INTO ASP.NET CORE WWWROOT
+      # ============================================================
 
       - name: Copy Angular application into ASP.NET Core wwwroot
         shell: pwsh
@@ -64,6 +135,9 @@ jobs:
             -Path "$env:GITHUB_WORKSPACE\frontend\dist" `
             -Recurse `
             -Filter index.html |
+            Where-Object {
+              $_.FullName -notmatch '\\server\\'
+            } |
             Select-Object -First 1
 
           if (-not $indexFile) {
@@ -73,25 +147,59 @@ jobs:
           $frontendOutput = $indexFile.Directory.FullName
           $wwwroot = "$env:GITHUB_WORKSPACE\publish\wwwroot"
 
-          New-Item -ItemType Directory -Force -Path $wwwroot | Out-Null
+          if (Test-Path $wwwroot) {
+            Remove-Item "$wwwroot\*" -Recurse -Force -ErrorAction SilentlyContinue
+          }
+          else {
+            New-Item -ItemType Directory -Force -Path $wwwroot | Out-Null
+          }
 
-          Write-Host "Angular output: $frontendOutput"
-          Write-Host "Copying to: $wwwroot"
+          Write-Host "Angular output directory:"
+          Write-Host $frontendOutput
 
-          Copy-Item "$frontendOutput\*" $wwwroot -Recurse -Force
+          Write-Host "Copying Angular production files to:"
+          Write-Host $wwwroot
 
-      - name: Verify publish package
+          Copy-Item `
+            "$frontendOutput\*" `
+            $wwwroot `
+            -Recurse `
+            -Force
+
+      # ============================================================
+      # VERIFY PACKAGE
+      # ============================================================
+
+      - name: Verify deployment package
         shell: pwsh
         run: |
-          if (-not (Test-Path "$env:GITHUB_WORKSPACE\publish\web.config")) {
+          $publishPath = "$env:GITHUB_WORKSPACE\publish"
+
+          if (-not (Test-Path "$publishPath\web.config")) {
             throw "ASP.NET Core web.config is missing."
           }
 
-          if (-not (Test-Path "$env:GITHUB_WORKSPACE\publish\wwwroot\index.html")) {
-            throw "Angular index.html is missing from published wwwroot."
+          if (-not (Test-Path "$publishPath\wwwroot\index.html")) {
+            throw "Angular index.html is missing from wwwroot."
           }
 
-          Write-Host "Publish package verified successfully."
+          $dll = Get-ChildItem `
+            -Path $publishPath `
+            -Filter "BabAlHara.Api.dll" `
+            -Recurse |
+            Select-Object -First 1
+
+          if (-not $dll) {
+            throw "BabAlHara.Api.dll was not found."
+          }
+
+          Write-Host "Deployment package verified successfully."
+          Write-Host "API DLL: $($dll.FullName)"
+          Write-Host "Angular index: $publishPath\wwwroot\index.html"
+
+      # ============================================================
+      # DEPLOY TO MONSTERASP.NET
+      # ============================================================
 
       - name: Deploy to MonsterASP.NET
         uses: rasmusbuchholdt/simply-web-deploy@2.1.0
@@ -102,3 +210,17 @@ jobs:
           server-password: ${{ secrets.SERVER_PASSWORD }}
           source-path: '\publish\'
           target-delete: true
+
+      # ============================================================
+      # COMPLETE
+      # ============================================================
+
+      - name: Deployment completed
+        shell: pwsh
+        run: |
+          Write-Host "============================================"
+          Write-Host "Bab Al Hara deployment completed."
+          Write-Host "Website: bab-al-hara.runasp.net"
+          Write-Host "Branch deployed: feature/customer-ordering"
+          Write-Host "SQL Server migrations: applied"
+          Write-Host "============================================"
