@@ -54,17 +54,27 @@ jobs:
           dotnet-version: "10.0.x"
 
       - name: Restore backend dependencies
-        run: >
-          dotnet restore
-          backend/src/BabAlHara.Api/BabAlHara.Api.csproj
-          --locked-mode
+        shell: pwsh
+        run: |
+          dotnet restore `
+            backend/src/BabAlHara.Api/BabAlHara.Api.csproj `
+            --locked-mode
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Backend locked restore failed."
+          }
 
       - name: Build backend
-        run: >
-          dotnet build
-          backend/src/BabAlHara.Api/BabAlHara.Api.csproj
-          --configuration Release
-          --no-restore
+        shell: pwsh
+        run: |
+          dotnet build `
+            backend/src/BabAlHara.Api/BabAlHara.Api.csproj `
+            --configuration Release `
+            --no-restore
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Backend Release build failed."
+          }
 
       # ============================================================
       # EF CORE / SQL SERVER
@@ -115,6 +125,26 @@ jobs:
           Write-Host "Database migrations completed successfully."
 
       # ============================================================
+      # RESTORE FOR MONSTER RUNTIME
+      # ============================================================
+
+      - name: Restore backend for Monster win-x86 runtime
+        shell: pwsh
+        run: |
+          Write-Host "Restoring backend for win-x86 publishing..."
+
+          dotnet restore `
+            backend/src/BabAlHara.Api/BabAlHara.Api.csproj `
+            --runtime win-x86 `
+            --force-evaluate
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Runtime-specific restore for win-x86 failed."
+          }
+
+          Write-Host "win-x86 restore completed successfully."
+
+      # ============================================================
       # PUBLISH ASP.NET CORE
       # ============================================================
 
@@ -124,8 +154,13 @@ jobs:
           $publishPath = "$env:GITHUB_WORKSPACE\publish"
 
           if (Test-Path $publishPath) {
-            Remove-Item $publishPath -Recurse -Force
+            Remove-Item `
+              $publishPath `
+              -Recurse `
+              -Force
           }
+
+          Write-Host "Publishing ASP.NET Core application for win-x86..."
 
           dotnet publish `
             backend/src/BabAlHara.Api/BabAlHara.Api.csproj `
@@ -133,7 +168,7 @@ jobs:
             --output "$publishPath" `
             --runtime win-x86 `
             --self-contained false `
-            -p:RestoreLockedMode=true
+            --no-restore
 
           if ($LASTEXITCODE -ne 0) {
             throw "ASP.NET Core publish failed."
@@ -165,7 +200,8 @@ jobs:
           $wwwroot = "$env:GITHUB_WORKSPACE\publish\wwwroot"
 
           if (Test-Path $wwwroot) {
-            Remove-Item "$wwwroot\*" `
+            Remove-Item `
+              "$wwwroot\*" `
               -Recurse `
               -Force `
               -ErrorAction SilentlyContinue
@@ -219,9 +255,13 @@ jobs:
             throw "BabAlHara.Api.dll was not found."
           }
 
-          Write-Host "Deployment package verified successfully."
-          Write-Host "API DLL: $($dll.FullName)"
-          Write-Host "Angular index: $publishPath\wwwroot\index.html"
+          Write-Host "============================================"
+          Write-Host "Deployment package verified."
+          Write-Host "API DLL:"
+          Write-Host $dll.FullName
+          Write-Host "Angular index:"
+          Write-Host "$publishPath\wwwroot\index.html"
+          Write-Host "============================================"
 
       # ============================================================
       # DEPLOY TO MONSTERASP.NET
@@ -246,9 +286,15 @@ jobs:
         run: |
           Write-Host "============================================"
           Write-Host "Bab Al Hara deployment completed."
-          Write-Host "Website: https://bab-al-hara.runasp.net"
-          Write-Host "Branch deployed: feature/customer-ordering"
+          Write-Host ""
+          Write-Host "Website:"
+          Write-Host "https://bab-al-hara.runasp.net"
+          Write-Host ""
+          Write-Host "Branch deployed:"
+          Write-Host "feature/customer-ordering"
+          Write-Host ""
           Write-Host "SQL Server migrations: applied"
           Write-Host "Angular: deployed"
           Write-Host "ASP.NET Core: deployed"
+          Write-Host "Runtime: win-x86"
           Write-Host "============================================"
