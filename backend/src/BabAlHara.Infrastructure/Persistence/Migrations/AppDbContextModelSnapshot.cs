@@ -368,6 +368,17 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTimeOffset?>("DriverAssignedAtUtc")
+                        .HasPrecision(7)
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("DriverId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DriverName")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
                     b.Property<string>("OrderType")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -416,6 +427,8 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("PublicCode")
                         .IsUnique();
+
+                    b.HasIndex("DriverId", "Status");
 
                     b.HasIndex("Status", "CreatedAt")
                         .IsDescending(false, true);

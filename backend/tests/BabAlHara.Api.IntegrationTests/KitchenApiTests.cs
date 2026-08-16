@@ -431,7 +431,6 @@ public sealed class KitchenApiTests(OrderingApiFactory factory) : IClassFixture<
             order.TransitionTo(OrderStatus.Confirmed);
             order.TransitionTo(OrderStatus.Preparing);
             order.TransitionTo(OrderStatus.Ready);
-            order.TransitionTo(OrderStatus.OnTheWay);
             order.TransitionTo(OrderStatus.Delivered);
         }
 
