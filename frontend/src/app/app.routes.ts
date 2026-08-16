@@ -43,5 +43,19 @@ export const routes: Routes = [
       import('./features/kitchen/kitchen-page').then((component) => component.KitchenPage),
     title: 'Kitchen | Bab Al Hara',
   },
+  {
+    path: 'cashier/sign-in',
+    loadComponent: () =>
+      import('./features/cashier/cashier-sign-in-page').then(
+        (m) => m.CashierSignInPage,
+      ),
+    title: 'Cashier sign in | Bab Al Hara',
+  },
+  {
+    path: 'cashier',
+    loadComponent: () =>
+      import('./features/cashier/cashier-page').then((m) => m.CashierPage),
+    title: 'Cashier | Bab Al Hara',
+  },
   { path: '**', redirectTo: '' },
 ];

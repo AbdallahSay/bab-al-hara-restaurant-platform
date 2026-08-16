@@ -1,7 +1,9 @@
+using BabAlHara.Application.Cashier;
 using BabAlHara.Application.Catalog;
 using BabAlHara.Application.Delivery;
 using BabAlHara.Application.Kitchen;
 using BabAlHara.Application.Ordering;
+using BabAlHara.Infrastructure.Cashier;
 using BabAlHara.Infrastructure.Catalog;
 using BabAlHara.Infrastructure.Delivery;
 using BabAlHara.Infrastructure.Identity;
@@ -66,6 +68,7 @@ public static class DependencyInjection
         services.AddScoped<IOrderApplicationService, OrderApplicationService>();
         services.AddScoped<IKitchenOrderQueryService, KitchenOrderQueryService>();
         services.AddScoped<IKitchenOrderCommandService, KitchenOrderCommandService>();
+        services.AddScoped<ICashierOrderService, CashierApplicationService>();
         services.AddScoped<DevelopmentDataSeeder>();
 
         return services;

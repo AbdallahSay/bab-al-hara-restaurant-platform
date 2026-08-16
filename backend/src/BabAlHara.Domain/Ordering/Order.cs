@@ -165,6 +165,41 @@ public sealed class Order
     public void TransitionTo(OrderStatus nextStatus) =>
         TransitionStatus(nextStatus, null, null, null, DateTimeOffset.UtcNow);
 
+    public OrderStatusHistory CompleteCashTakeawayHandoff(
+        string? actorId,
+        string? actorName,
+        string? actorRole,
+        DateTimeOffset changedAtUtc,
+        string? notes = null)
+    {
+        if (Status != OrderStatus.Ready)
+            throw new InvalidOperationException($"Cannot complete cashier handoff from status {Status}.");
+        if (OrderType != OrderType.Takeaway)
+            throw new InvalidOperationException("Cashier cash handoff is only valid for Takeaway orders.");
+        if (PaymentMethod != PaymentMethod.Cash)
+            throw new InvalidOperationException("Cashier cash handoff is only valid for Cash payment orders.");
+        if (PaymentStatus == PaymentStatus.Paid)
+            throw new InvalidOperationException("Order payment is already marked as paid.");
+
+        var previousStatus = Status;
+        PaymentStatus = PaymentStatus.Paid;
+        Status = OrderStatus.Delivered;
+
+        var history = new OrderStatusHistory(
+            Guid.NewGuid(),
+            Id,
+            previousStatus,
+            OrderStatus.Delivered,
+            actorId,
+            actorName,
+            actorRole,
+            changedAtUtc,
+            notes);
+
+        statusHistory.Add(history);
+        return history;
+    }
+
     private static string RequireText(string value, string parameterName) =>
         string.IsNullOrWhiteSpace(value)
             ? throw new ArgumentException("A non-empty value is required.", parameterName)
