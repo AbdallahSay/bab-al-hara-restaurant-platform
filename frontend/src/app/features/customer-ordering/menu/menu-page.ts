@@ -15,6 +15,7 @@ import { formatMoney, localizedText } from '../../../core/i18n/formatters';
 import { LanguageService } from '../../../core/i18n/language.service';
 import { CustomerHeader } from '../../../shared/customer-header/customer-header';
 import { CartService } from '../cart/cart.service';
+import { CartToastService } from '../cart/cart-toast.service';
 import { CustomerApiService } from '../customer-api.service';
 import { Category, MenuItem } from '../order.models';
 
@@ -34,7 +35,9 @@ export class MenuPage implements OnInit {
   protected readonly language = inject(LanguageService);
   protected readonly copy = this.language.copy;
   protected readonly cart = inject(CartService);
+  private readonly cartToast = inject(CartToastService);
   protected readonly state = signal<MenuState>('loading');
+  protected readonly addedItemIds = signal<Set<string>>(new Set());
   protected readonly categories = signal<readonly Category[]>([]);
   protected readonly items = signal<readonly MenuItem[]>([]);
   protected readonly selectedCategoryId = signal<string | null>(null);
@@ -70,9 +73,42 @@ export class MenuPage implements OnInit {
   }
 
   protected addToCart(item: MenuItem): void {
-    if (this.cart.add(item)) {
+    const inFlight = this.addedItemIds();
+    if (inFlight.has(item.id)) {
+      return;
+    }
+
+    const result = this.cart.add(item);
+    if (result) {
+      // Debounce logic / visual state
+      const newSet = new Set(inFlight);
+      newSet.add(item.id);
+      this.addedItemIds.set(newSet);
+
+      setTimeout(() => {
+        const currentSet = new Set(this.addedItemIds());
+        currentSet.delete(item.id);
+        this.addedItemIds.set(currentSet);
+      }, 2000);
+
+      // Toast feedback
+      this.cartToast.showAddedToast(
+        this.itemName(item),
+        result === 'updated',
+        this.language.current(),
+      );
+
+      // Screen reader announcement (kept existing behavior)
       this.announcement.set(`${this.itemName(item)} — ${this.copy().menu.added}`);
     }
+  }
+
+  protected getButtonText(item: MenuItem): string {
+    if (!item.isAvailable) return this.copy().common.unavailable;
+    if (this.addedItemIds().has(item.id)) {
+      return this.language.current() === 'ar' ? '✓ تمت الإضافة' : '✓ Added';
+    }
+    return this.copy().menu.add;
   }
 
   protected itemName(item: MenuItem): string {

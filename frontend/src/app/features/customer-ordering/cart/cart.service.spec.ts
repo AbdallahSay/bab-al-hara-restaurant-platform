@@ -25,7 +25,7 @@ describe('CartService', () => {
   it('adds an available item and calculates the line subtotal', () => {
     const service = TestBed.inject(CartService);
 
-    expect(service.add(AVAILABLE_ITEM)).toBe(true);
+    expect(service.add(AVAILABLE_ITEM)).toBe('added');
 
     expect(service.itemCount()).toBe(1);
     expect(service.subtotal()).toBe(85);
