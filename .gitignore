@@ -12,6 +12,7 @@ TestResults/
 # IDE
 .vscode/
 .idea/
+.vs/
 *.user
 *.suo
 
