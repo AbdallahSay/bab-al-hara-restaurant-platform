@@ -215,6 +215,21 @@ export interface UiCopy {
     readonly address: string;
     readonly area: string;
     readonly signOut: string;
+    readonly selectDriver: string;
+    readonly selectDriverPlaceholder: string;
+    readonly assignDriver: string;
+    readonly assignedDriver: string;
+    readonly assignConfirmTitle: string;
+    readonly assignConfirmBody: string;
+    readonly assignConfirmYes: string;
+    readonly assignConfirmNo: string;
+    readonly assignDriverSuccess: string;
+    readonly assignDriverStaleError: string;
+    readonly assignDriverError: string;
+    readonly driverStatus: string;
+    readonly statusReady: string;
+    readonly statusOnTheWay: string;
+    readonly statusDelivered: string;
   };
   readonly driver: {
     readonly title: string;
@@ -502,6 +517,21 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       address: 'العنوان',
       area: 'المنطقة',
       signOut: 'تسجيل الخروج',
+      selectDriver: 'اختر السائق',
+      selectDriverPlaceholder: '-- اختر سائقاً للتوصيل --',
+      assignDriver: 'تعيين سائق',
+      assignedDriver: 'السائق',
+      assignConfirmTitle: 'تأكيد تعيين السائق',
+      assignConfirmBody: 'هل أنت متأكد من تعيين السائق لهذا الطلب؟',
+      assignConfirmYes: 'نعم، تعيين السائق',
+      assignConfirmNo: 'إلغاء',
+      assignDriverSuccess: 'تم تعيين السائق بنجاح',
+      assignDriverStaleError: 'تم تعديل الطلب من قبل مستخدم آخر، يرجى إعادة المحاولة',
+      assignDriverError: 'حدث خطأ أثناء تعيين السائق، يرجى المحاولة مرة أخرى',
+      driverStatus: 'حالة التوصيل',
+      statusReady: 'جاهز للتوصيل',
+      statusOnTheWay: 'في الطريق',
+      statusDelivered: 'تم التسليم',
     },
 
     driver: {
@@ -796,6 +826,21 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       address: 'Address',
       area: 'Area',
       signOut: 'Sign out',
+      selectDriver: 'Select Driver',
+      selectDriverPlaceholder: '-- Select delivery driver --',
+      assignDriver: 'Assign Driver',
+      assignedDriver: 'Driver',
+      assignConfirmTitle: 'Confirm Driver Assignment',
+      assignConfirmBody: 'Are you sure you want to assign the driver to this order?',
+      assignConfirmYes: 'Yes, assign driver',
+      assignConfirmNo: 'Cancel',
+      assignDriverSuccess: 'Driver assigned successfully',
+      assignDriverStaleError: 'Order was updated by another user, please try again',
+      assignDriverError: 'Failed to assign driver, please try again',
+      driverStatus: 'Delivery Status',
+      statusReady: 'Ready for Delivery',
+      statusOnTheWay: 'On the way',
+      statusDelivered: 'Delivered',
     },
 
     driver: {
