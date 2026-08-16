@@ -60,6 +60,19 @@ export class CheckoutPage implements OnInit {
       validators: [Validators.maxLength(500)],
     }),
   });
+  private readonly nameValue = toSignal(this.form.controls.customerName.valueChanges, {
+    initialValue: this.form.controls.customerName.value,
+  });
+  private readonly phoneStatus = toSignal(this.form.controls.customerPhone.statusChanges, {
+    initialValue: this.form.controls.customerPhone.status,
+  });
+  private readonly phoneValue = toSignal(this.form.controls.customerPhone.valueChanges, {
+    initialValue: this.form.controls.customerPhone.value,
+  });
+  private readonly addressValue = toSignal(this.form.controls.address.valueChanges, {
+    initialValue: this.form.controls.address.value,
+  });
+
   protected readonly orderType = toSignal(this.form.controls.orderType.valueChanges, {
     initialValue: this.form.controls.orderType.value,
   });
@@ -75,6 +88,26 @@ export class CheckoutPage implements OnInit {
   protected readonly displayedTotal = computed(
     () => this.cart.subtotal() + this.displayedDeliveryFee(),
   );
+  protected readonly isStep1Complete = computed(() => {
+    const name = this.nameValue().trim();
+    const phone = this.phoneValue().trim();
+    const phoneValid = this.phoneStatus() === 'VALID';
+    return Boolean(name && phone && phoneValid);
+  });
+  protected readonly isStep2Complete = computed(() => {
+    if (this.orderType() === 'Takeaway') {
+      return true;
+    }
+    return Boolean(this.selectedAreaId() && this.addressValue().trim());
+  });
+  protected readonly isStep3Complete = computed(
+    () => this.isStep1Complete() && this.isStep2Complete(),
+  );
+  protected readonly activeStep = computed<1 | 2 | 3>(() => {
+    if (!this.isStep1Complete()) return 1;
+    if (!this.isStep2Complete()) return 2;
+    return 3;
+  });
   protected readonly deliveryDetailsInvalid = computed(
     () =>
       this.submitted() &&
@@ -164,6 +197,16 @@ export class CheckoutPage implements OnInit {
 
   protected areaName(area: DeliveryArea): string {
     return localizedText(this.language.current(), area.nameAr, area.nameEn);
+  }
+
+  protected itemName(item: { nameAr: string; nameEn: string }): string {
+    return localizedText(this.language.current(), item.nameAr, item.nameEn);
+  }
+
+  protected selectOrderType(type: OrderType): void {
+    if (this.form.controls.orderType.value !== type) {
+      this.form.controls.orderType.setValue(type);
+    }
   }
 
   protected money(value: number): string {

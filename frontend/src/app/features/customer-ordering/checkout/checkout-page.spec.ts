@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
+import { LanguageService } from '../../../core/i18n/language.service';
 import { CartService } from '../cart/cart.service';
 import { CustomerApiService } from '../customer-api.service';
 import { CreatedOrder, MenuItem } from '../order.models';
@@ -21,6 +22,7 @@ const ITEM: MenuItem = {
   preparationMinutes: 14,
   isAvailable: true,
 };
+
 const ORDER: CreatedOrder = {
   publicCode: 'BH-TEST-123',
   createdAt: '2026-08-13T18:00:00Z',
@@ -55,6 +57,7 @@ describe('CheckoutPage', () => {
     expect(
       fixture.nativeElement.querySelector('#customer-phone').getAttribute('aria-invalid'),
     ).toBe('true');
+    expect(fixture.nativeElement.textContent).toContain('هذا الحقل مطلوب');
   });
 
   it('submits a valid Takeaway order without delivery details', async () => {
@@ -127,6 +130,94 @@ describe('CheckoutPage', () => {
       'لم يعد متاحاً',
     );
     expect(cart.items()).toHaveLength(1);
+  });
+
+  it('updates the stepper progress indicators as user fills contact and selects fulfillment', async () => {
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+    const steps = fixture.nativeElement.querySelectorAll('.stepper-step');
+    expect(steps.length).toBe(3);
+
+    // Initial state: step 1 active, incomplete
+    expect(steps[0].classList.contains('is-active')).toBe(true);
+    expect(steps[0].classList.contains('is-complete')).toBe(false);
+
+    // Fill contact details
+    fillContact(fixture);
+    fixture.detectChanges();
+
+    expect(steps[0].classList.contains('is-complete')).toBe(true);
+    // Takeaway is default so step 2 is complete
+    expect(steps[1].classList.contains('is-complete')).toBe(true);
+    expect(steps[2].classList.contains('is-complete')).toBe(true);
+  });
+
+  it('verifies input directionality (dir="auto" for name/address, dir="ltr" for phone)', async () => {
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+
+    const nameInput: HTMLInputElement = fixture.nativeElement.querySelector('#customer-name');
+    const phoneInput: HTMLInputElement = fixture.nativeElement.querySelector('#customer-phone');
+
+    expect(nameInput.getAttribute('dir')).toBe('auto');
+    expect(phoneInput.getAttribute('dir')).toBe('ltr');
+
+    // Switch to delivery to check address input
+    const deliveryRadio: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[value="Delivery"]');
+    deliveryRadio.click();
+    fixture.detectChanges();
+
+    const addressTextarea: HTMLTextAreaElement =
+      fixture.nativeElement.querySelector('#delivery-address');
+    expect(addressTextarea.getAttribute('dir')).toBe('auto');
+  });
+
+  it('renders order summary breakdown and updates delivery fee when area is chosen', async () => {
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+
+    const summary = fixture.nativeElement.querySelector('.checkout-summary');
+    expect(summary.textContent).toContain('سندوتش كفتة');
+    expect(summary.textContent).toContain('مجاناً');
+
+    // Switch to Delivery and pick an area
+    const deliveryRadio: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[value="Delivery"]');
+    deliveryRadio.click();
+    fixture.detectChanges();
+
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector('#delivery-area');
+    select.value = 'area-1';
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    // Delivery fee 35 added to 85 subtotal -> 120 total
+    expect(summary.textContent).toContain('١٢٠');
+  });
+
+  it('renders both English and Arabic translations accurately when language changes', async () => {
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+    const language = TestBed.inject(LanguageService);
+
+    expect(fixture.nativeElement.textContent).toContain('إتمام الطلب');
+    expect(fixture.nativeElement.textContent).toContain('بياناتك');
+
+    language.setLanguage('en');
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Checkout');
+    expect(fixture.nativeElement.textContent).toContain('Details');
+    expect(fixture.nativeElement.textContent).toContain('Fulfillment');
+    expect(fixture.nativeElement.textContent).toContain('Payment');
+    expect(fixture.nativeElement.textContent).toContain('Kofta sandwich');
+    expect(fixture.nativeElement.querySelector('.checkout-summary').textContent).toContain('85.00');
+  });
+
+  it('renders mobile sticky action bar with total and submit button', async () => {
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+
+    const mobileBar = fixture.nativeElement.querySelector('.mobile-action-bar');
+    expect(mobileBar).toBeTruthy();
+    expect(mobileBar.querySelector('.mobile-action-bar__amount').textContent).toContain('٨٥');
+    expect(mobileBar.querySelector('.mobile-action-bar__btn')).toBeTruthy();
   });
 
   async function createFixture(apiOverrides: Partial<CustomerApiService>) {
