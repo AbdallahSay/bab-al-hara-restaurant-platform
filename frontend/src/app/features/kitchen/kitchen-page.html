@@ -1,10 +1,23 @@
-<div class="kitchen-shell">
+﻿<div class="kitchen-shell">
   <header class="kitchen-header">
-    <div>
+    <div class="kitchen-header__brand">
       <p>{{ copy().brand.name }}</p>
       <h1>{{ copy().kitchen.title }}</h1>
     </div>
     <div class="kitchen-header__actions">
+      <button
+        class="availability-button"
+        type="button"
+        (click)="openAvailabilityModal()"
+        [attr.aria-label]="copy().kitchen.manageAvailability"
+      >
+        <span class="action-icon" aria-hidden="true">🍱</span>
+        <span>{{ copy().kitchen.manageAvailability }}</span>
+        @if (unavailableCount() > 0) {
+          <span class="badge badge--warning">{{ unavailableCount() }}</span>
+        }
+      </button>
+
       <div class="language-switcher" role="group" [attr.aria-label]="copy().brand.languageLabel">
         <button
           type="button"
@@ -23,6 +36,7 @@
           {{ copy().brand.english }}
         </button>
       </div>
+
       <button class="sign-out" type="button" (click)="signOut()">
         {{ copy().kitchen.signOut }}
       </button>
@@ -30,40 +44,144 @@
   </header>
 
   <section class="kitchen-toolbar" [attr.aria-label]="copy().kitchen.connectionLabel">
-    <div
-      class="connection-status"
-      [class.is-connected]="realtime.status() === 'connected'"
-      role="status"
-      aria-live="polite"
-    >
-      <span aria-hidden="true"></span>
-      {{ realtimeLabel() }}
+    <div class="kitchen-toolbar__left">
+      <div
+        class="connection-status"
+        [class.is-connected]="realtime.status() === 'connected'"
+        [class.is-reconnecting]="realtime.status() === 'reconnecting'"
+        [class.is-disconnected]="realtime.status() === 'disconnected'"
+        role="status"
+        aria-live="polite"
+      >
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>{{ realtimeLabel() }}</span>
+      </div>
+
+      <button
+        class="refresh-button"
+        type="button"
+        (click)="loadOrders()"
+        [attr.aria-label]="copy().kitchen.refresh"
+      >
+        <span class="action-icon" aria-hidden="true">🔄</span>
+        <span>{{ copy().kitchen.refresh }}</span>
+      </button>
     </div>
-    <button
-      class="sound-button"
-      type="button"
-      [class.is-enabled]="soundEnabled()"
-      (click)="enableSound()"
-    >
-      {{ soundEnabled() ? copy().kitchen.soundEnabled : copy().kitchen.soundEnable }}
-    </button>
+
+    <div class="kitchen-toolbar__right">
+      <button
+        class="sound-button"
+        type="button"
+        [class.is-enabled]="soundEnabled()"
+        (click)="enableSound()"
+      >
+        <span class="action-icon" aria-hidden="true">{{ soundEnabled() ? '🔔' : '🔕' }}</span>
+        <span>{{ soundEnabled() ? copy().kitchen.soundEnabled : copy().kitchen.soundEnable }}</span>
+      </button>
+    </div>
   </section>
 
-  @if (newOrderCode()) {
-    <div class="new-order-banner" role="alert" aria-live="assertive">
-      <strong>{{ copy().kitchen.newOrder }}</strong>
-      <span dir="ltr">{{ newOrderCode() }}</span>
+  @if (toastMessage()) {
+    <div
+      class="toast-banner"
+      [class.toast--success]="toastType() === 'success'"
+      [class.toast--warning]="toastType() === 'warning'"
+      [class.toast--error]="toastType() === 'error'"
+      role="alert"
+      aria-live="assertive"
+    >
+      <span>{{ toastMessage() }}</span>
     </div>
   }
 
-  <main class="queue">
-    <div class="queue__heading">
-      <h2>{{ copy().kitchen.currentOrders }}</h2>
-      <strong>{{ orders().length }}</strong>
+  @if (newOrderCode()) {
+    <div class="new-order-banner" role="alert" aria-live="assertive">
+      <span class="pulse-icon" aria-hidden="true">🔔</span>
+      <strong>{{ copy().kitchen.newOrder }}</strong>
+      <span class="order-tag" dir="ltr">#{{ newOrderCode() }}</span>
+    </div>
+  }
+
+  <section class="kitchen-filters" aria-label="Order filters">
+    <div class="filter-tabs" role="tablist">
+      <button
+        type="button"
+        role="tab"
+        class="filter-tab"
+        [class.is-active]="activeFilter() === 'ALL'"
+        [attr.aria-selected]="activeFilter() === 'ALL'"
+        (click)="setFilter('ALL')"
+      >
+        <span>{{ copy().kitchen.allOrders }}</span>
+        <span class="tab-count">{{ allCount() }}</span>
+      </button>
+
+      <button
+        type="button"
+        role="tab"
+        class="filter-tab"
+        [class.is-active]="activeFilter() === 'Pending'"
+        [attr.aria-selected]="activeFilter() === 'Pending'"
+        (click)="setFilter('Pending')"
+      >
+        <span>🕒 {{ copy().kitchen.pendingFilter }}</span>
+        <span class="tab-count tab-count--pending">{{ pendingCount() }}</span>
+      </button>
+
+      <button
+        type="button"
+        role="tab"
+        class="filter-tab"
+        [class.is-active]="activeFilter() === 'Confirmed'"
+        [attr.aria-selected]="activeFilter() === 'Confirmed'"
+        (click)="setFilter('Confirmed')"
+      >
+        <span>📋 {{ copy().kitchen.confirmedFilter }}</span>
+        <span class="tab-count tab-count--confirmed">{{ confirmedCount() }}</span>
+      </button>
+
+      <button
+        type="button"
+        role="tab"
+        class="filter-tab"
+        [class.is-active]="activeFilter() === 'Preparing'"
+        [attr.aria-selected]="activeFilter() === 'Preparing'"
+        (click)="setFilter('Preparing')"
+      >
+        <span>🔥 {{ copy().kitchen.preparingFilter }}</span>
+        <span class="tab-count tab-count--preparing">{{ preparingCount() }}</span>
+      </button>
+
+      <button
+        type="button"
+        role="tab"
+        class="filter-tab"
+        [class.is-active]="activeFilter() === 'Ready'"
+        [attr.aria-selected]="activeFilter() === 'Ready'"
+        (click)="setFilter('Ready')"
+      >
+        <span>✅ {{ copy().kitchen.readyFilter }}</span>
+        <span class="tab-count tab-count--ready">{{ readyCount() }}</span>
+      </button>
     </div>
 
+    <div class="search-box">
+      <input
+        type="search"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+        [placeholder]="copy().kitchen.orderCode"
+        aria-label="Search orders"
+      />
+    </div>
+  </section>
+
+  <main class="queue">
     @if (state() === 'loading') {
-      <section class="queue-state" role="status">{{ copy().kitchen.loading }}</section>
+      <section class="queue-state" role="status">
+        <span class="spinner" aria-hidden="true"></span>
+        <p>{{ copy().kitchen.loading }}</p>
+      </section>
     } @else if (state() === 'error') {
       <section class="queue-state queue-state--error" role="alert">
         <p>{{ copy().kitchen.queueError }}</p>
@@ -76,53 +194,287 @@
         <h3>{{ copy().kitchen.emptyTitle }}</h3>
         <p>{{ copy().kitchen.emptyBody }}</p>
       </section>
+    } @else if (filteredOrders().length === 0) {
+      <section class="queue-state" role="status">
+        <h3>{{ copy().kitchen.emptyFilterTitle }}</h3>
+        <p>{{ copy().kitchen.emptyFilterBody }}</p>
+      </section>
     } @else {
       <section class="order-grid" [attr.aria-label]="copy().kitchen.queueLabel">
-        @for (order of sortedOrders(); track order.publicCode) {
+        @for (order of filteredOrders(); track order.publicCode) {
           <article
             class="order-ticket"
             [class.is-new]="newOrderCode() === order.publicCode"
-            [class.is-late]="elapsedMinutes(order.createdAt) >= 20"
+            [class.is-late]="elapsedMinutes(order.createdAt) >= 15"
+            [class.status-pending]="order.status === 'Pending'"
+            [class.status-confirmed]="order.status === 'Confirmed'"
+            [class.status-preparing]="order.status === 'Preparing'"
+            [class.status-ready]="order.status === 'Ready'"
           >
             <header class="order-ticket__header">
-              <div>
-                <span>{{ orderType(order) }}</span>
-                <h3 dir="ltr">{{ order.publicCode }}</h3>
+              <div class="order-ticket__meta">
+                <span class="order-type-badge" [class.is-delivery]="order.orderType === 'Delivery'">
+                  <span class="type-icon" aria-hidden="true">{{
+                    order.orderType === 'Delivery' ? '🛵' : '🛍️'
+                  }}</span>
+                  {{ orderType(order) }}
+                </span>
+                <h3 class="order-code" dir="ltr">#{{ order.publicCode }}</h3>
               </div>
-              <strong>{{ copy().kitchen.status[order.status] }}</strong>
+              <div class="order-status-badge" [attr.data-status]="order.status">
+                <span>{{ copy().kitchen.status[order.status] }}</span>
+              </div>
             </header>
 
             <div class="order-ticket__time">
-              <span>{{ copy().kitchen.received }} {{ receivedAt(order.createdAt) }}</span>
-              <strong>{{ copy().kitchen.elapsed }} {{ elapsedLabel(order.createdAt) }}</strong>
+              <span class="time-received"
+                >🕒 {{ copy().kitchen.received }} {{ receivedAt(order.createdAt) }}</span
+              >
+              <strong
+                class="time-elapsed"
+                [class.is-urgent]="elapsedMinutes(order.createdAt) >= 15"
+              >
+                ⏱️ {{ copy().kitchen.elapsed }}: {{ elapsedLabel(order.createdAt) }}
+              </strong>
             </div>
+
+            <div class="order-ticket__customer">
+              <strong>{{ copy().kitchen.customer }}:</strong>
+              <span>{{ order.customerName }}</span>
+            </div>
+
+            @if (order.orderType === 'Delivery') {
+              <div class="delivery-detail">
+                <strong class="delivery-area">📍 {{ areaName(order) }}</strong>
+                @if (order.address) {
+                  <span class="delivery-address">{{ order.address }}</span>
+                }
+              </div>
+            }
+
+            @if (order.customerNote) {
+              <div class="kitchen-note" role="note">
+                <span class="note-icon" aria-hidden="true">⚠️</span>
+                <div>
+                  <strong>{{ copy().kitchen.note }}:</strong>
+                  <span>{{ order.customerNote }}</span>
+                </div>
+              </div>
+            }
 
             <section class="order-ticket__items" [attr.aria-label]="copy().kitchen.items">
               @for (item of order.items; track item.productNameEn) {
-                <div>
-                  <strong>{{ item.quantity }}×</strong>
-                  <span>{{ itemName(item) }}</span>
+                <div class="order-item-row">
+                  <strong class="item-quantity">{{ item.quantity }}×</strong>
+                  <span class="item-name">{{ itemName(item) }}</span>
                 </div>
               }
             </section>
 
-            @if (order.customerNote) {
-              <p class="kitchen-note">
-                <strong>{{ copy().kitchen.note }}:</strong> {{ order.customerNote }}
-              </p>
-            }
-
-            @if (order.orderType === 'Delivery') {
-              <div class="delivery-detail">
-                <strong>{{ areaName(order) }}</strong>
-                @if (order.address) {
-                  <span>{{ order.address }}</span>
-                }
-              </div>
-            }
+            <footer class="order-ticket__actions">
+              @if (order.status === 'Pending') {
+                <button
+                  type="button"
+                  class="action-button action-button--confirm"
+                  [disabled]="isSubmitting(order.publicCode)"
+                  (click)="advanceOrder(order)"
+                >
+                  @if (isSubmitting(order.publicCode)) {
+                    <span class="btn-spinner" aria-hidden="true"></span>
+                    <span>{{ copy().kitchen.updating }}</span>
+                  } @else {
+                    <span class="btn-icon" aria-hidden="true">✔️</span>
+                    <span>{{ copy().kitchen.confirmOrder }}</span>
+                  }
+                </button>
+              } @else if (order.status === 'Confirmed') {
+                <button
+                  type="button"
+                  class="action-button action-button--prepare"
+                  [disabled]="isSubmitting(order.publicCode)"
+                  (click)="advanceOrder(order)"
+                >
+                  @if (isSubmitting(order.publicCode)) {
+                    <span class="btn-spinner" aria-hidden="true"></span>
+                    <span>{{ copy().kitchen.updating }}</span>
+                  } @else {
+                    <span class="btn-icon" aria-hidden="true">🔥</span>
+                    <span>{{ copy().kitchen.startPreparing }}</span>
+                  }
+                </button>
+              } @else if (order.status === 'Preparing') {
+                <button
+                  type="button"
+                  class="action-button action-button--ready"
+                  [disabled]="isSubmitting(order.publicCode)"
+                  (click)="advanceOrder(order)"
+                >
+                  @if (isSubmitting(order.publicCode)) {
+                    <span class="btn-spinner" aria-hidden="true"></span>
+                    <span>{{ copy().kitchen.updating }}</span>
+                  } @else {
+                    <span class="btn-icon" aria-hidden="true">🍽️</span>
+                    <span>{{ copy().kitchen.markReady }}</span>
+                  }
+                </button>
+              } @else if (order.status === 'Ready') {
+                <div class="order-completed-tag">
+                  <span class="complete-icon" aria-hidden="true">✅</span>
+                  <span>{{ copy().kitchen.readyForPickup }}</span>
+                </div>
+              }
+            </footer>
           </article>
         }
       </section>
     }
   </main>
+
+  <!-- Availability Management Modal -->
+  @if (isAvailabilityModalOpen()) {
+    <div class="modal-backdrop">
+      <button
+        type="button"
+        class="modal-backdrop-overlay"
+        (click)="closeAvailabilityModal()"
+        [attr.aria-label]="copy().kitchen.close"
+      ></button>
+      <div class="modal-card modal-card--availability" role="dialog" aria-modal="true">
+        <header class="modal-header">
+          <div>
+            <h2>{{ copy().kitchen.availabilityTitle }}</h2>
+            <p>{{ copy().kitchen.availabilitySubtitle }}</p>
+          </div>
+          <button
+            type="button"
+            class="modal-close-button"
+            (click)="closeAvailabilityModal()"
+            [attr.aria-label]="copy().kitchen.close"
+          >
+            ✕
+          </button>
+        </header>
+
+        <div class="modal-toolbar">
+          <div class="category-filters">
+            <button
+              type="button"
+              class="category-chip"
+              [class.is-active]="selectedAvailabilityCategory() === 'ALL'"
+              (click)="selectedAvailabilityCategory.set('ALL')"
+            >
+              {{ copy().kitchen.allItems }}
+            </button>
+            @for (category of categories(); track category.id) {
+              <button
+                type="button"
+                class="category-chip"
+                [class.is-active]="selectedAvailabilityCategory() === category.id"
+                (click)="selectedAvailabilityCategory.set(category.id)"
+              >
+                {{ localizedText(language.current(), category.nameAr, category.nameEn) }}
+              </button>
+            }
+          </div>
+
+          <div class="search-box">
+            <input
+              type="search"
+              [ngModel]="availabilitySearch()"
+              (ngModelChange)="availabilitySearch.set($event)"
+              [placeholder]="copy().kitchen.searchItems"
+              aria-label="Search menu items"
+            />
+          </div>
+        </div>
+
+        <div class="availability-list">
+          @for (item of filteredMenuItems(); track item.id) {
+            <article class="availability-item" [class.is-unavailable]="!item.isAvailable">
+              <div class="item-info">
+                <span class="item-category">{{ categoryName(item.categoryId) }}</span>
+                <h3>{{ menuItemName(item) }}</h3>
+              </div>
+
+              <div class="item-actions">
+                <span
+                  class="availability-badge"
+                  [class.is-available]="item.isAvailable"
+                  [class.is-unavailable]="!item.isAvailable"
+                >
+                  <span class="badge-dot" aria-hidden="true"></span>
+                  {{ item.isAvailable ? copy().kitchen.available : copy().kitchen.unavailable }}
+                </span>
+
+                <button
+                  type="button"
+                  class="toggle-availability-btn"
+                  [class.btn--make-unavailable]="item.isAvailable"
+                  [class.btn--make-available]="!item.isAvailable"
+                  (click)="requestToggleAvailability(item)"
+                >
+                  {{
+                    item.isAvailable
+                      ? copy().kitchen.markAsUnavailable
+                      : copy().kitchen.markAsAvailable
+                  }}
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Confirmation Modal for Availability Toggle -->
+  @if (pendingAvailabilityToggle(); as pending) {
+    <div class="modal-backdrop modal-backdrop--confirm">
+      <button
+        type="button"
+        class="modal-backdrop-overlay"
+        (click)="cancelToggleAvailability()"
+        [attr.aria-label]="copy().kitchen.cancel"
+      ></button>
+      <div class="modal-card modal-card--confirm" role="alertdialog" aria-modal="true">
+        <h3>{{ copy().kitchen.toggleConfirmTitle }}</h3>
+        <p>
+          {{ copy().kitchen.toggleConfirmMessage }}
+          <strong
+            >"{{
+              pending.nextStatus ? copy().kitchen.available : copy().kitchen.unavailable
+            }}"</strong
+          >
+          ({{ menuItemName(pending.item) }})؟
+        </p>
+
+        <div class="confirm-actions">
+          <button
+            type="button"
+            class="button button--confirm"
+            [class.button--danger]="!pending.nextStatus"
+            [class.button--success]="pending.nextStatus"
+            [disabled]="isSavingAvailability()"
+            (click)="confirmToggleAvailability()"
+          >
+            @if (isSavingAvailability()) {
+              <span class="btn-spinner" aria-hidden="true"></span>
+              <span>{{ copy().kitchen.saving }}</span>
+            } @else {
+              <span>{{ copy().kitchen.confirm }}</span>
+            }
+          </button>
+
+          <button
+            type="button"
+            class="button button--secondary"
+            [disabled]="isSavingAvailability()"
+            (click)="cancelToggleAvailability()"
+          >
+            {{ copy().kitchen.cancel }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

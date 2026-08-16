@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+﻿import { TestBed } from '@angular/core/testing';
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { KitchenRealtimeService } from './kitchen-realtime.service';
 
@@ -17,6 +17,11 @@ describe('KitchenRealtimeService', () => {
       ],
     });
 
-    expect(TestBed.inject(KitchenRealtimeService).status()).toBe('disconnected');
+    const service = TestBed.inject(KitchenRealtimeService);
+    expect(service.status()).toBe('disconnected');
+    expect(service.newOrders$).toBeDefined();
+    expect(service.statusChanged$).toBeDefined();
+    expect(service.availabilityChanged$).toBeDefined();
+    expect(service.reconnected$).toBeDefined();
   });
 });

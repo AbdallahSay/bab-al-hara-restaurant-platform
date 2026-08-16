@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+﻿import { inject, Injectable, signal } from '@angular/core';
 import {
   HubConnection,
   HubConnectionBuilder,
@@ -8,18 +8,26 @@ import {
 import { Subject } from 'rxjs';
 
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
-import { KitchenOrder } from '../customer-ordering/order.models';
+import {
+  KitchenOrder,
+  MenuItemAvailabilityChangedEvent,
+  OrderStatusChangedEvent,
+} from '../customer-ordering/order.models';
 
 export type RealtimeStatus = 'disconnected' | 'connecting' | 'connected' | 'reconnecting';
 
 @Injectable({ providedIn: 'root' })
 export class KitchenRealtimeService {
   private readonly newOrders = new Subject<KitchenOrder>();
+  private readonly statusChanged = new Subject<OrderStatusChangedEvent>();
+  private readonly availabilityChanged = new Subject<MenuItemAvailabilityChangedEvent>();
   private readonly reconnected = new Subject<void>();
   private readonly connection: HubConnection;
 
   readonly status = signal<RealtimeStatus>('disconnected');
   readonly newOrders$ = this.newOrders.asObservable();
+  readonly statusChanged$ = this.statusChanged.asObservable();
+  readonly availabilityChanged$ = this.availabilityChanged.asObservable();
   readonly reconnected$ = this.reconnected.asObservable();
 
   constructor() {
@@ -31,6 +39,12 @@ export class KitchenRealtimeService {
       .build();
 
     this.connection.on('NewOrder', (order: KitchenOrder) => this.newOrders.next(order));
+    this.connection.on('OrderStatusChanged', (event: OrderStatusChangedEvent) =>
+      this.statusChanged.next(event),
+    );
+    this.connection.on('MenuItemAvailabilityChanged', (event: MenuItemAvailabilityChangedEvent) =>
+      this.availabilityChanged.next(event),
+    );
     this.connection.onreconnecting(() => this.status.set('reconnecting'));
     this.connection.onreconnected(() => {
       this.status.set('connected');
