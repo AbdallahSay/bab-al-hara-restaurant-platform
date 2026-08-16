@@ -1,3 +1,4 @@
+import { EnvironmentProviders, Provider } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -5,6 +6,7 @@ import { of, throwError } from 'rxjs';
 import { CustomerApiService } from '../customer-api.service';
 import { Category, MenuItem } from '../order.models';
 import { MenuPage } from './menu-page';
+import { CartToastService } from '../cart/cart-toast.service';
 
 const CATEGORY: Category = {
   id: 'category-1',
@@ -108,6 +110,44 @@ describe('MenuPage', () => {
     expect(fixture.nativeElement.querySelector('.cart-link strong').textContent).toContain('1');
   });
 
+  it('changes button text temporarily and debounces duplicate clicks, triggering toast', async () => {
+    vi.useFakeTimers();
+    const cartToastSpy = vi.fn();
+    await configure(
+      {
+        getCategories: () => of([CATEGORY]),
+        getMenuItems: () => of(ITEMS),
+      },
+      { showAddedToast: cartToastSpy },
+    );
+
+    const fixture = TestBed.createComponent(MenuPage);
+    fixture.detectChanges();
+
+    const add: HTMLButtonElement = fixture.nativeElement.querySelector(
+      '.menu-item:not(.menu-item--unavailable) .button--primary',
+    );
+    add.click();
+    fixture.detectChanges();
+
+    expect(cartToastSpy).toHaveBeenCalledTimes(1);
+    expect(add.textContent).toContain('✓ تمت الإضافة');
+
+    // duplicate click immediately
+    add.click();
+    fixture.detectChanges();
+    expect(cartToastSpy).toHaveBeenCalledTimes(1); // Should not increase because debounced
+
+    // advance time
+    vi.advanceTimersByTime(2100);
+    fixture.detectChanges();
+
+    expect(add.textContent).not.toContain('✓ تمت الإضافة');
+    expect(add.textContent).toContain('أضف للسلة');
+
+    vi.useRealTimers();
+  });
+
   it('shows a retryable failure when the menu request fails', async () => {
     await configure({
       getCategories: () => of([CATEGORY]),
@@ -120,10 +160,23 @@ describe('MenuPage', () => {
     expect(fixture.nativeElement.textContent).toContain('تعذر تحميل القائمة');
   });
 
-  async function configure(api: Partial<CustomerApiService>): Promise<void> {
+  async function configure(
+    api: Partial<CustomerApiService>,
+    cartToastMock?: Partial<CartToastService>,
+  ): Promise<void> {
+    const providers: (Provider | EnvironmentProviders)[] = [
+      provideRouter([]),
+      { provide: CustomerApiService, useValue: api },
+    ];
+    if (cartToastMock) {
+      providers.push({ provide: CartToastService, useValue: cartToastMock });
+    } else {
+      providers.push({ provide: CartToastService, useValue: { showAddedToast: vi.fn() } });
+    }
+
     await TestBed.configureTestingModule({
       imports: [MenuPage],
-      providers: [provideRouter([]), { provide: CustomerApiService, useValue: api }],
+      providers: providers,
     }).compileComponents();
   }
 });

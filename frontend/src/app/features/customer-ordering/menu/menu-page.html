@@ -79,7 +79,7 @@
                   [disabled]="!item.isAvailable"
                   (click)="addToCart(item)"
                 >
-                  {{ item.isAvailable ? copy().menu.add : copy().common.unavailable }}
+                  {{ getButtonText(item) }}
                 </button>
               </div>
             </div>

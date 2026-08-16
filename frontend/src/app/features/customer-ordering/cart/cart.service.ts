@@ -35,7 +35,7 @@ export class CartService {
     });
   }
 
-  add(menuItem: MenuItem): boolean {
+  add(menuItem: MenuItem): 'added' | 'updated' | false {
     if (!menuItem.isAvailable) {
       return false;
     }
@@ -43,7 +43,7 @@ export class CartService {
     const existing = this.items().find((item) => item.menuItemId === menuItem.id);
     if (existing) {
       this.changeQuantity(menuItem.id, existing.quantity + 1);
-      return true;
+      return 'updated';
     }
 
     this.items.update((items) => [
@@ -58,7 +58,7 @@ export class CartService {
         isAvailable: true,
       },
     ]);
-    return true;
+    return 'added';
   }
 
   increase(menuItemId: string): void {

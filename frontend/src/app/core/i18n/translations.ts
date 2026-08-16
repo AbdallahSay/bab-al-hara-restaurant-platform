@@ -40,6 +40,9 @@ export interface UiCopy {
     readonly errorTitle: string;
     readonly errorBody: string;
     readonly viewCart: string;
+    readonly addedToast: string;
+    readonly updatedToast: string;
+    readonly addedToastSubtitle: string;
   };
   readonly cart: {
     readonly title: string;
@@ -214,6 +217,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       errorTitle: 'تعذر تحميل القائمة',
       errorBody: 'تحقق من اتصالك ثم حاول مرة أخرى.',
       viewCart: 'عرض السلة',
+      addedToast: 'تمت الإضافة للسلة',
+      updatedToast: 'تم تحديث الكمية في السلة',
+      addedToastSubtitle: '{{itemName}} أضيف بنجاح',
     },
     cart: {
       title: 'سلة الطلب',
@@ -394,6 +400,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       errorTitle: 'The menu could not be loaded',
       errorBody: 'Check your connection and try again.',
       viewCart: 'View cart',
+      addedToast: 'Added to cart',
+      updatedToast: 'Cart quantity updated',
+      addedToastSubtitle: '{{itemName}} was added successfully',
     },
     cart: {
       title: 'Your cart',
