@@ -391,13 +391,13 @@
   border-radius: var(--radius-sm);
   border: 1px solid #ffeeba;
   margin-bottom: var(--space-3);
-  
+
   strong {
     display: block;
     margin-bottom: var(--space-2);
     font-size: 1.1rem;
   }
-  
+
   p {
     margin-bottom: var(--space-3);
   }
@@ -406,7 +406,7 @@
 .handoff-confirm__buttons {
   display: flex;
   gap: var(--space-2);
-  
+
   button {
     flex: 1;
     min-height: 48px;

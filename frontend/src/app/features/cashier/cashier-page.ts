@@ -40,7 +40,7 @@ export class CashierPage implements OnInit, OnDestroy {
   protected readonly state = signal<PageState>('loading');
   protected readonly orders = signal<readonly CashierOrderDto[]>([]);
   protected readonly now = signal(Date.now());
-  
+
   protected readonly inFlightHandoffs = signal<Set<string>>(new Set());
   protected readonly staleOrders = signal<Set<string>>(new Set());
   protected readonly errorOrders = signal<Set<string>>(new Set());
@@ -148,12 +148,12 @@ export class CashierPage implements OnInit, OnDestroy {
     const newConfirming = new Set(this.confirmingOrders());
     newConfirming.add(orderId);
     this.confirmingOrders.set(newConfirming);
-    
+
     // Clear any previous errors for this order
     const newStale = new Set(this.staleOrders());
     newStale.delete(orderId);
     this.staleOrders.set(newStale);
-    
+
     const newErrors = new Set(this.errorOrders());
     newErrors.delete(orderId);
     this.errorOrders.set(newErrors);
@@ -186,11 +186,11 @@ export class CashierPage implements OnInit, OnDestroy {
           const stale = new Set(this.staleOrders());
           stale.add(order.id);
           this.staleOrders.set(stale);
-          
+
           const confirming = new Set(this.confirmingOrders());
           confirming.delete(order.id);
           this.confirmingOrders.set(confirming);
-          
+
           // Reload orders after a delay to get the latest
           setTimeout(() => this.loadOrders(), 3000);
         } else {

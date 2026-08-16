@@ -46,15 +46,12 @@ export const routes: Routes = [
   {
     path: 'cashier/sign-in',
     loadComponent: () =>
-      import('./features/cashier/cashier-sign-in-page').then(
-        (m) => m.CashierSignInPage,
-      ),
+      import('./features/cashier/cashier-sign-in-page').then((m) => m.CashierSignInPage),
     title: 'Cashier sign in | Bab Al Hara',
   },
   {
     path: 'cashier',
-    loadComponent: () =>
-      import('./features/cashier/cashier-page').then((m) => m.CashierPage),
+    loadComponent: () => import('./features/cashier/cashier-page').then((m) => m.CashierPage),
     title: 'Cashier | Bab Al Hara',
   },
   { path: '**', redirectTo: '' },

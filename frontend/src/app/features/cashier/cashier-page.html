@@ -63,10 +63,7 @@
     } @else {
       <section class="order-grid">
         @for (order of sortedOrders(); track order.id) {
-          <article
-            class="order-ticket"
-            [class.is-late]="elapsedMinutes(order.createdAt) >= 15"
-          >
+          <article class="order-ticket" [class.is-late]="elapsedMinutes(order.createdAt) >= 15">
             <header class="order-ticket__header">
               <div>
                 <span>{{ orderType(order) }}</span>
@@ -110,9 +107,7 @@
                       <span>{{ order.address }}</span>
                     }
                   </div>
-                  <div class="waiting-driver">
-                    ⏳ {{ copy().cashier.waitingForDriver }}
-                  </div>
+                  <div class="waiting-driver">⏳ {{ copy().cashier.waitingForDriver }}</div>
                 </div>
               } @else {
                 @if (confirmingOrders().has(order.id)) {
@@ -120,10 +115,18 @@
                     <strong>{{ copy().cashier.handoffConfirmTitle }}</strong>
                     <p>{{ copy().cashier.handoffConfirmBody }}</p>
                     <div class="handoff-confirm__buttons">
-                      <button class="button" (click)="cancelHandoff(order.id)" [disabled]="inFlightHandoffs().has(order.id)">
+                      <button
+                        class="button"
+                        (click)="cancelHandoff(order.id)"
+                        [disabled]="inFlightHandoffs().has(order.id)"
+                      >
                         {{ copy().cashier.handoffConfirmNo }}
                       </button>
-                      <button class="button button--danger" (click)="confirmHandoff(order)" [disabled]="inFlightHandoffs().has(order.id)">
+                      <button
+                        class="button button--danger"
+                        (click)="confirmHandoff(order)"
+                        [disabled]="inFlightHandoffs().has(order.id)"
+                      >
                         {{ copy().cashier.handoffConfirmYes }}
                       </button>
                     </div>
@@ -137,7 +140,7 @@
                   </button>
                 }
               }
-              
+
               @if (staleOrders().has(order.id)) {
                 <p class="error-text">{{ copy().cashier.handoffStaleError }}</p>
               }

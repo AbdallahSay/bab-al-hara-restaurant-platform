@@ -24,7 +24,7 @@ export class CashierApiService {
       .post(
         `${this.apiBaseUrl}/orders/${id}/cash-payment/confirm`,
         { rowVersion },
-        { withCredentials: true }
+        { withCredentials: true },
       )
       .pipe(
         map(() => 'success' as HandoffResult),
@@ -33,7 +33,7 @@ export class CashierApiService {
             return of('stale' as HandoffResult);
           }
           return of('error' as HandoffResult);
-        })
+        }),
       );
   }
 }

@@ -39,7 +39,7 @@ public enum CompleteCashTakeawayResult
 public interface ICashierOrderService
 {
     Task<IReadOnlyList<CashierOrderDto>> GetReadyOrdersAsync(CancellationToken cancellationToken);
-    
+
     Task<CompleteCashTakeawayResult> CompleteCashTakeawayHandoffAsync(
         Guid orderId,
         byte[] rowVersion,

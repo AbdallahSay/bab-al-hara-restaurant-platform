@@ -57,8 +57,11 @@ describe('CashierPage', () => {
   });
 
   it('SignalR OrderCompleted removes order from list', async () => {
-    const { fixture, orderCompleted } = await createFixture([INITIAL_ORDER_TAKEAWAY, INITIAL_ORDER_DELIVERY]);
-    
+    const { fixture, orderCompleted } = await createFixture([
+      INITIAL_ORDER_TAKEAWAY,
+      INITIAL_ORDER_DELIVERY,
+    ]);
+
     orderCompleted.next('1');
     fixture.detectChanges();
 
@@ -76,12 +79,12 @@ describe('CashierPage', () => {
           provide: StaffSessionService,
           useValue: { getSession: () => of({ isAuthenticated: true }) },
         },
-        { 
-          provide: CashierApiService, 
-          useValue: { 
+        {
+          provide: CashierApiService,
+          useValue: {
             getReadyOrders: () => of(orders),
             completeCashTakeaway: () => of('success'),
-          } 
+          },
         },
         {
           provide: CashierHubService,
