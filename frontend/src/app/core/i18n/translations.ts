@@ -1,4 +1,4 @@
-﻿export type Language = 'ar' | 'en';
+export type Language = 'ar' | 'en';
 
 export interface UiCopy {
   readonly brand: {
@@ -173,6 +173,41 @@ export interface UiCopy {
     readonly allItems: string;
     readonly unavailableCount: string;
     readonly status: Readonly<Record<string, string>>;
+  };
+  readonly cashier: {
+    readonly title: string;
+    readonly signIn: string;
+    readonly readyOrders: string;
+    readonly noReadyOrders: string;
+    readonly takeaway: string;
+    readonly delivery: string;
+    readonly waitingForDriver: string;
+    readonly orderCode: string;
+    readonly customer: string;
+    readonly items: string;
+    readonly total: string;
+    readonly payment: string;
+    readonly elapsed: string;
+    readonly minute: string;
+    readonly minutes: string;
+    readonly handoff: string;
+    readonly handoffConfirmTitle: string;
+    readonly handoffConfirmBody: string;
+    readonly handoffConfirmYes: string;
+    readonly handoffConfirmNo: string;
+    readonly handoffSuccess: string;
+    readonly handoffStaleError: string;
+    readonly handoffError: string;
+    readonly loading: string;
+    readonly loadError: string;
+    readonly connected: string;
+    readonly connecting: string;
+    readonly reconnecting: string;
+    readonly disconnected: string;
+    readonly note: string;
+    readonly address: string;
+    readonly area: string;
+    readonly signOut: string;
   };
 }
 
@@ -358,6 +393,41 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         Delivered: 'تم التسليم',
       },
     },
+    cashier: {
+      title: 'الكاشير',
+      signIn: 'تسجيل الدخول',
+      readyOrders: 'الطلبات الجاهزة',
+      noReadyOrders: 'لا توجد طلبات جاهزة',
+      takeaway: 'استلام',
+      delivery: 'توصيل',
+      waitingForDriver: 'بانتظار السائق',
+      orderCode: 'رقم الطلب',
+      customer: 'العميل',
+      items: 'الأصناف',
+      total: 'الإجمالي',
+      payment: 'الدفع',
+      elapsed: 'منذ',
+      minute: 'دقيقة',
+      minutes: 'دقائق',
+      handoff: 'تسليم وإنهاء الطلب',
+      handoffConfirmTitle: 'تأكيد التسليم',
+      handoffConfirmBody: 'هل تم استلام المبلغ وتسليم الطلب للعميل؟',
+      handoffConfirmYes: 'نعم، تسليم الطلب',
+      handoffConfirmNo: 'إلغاء',
+      handoffSuccess: 'تم تسليم الطلب بنجاح',
+      handoffStaleError: 'تم تحديث البيانات، يرجى المحاولة مرة أخرى',
+      handoffError: 'حدث خطأ، يرجى المحاولة مرة أخرى',
+      loading: 'جاري التحميل...',
+      loadError: 'حدث خطأ في تحميل الطلبات',
+      connected: 'متصل',
+      connecting: 'جاري الاتصال...',
+      reconnecting: 'جاري إعادة الاتصال...',
+      disconnected: 'غير متصل',
+      note: 'ملاحظة',
+      address: 'العنوان',
+      area: 'المنطقة',
+      signOut: 'تسجيل الخروج',
+    },
   },
   en: {
     brand: {
@@ -540,6 +610,41 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         OnTheWay: 'On the way',
         Delivered: 'Delivered',
       },
+    },
+    cashier: {
+      title: 'Cashier',
+      signIn: 'Sign in',
+      readyOrders: 'Ready orders',
+      noReadyOrders: 'No ready orders',
+      takeaway: 'Takeaway',
+      delivery: 'Delivery',
+      waitingForDriver: 'Waiting for driver',
+      orderCode: 'Order number',
+      customer: 'Customer',
+      items: 'Items',
+      total: 'Total',
+      payment: 'Payment',
+      elapsed: 'Waiting',
+      minute: 'minute',
+      minutes: 'minutes',
+      handoff: 'Complete & Hand Off',
+      handoffConfirmTitle: 'Confirm Handoff',
+      handoffConfirmBody: 'Has payment been collected and the order handed off to the customer?',
+      handoffConfirmYes: 'Yes, hand off order',
+      handoffConfirmNo: 'Cancel',
+      handoffSuccess: 'Order handed off successfully',
+      handoffStaleError: 'Order data was updated, please try again',
+      handoffError: 'An error occurred, please try again',
+      loading: 'Loading...',
+      loadError: 'Failed to load orders',
+      connected: 'Connected',
+      connecting: 'Connecting...',
+      reconnecting: 'Reconnecting...',
+      disconnected: 'Disconnected',
+      note: 'Note',
+      address: 'Address',
+      area: 'Area',
+      signOut: 'Sign out',
     },
   },
 };

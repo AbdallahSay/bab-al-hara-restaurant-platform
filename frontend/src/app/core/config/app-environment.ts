@@ -4,6 +4,7 @@ export interface AppEnvironment {
   readonly production: boolean;
   readonly apiBaseUrl: string;
   readonly kitchenHubUrl: string;
+  readonly cashierHubUrl: string;
 }
 
 export const APP_ENVIRONMENT = new InjectionToken<AppEnvironment>('APP_ENVIRONMENT');

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using BabAlHara.Api.Features.Cashier;
 using BabAlHara.Api.Features.Catalog;
 using BabAlHara.Api.Features.Kitchen;
 using BabAlHara.Api.Features.Ordering;
@@ -7,6 +8,7 @@ using BabAlHara.Api.Platform.Errors;
 using BabAlHara.Api.Platform.Health;
 using BabAlHara.Api.Platform.Observability;
 using BabAlHara.Api.Platform.Security;
+using BabAlHara.Application.Cashier;
 using BabAlHara.Application.Kitchen;
 using BabAlHara.Infrastructure;
 using BabAlHara.Infrastructure.Persistence;
@@ -93,6 +95,7 @@ builder.Services.AddSingleton<IKitchenRealtimeNotifier>(sp =>
     sp.GetRequiredService<SignalRKitchenRealtimeNotifier>());
 builder.Services.AddSingleton<INewOrderNotifier>(sp =>
     sp.GetRequiredService<SignalRKitchenRealtimeNotifier>());
+builder.Services.AddSingleton<ICashierOrderCompletedNotifier, SignalRCashierNotifier>();
 
 //
 // Authorization
@@ -107,6 +110,15 @@ builder.Services
                 .RequireAuthenticatedUser()
                 .RequireRole(
                     DevelopmentDataSeeder.KitchenRole,
+                    DevelopmentDataSeeder.ManagerRole,
+                    DevelopmentDataSeeder.AdminRole))
+    .AddPolicy(
+        AuthorizationPolicies.Cashier,
+        policy =>
+            policy
+                .RequireAuthenticatedUser()
+                .RequireRole(
+                    DevelopmentDataSeeder.CashierRole,
                     DevelopmentDataSeeder.ManagerRole,
                     DevelopmentDataSeeder.AdminRole));
 
@@ -352,11 +364,14 @@ app.MapOrderEndpoints();
 
 app.MapKitchenEndpoints();
 
+app.MapCashierEndpoints();
+
 //
 // SignalR
 //
 
 app.MapHub<KitchenHub>("/hubs/kitchen");
+app.MapHub<CashierHub>("/hubs/cashier");
 
 //
 // Angular SPA Fallback
@@ -368,6 +383,8 @@ app.MapHub<KitchenHub>("/hubs/kitchen");
 // /order-confirmed
 // /kitchen
 // /kitchen/sign-in
+// /cashier
+// /cashier/sign-in
 //
 // But API, SignalR and health routes must remain real
 // backend routes and return 404 when no endpoint exists.

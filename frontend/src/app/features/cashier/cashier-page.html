@@ -1,0 +1,156 @@
+<div class="kitchen-shell">
+  <header class="kitchen-header">
+    <div>
+      <p>{{ copy().brand.name }}</p>
+      <h1>{{ copy().cashier.title }}</h1>
+    </div>
+    <div class="kitchen-header__actions">
+      <div class="language-switcher" role="group" [attr.aria-label]="copy().brand.languageLabel">
+        <button
+          type="button"
+          [class.is-active]="language.current() === 'ar'"
+          [attr.aria-pressed]="language.current() === 'ar'"
+          (click)="setLanguage('ar')"
+        >
+          {{ copy().brand.arabic }}
+        </button>
+        <button
+          type="button"
+          [class.is-active]="language.current() === 'en'"
+          [attr.aria-pressed]="language.current() === 'en'"
+          (click)="setLanguage('en')"
+        >
+          {{ copy().brand.english }}
+        </button>
+      </div>
+      <button class="sign-out" type="button" (click)="signOut()">
+        {{ copy().cashier.signOut }}
+      </button>
+    </div>
+  </header>
+
+  <section class="kitchen-toolbar">
+    <div
+      class="connection-status"
+      [class.is-connected]="realtime.status() === 'connected'"
+      role="status"
+      aria-live="polite"
+    >
+      <span aria-hidden="true"></span>
+      {{ realtimeLabel() }}
+    </div>
+  </section>
+
+  <main class="queue">
+    <div class="queue__heading">
+      <h2>{{ copy().cashier.readyOrders }}</h2>
+      <strong>{{ orders().length }}</strong>
+    </div>
+
+    @if (state() === 'loading') {
+      <section class="queue-state" role="status">{{ copy().cashier.loading }}</section>
+    } @else if (state() === 'error') {
+      <section class="queue-state queue-state--error" role="alert">
+        <p>{{ copy().cashier.loadError }}</p>
+        <button class="button button--primary" type="button" (click)="loadOrders()">
+          {{ copy().common.retry }}
+        </button>
+      </section>
+    } @else if (orders().length === 0) {
+      <section class="queue-state" role="status">
+        <h3>{{ copy().cashier.noReadyOrders }}</h3>
+      </section>
+    } @else {
+      <section class="order-grid">
+        @for (order of sortedOrders(); track order.id) {
+          <article class="order-ticket" [class.is-late]="elapsedMinutes(order.createdAt) >= 15">
+            <header class="order-ticket__header">
+              <div>
+                <span>{{ orderType(order) }}</span>
+                <h3 dir="ltr">{{ order.publicCode }}</h3>
+              </div>
+              <strong>{{ copy().cashier.elapsed }} {{ elapsedLabel(order.createdAt) }}</strong>
+            </header>
+
+            <div class="order-ticket__customer">
+              <strong>{{ copy().cashier.customer }}:</strong>
+              <span>{{ order.customerName }}</span>
+              <span class="payment-badge">{{ copy().common.cash }}</span>
+            </div>
+
+            <section class="order-ticket__items" [attr.aria-label]="copy().cashier.items">
+              @for (item of order.items; track item.productNameEn) {
+                <div>
+                  <strong>{{ item.quantity }}×</strong>
+                  <span>{{ itemName(item) }}</span>
+                </div>
+              }
+            </section>
+
+            @if (order.customerNote) {
+              <p class="kitchen-note">
+                <strong>{{ copy().cashier.note }}:</strong> {{ order.customerNote }}
+              </p>
+            }
+
+            <div class="order-ticket__totals">
+              <span>{{ copy().cashier.total }}</span>
+              <strong>{{ order.total }} {{ copy().common.currency }}</strong>
+            </div>
+
+            <footer class="order-ticket__actions">
+              @if (order.orderType === 'Delivery') {
+                <div class="delivery-status">
+                  <div class="delivery-detail">
+                    <strong>{{ areaName(order) }}</strong>
+                    @if (order.address) {
+                      <span>{{ order.address }}</span>
+                    }
+                  </div>
+                  <div class="waiting-driver">⏳ {{ copy().cashier.waitingForDriver }}</div>
+                </div>
+              } @else {
+                @if (confirmingOrders().has(order.id)) {
+                  <div class="handoff-confirm" role="dialog" aria-modal="true">
+                    <strong>{{ copy().cashier.handoffConfirmTitle }}</strong>
+                    <p>{{ copy().cashier.handoffConfirmBody }}</p>
+                    <div class="handoff-confirm__buttons">
+                      <button
+                        class="button"
+                        (click)="cancelHandoff(order.id)"
+                        [disabled]="inFlightHandoffs().has(order.id)"
+                      >
+                        {{ copy().cashier.handoffConfirmNo }}
+                      </button>
+                      <button
+                        class="button button--danger"
+                        (click)="confirmHandoff(order)"
+                        [disabled]="inFlightHandoffs().has(order.id)"
+                      >
+                        {{ copy().cashier.handoffConfirmYes }}
+                      </button>
+                    </div>
+                  </div>
+                } @else {
+                  <button
+                    class="button button--primary button--large handoff-button"
+                    (click)="initiateHandoff(order.id)"
+                  >
+                    ✓ {{ copy().cashier.handoff }}
+                  </button>
+                }
+              }
+
+              @if (staleOrders().has(order.id)) {
+                <p class="error-text">{{ copy().cashier.handoffStaleError }}</p>
+              }
+              @if (errorOrders().has(order.id)) {
+                <p class="error-text">{{ copy().cashier.handoffError }}</p>
+              }
+            </footer>
+          </article>
+        }
+      </section>
+    }
+  </main>
+</div>
