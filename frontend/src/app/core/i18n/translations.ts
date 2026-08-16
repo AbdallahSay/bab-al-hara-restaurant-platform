@@ -86,6 +86,13 @@ export interface UiCopy {
     readonly areaError: string;
     readonly emptyCart: string;
     readonly authoritativeNotice: string;
+    readonly stepDetails: string;
+    readonly stepFulfillment: string;
+    readonly stepPayment: string;
+    readonly free: string;
+    readonly items: string;
+    readonly orderTypeTakeaway: string;
+    readonly orderTypeDelivery: string;
   };
   readonly success: {
     readonly eyebrow: string;
@@ -224,6 +231,13 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       areaError: 'منطقة التوصيل المختارة لم تعد متاحة.',
       emptyCart: 'السلة فارغة. أضف أصنافاً قبل إتمام الطلب.',
       authoritativeNotice: 'يحسب الخادم الأسعار ورسوم التوصيل والإجمالي النهائي.',
+      stepDetails: 'بياناتك',
+      stepFulfillment: 'الاستلام',
+      stepPayment: 'الدفع',
+      free: 'مجاناً',
+      items: 'أصناف',
+      orderTypeTakeaway: 'استلام من الفرع',
+      orderTypeDelivery: 'توصيل للمنزل',
     },
     success: {
       eyebrow: 'تم استلام الطلب',
@@ -368,6 +382,13 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       areaError: 'The selected delivery area is no longer available.',
       emptyCart: 'Your cart is empty. Add items before checkout.',
       authoritativeNotice: 'The server calculates current prices, delivery fee, and final total.',
+      stepDetails: 'Details',
+      stepFulfillment: 'Fulfillment',
+      stepPayment: 'Payment',
+      free: 'Free',
+      items: 'items',
+      orderTypeTakeaway: 'Pick up from restaurant',
+      orderTypeDelivery: 'Delivery to address',
     },
     success: {
       eyebrow: 'Order received',

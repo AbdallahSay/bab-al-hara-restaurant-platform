@@ -1,26 +1,157 @@
 <app-customer-header />
 
 <main class="checkout-shell">
-  <a class="back-link" routerLink="/cart">← {{ copy().cart.title }}</a>
-  <h1>{{ copy().checkout.title }}</h1>
+  <div class="checkout-topbar">
+    <a class="back-link" routerLink="/cart">
+      <span class="back-arrow" aria-hidden="true">←</span>
+      <span>{{ copy().cart.title }}</span>
+    </a>
+    <div class="checkout-title-row">
+      <h1>{{ copy().checkout.title }}</h1>
+      <span class="items-badge">{{ cart.itemCount() }} {{ copy().checkout.items }}</span>
+    </div>
+  </div>
+
+  <nav class="checkout-stepper" [attr.aria-label]="copy().checkout.title">
+    <ol class="stepper-list">
+      <li
+        class="stepper-step"
+        [class.is-complete]="isStep1Complete()"
+        [class.is-active]="activeStep() === 1"
+        [attr.aria-current]="activeStep() === 1 ? 'step' : null"
+      >
+        <div class="step-indicator">
+          @if (isStep1Complete()) {
+            <svg
+              class="step-check"
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="4 10 8 14 16 6" />
+            </svg>
+          } @else {
+            <span>1</span>
+          }
+        </div>
+        <span class="step-label">{{ copy().checkout.stepDetails }}</span>
+      </li>
+
+      <li class="stepper-divider" aria-hidden="true"></li>
+
+      <li
+        class="stepper-step"
+        [class.is-complete]="isStep2Complete()"
+        [class.is-active]="activeStep() === 2"
+        [attr.aria-current]="activeStep() === 2 ? 'step' : null"
+      >
+        <div class="step-indicator">
+          @if (isStep2Complete()) {
+            <svg
+              class="step-check"
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="4 10 8 14 16 6" />
+            </svg>
+          } @else {
+            <span>2</span>
+          }
+        </div>
+        <span class="step-label">{{ copy().checkout.stepFulfillment }}</span>
+      </li>
+
+      <li class="stepper-divider" aria-hidden="true"></li>
+
+      <li
+        class="stepper-step"
+        [class.is-complete]="isStep3Complete()"
+        [class.is-active]="activeStep() === 3"
+        [attr.aria-current]="activeStep() === 3 ? 'step' : null"
+      >
+        <div class="step-indicator">
+          @if (isStep3Complete()) {
+            <svg
+              class="step-check"
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="4 10 8 14 16 6" />
+            </svg>
+          } @else {
+            <span>3</span>
+          }
+        </div>
+        <span class="step-label">{{ copy().checkout.stepPayment }}</span>
+      </li>
+    </ol>
+  </nav>
 
   @if (errorMessage()) {
-    <div class="error-banner" role="alert">{{ errorMessage() }}</div>
+    <div class="error-banner" role="alert">
+      <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path
+          fill-rule="evenodd"
+          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
   }
 
   <form (submit)="submit(); $event.preventDefault()" novalidate>
     <div class="checkout-layout">
       <div class="checkout-fields">
+        <!-- Step 1: Contact Information -->
         <section class="checkout-card" aria-labelledby="contact-title">
-          <h2 id="contact-title"><span>1</span>{{ copy().checkout.contactTitle }}</h2>
+          <div class="card-header">
+            <div class="card-badge" [class.is-complete]="isStep1Complete()">
+              @if (isStep1Complete()) {
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="4 10 8 14 16 6" />
+                </svg>
+              } @else {
+                <span>1</span>
+              }
+            </div>
+            <h2 id="contact-title">{{ copy().checkout.contactTitle }}</h2>
+          </div>
+
           <div class="field-grid">
             <div class="field-group">
-              <label for="customer-name">{{ copy().checkout.name }}</label>
+              <label for="customer-name">
+                {{ copy().checkout.name }}
+                <span class="required-mark" aria-hidden="true">*</span>
+              </label>
               <input
                 id="customer-name"
                 type="text"
                 autocomplete="name"
                 maxlength="120"
+                dir="auto"
                 [formControl]="form.controls.customerName"
                 [placeholder]="copy().checkout.namePlaceholder"
                 [attr.aria-invalid]="submitted() && form.controls.customerName.invalid"
@@ -29,12 +160,17 @@
                 "
               />
               @if (submitted() && form.controls.customerName.invalid) {
-                <p id="customer-name-error" class="field-error">{{ copy().checkout.required }}</p>
+                <p id="customer-name-error" class="field-error" role="alert">
+                  {{ copy().checkout.required }}
+                </p>
               }
             </div>
 
             <div class="field-group">
-              <label for="customer-phone">{{ copy().checkout.phone }}</label>
+              <label for="customer-phone">
+                {{ copy().checkout.phone }}
+                <span class="required-mark" aria-hidden="true">*</span>
+              </label>
               <input
                 id="customer-phone"
                 type="tel"
@@ -53,7 +189,7 @@
               />
               <p id="customer-phone-hint" class="field-hint">{{ copy().checkout.phoneHint }}</p>
               @if (submitted() && form.controls.customerPhone.invalid) {
-                <p id="customer-phone-error" class="field-error">
+                <p id="customer-phone-error" class="field-error" role="alert">
                   {{ copy().checkout.invalidPhone }}
                 </p>
               }
@@ -61,82 +197,205 @@
           </div>
         </section>
 
+        <!-- Step 2: Fulfillment Method -->
         <section class="checkout-card" aria-labelledby="type-title">
-          <h2 id="type-title"><span>2</span>{{ copy().checkout.orderType }}</h2>
-          <div class="choice-grid">
+          <div class="card-header">
+            <div class="card-badge" [class.is-complete]="isStep2Complete()">
+              @if (isStep2Complete()) {
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="4 10 8 14 16 6" />
+                </svg>
+              } @else {
+                <span>2</span>
+              }
+            </div>
+            <h2 id="type-title">{{ copy().checkout.orderType }}</h2>
+          </div>
+
+          <div class="choice-grid" role="radiogroup" [attr.aria-labelledby]="'type-title'">
             <label class="choice-card" [class.is-selected]="orderType() === 'Takeaway'">
               <input type="radio" value="Takeaway" [formControl]="form.controls.orderType" />
-              <strong>{{ copy().common.takeaway }}</strong>
-              <small>{{ copy().checkout.takeawayDescription }}</small>
+              <div class="choice-card__radio" aria-hidden="true">
+                <div class="choice-card__radio-dot"></div>
+              </div>
+              <div class="choice-card__icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+              </div>
+              <div class="choice-card__body">
+                <div class="choice-card__heading">
+                  <strong>{{ copy().checkout.orderTypeTakeaway }}</strong>
+                  <span class="badge-free">{{ copy().checkout.free }}</span>
+                </div>
+                <small>{{ copy().checkout.takeawayDescription }}</small>
+              </div>
             </label>
+
             <label class="choice-card" [class.is-selected]="orderType() === 'Delivery'">
               <input type="radio" value="Delivery" [formControl]="form.controls.orderType" />
-              <strong>{{ copy().common.delivery }}</strong>
-              <small>{{ copy().checkout.deliveryDescription }}</small>
+              <div class="choice-card__radio" aria-hidden="true">
+                <div class="choice-card__radio-dot"></div>
+              </div>
+              <div class="choice-card__icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="1" y="3" width="15" height="13" />
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                  <circle cx="5.5" cy="18.5" r="2.5" />
+                  <circle cx="18.5" cy="18.5" r="2.5" />
+                </svg>
+              </div>
+              <div class="choice-card__body">
+                <div class="choice-card__heading">
+                  <strong>{{ copy().checkout.orderTypeDelivery }}</strong>
+                </div>
+                <small>{{ copy().checkout.deliveryDescription }}</small>
+              </div>
             </label>
           </div>
 
           @if (orderType() === 'Delivery') {
             <div class="delivery-fields">
               <div class="field-group">
-                <label for="delivery-area">{{ copy().checkout.area }}</label>
+                <label for="delivery-area">
+                  {{ copy().checkout.area }}
+                  <span class="required-mark" aria-hidden="true">*</span>
+                </label>
                 @if (areaState() === 'error') {
                   <div class="inline-error" role="alert">
                     <span>{{ copy().checkout.areasError }}</span>
-                    <button type="button" (click)="loadDeliveryAreas()">
+                    <button type="button" class="retry-btn" (click)="loadDeliveryAreas()">
                       {{ copy().common.retry }}
                     </button>
                   </div>
                 } @else {
-                  <select
-                    id="delivery-area"
-                    [formControl]="form.controls.deliveryAreaId"
-                    [attr.aria-invalid]="submitted() && !selectedAreaId()"
-                  >
-                    <option value="">{{ copy().checkout.chooseArea }}</option>
-                    @for (area of deliveryAreas(); track area.id) {
-                      <option [value]="area.id">
-                        {{ areaName(area) }} — {{ money(area.deliveryFee) }}
-                      </option>
-                    }
-                  </select>
+                  <div class="select-wrapper">
+                    <select
+                      id="delivery-area"
+                      [formControl]="form.controls.deliveryAreaId"
+                      [attr.aria-invalid]="submitted() && !selectedAreaId()"
+                    >
+                      <option value="">{{ copy().checkout.chooseArea }}</option>
+                      @for (area of deliveryAreas(); track area.id) {
+                        <option [value]="area.id">
+                          {{ areaName(area) }} — {{ money(area.deliveryFee) }}
+                        </option>
+                      }
+                    </select>
+                  </div>
                   @if (submitted() && !selectedAreaId()) {
-                    <p class="field-error">{{ copy().checkout.chooseDeliveryArea }}</p>
+                    <p class="field-error" role="alert">{{ copy().checkout.chooseDeliveryArea }}</p>
                   }
                 }
               </div>
 
               <div class="field-group">
-                <label for="delivery-address">{{ copy().checkout.address }}</label>
+                <label for="delivery-address">
+                  {{ copy().checkout.address }}
+                  <span class="required-mark" aria-hidden="true">*</span>
+                </label>
                 <textarea
                   id="delivery-address"
                   rows="3"
                   maxlength="500"
+                  dir="auto"
                   autocomplete="street-address"
                   [formControl]="form.controls.address"
                   [placeholder]="copy().checkout.addressPlaceholder"
                   [attr.aria-invalid]="submitted() && !form.controls.address.value.trim()"
+                  [attr.aria-describedby]="
+                    submitted() && !form.controls.address.value.trim()
+                      ? 'delivery-address-error'
+                      : null
+                  "
                 ></textarea>
                 @if (submitted() && !form.controls.address.value.trim()) {
-                  <p class="field-error">{{ copy().checkout.addressRequired }}</p>
+                  <p id="delivery-address-error" class="field-error" role="alert">
+                    {{ copy().checkout.addressRequired }}
+                  </p>
                 }
               </div>
             </div>
           }
         </section>
 
+        <!-- Step 3: Payment & Notes -->
         <section class="checkout-card" aria-labelledby="payment-title">
-          <h2 id="payment-title"><span>3</span>{{ copy().checkout.payment }}</h2>
-          <div class="cash-method">
-            <strong>{{ copy().common.cash }}</strong>
-            <p>{{ copy().checkout.cashDescription }}</p>
+          <div class="card-header">
+            <div class="card-badge" [class.is-complete]="isStep3Complete()">
+              @if (isStep3Complete()) {
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="4 10 8 14 16 6" />
+                </svg>
+              } @else {
+                <span>3</span>
+              }
+            </div>
+            <h2 id="payment-title">{{ copy().checkout.payment }}</h2>
           </div>
-          <div class="field-group">
+
+          <div class="cash-method">
+            <div class="cash-method__icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="6" width="20" height="12" rx="2" />
+                <circle cx="12" cy="12" r="2" />
+                <path d="M6 12h.01M18 12h.01" />
+              </svg>
+            </div>
+            <div class="cash-method__content">
+              <div class="cash-method__title-row">
+                <strong>{{ copy().common.cash }}</strong>
+                <span class="cash-active-tag">✓</span>
+              </div>
+              <p>{{ copy().checkout.cashDescription }}</p>
+            </div>
+          </div>
+
+          <div class="field-group note-field-group">
             <label for="customer-note">{{ copy().checkout.note }}</label>
             <textarea
               id="customer-note"
-              rows="3"
+              rows="2"
               maxlength="500"
+              dir="auto"
               [formControl]="form.controls.customerNote"
               [placeholder]="copy().checkout.notePlaceholder"
             ></textarea>
@@ -144,42 +403,97 @@
         </section>
       </div>
 
+      <!-- Desktop & Tablet Order Summary Sidebar -->
       <aside class="checkout-summary" aria-labelledby="summary-title">
-        <h2 id="summary-title">{{ copy().checkout.summary }}</h2>
-        <ul>
+        <div class="summary-header">
+          <h2 id="summary-title">{{ copy().checkout.summary }}</h2>
+          <span class="summary-badge">{{ cart.itemCount() }}</span>
+        </div>
+
+        <ul class="summary-items">
           @for (item of cart.items(); track item.menuItemId) {
-            <li>
-              <span
-                >{{ item.quantity }} ×
-                {{ language.current() === 'ar' ? item.nameAr : item.nameEn }}</span
-              >
-              <strong>{{ money(item.quantity * item.unitPrice) }}</strong>
+            <li class="summary-item">
+              <div class="summary-item__info">
+                <span class="summary-item__qty">{{ item.quantity }}×</span>
+                <span class="summary-item__name">{{ itemName(item) }}</span>
+              </div>
+              <strong class="summary-item__price">{{
+                money(item.quantity * item.unitPrice)
+              }}</strong>
             </li>
           }
         </ul>
-        <dl>
-          <div>
+
+        <dl class="summary-totals">
+          <div class="summary-row">
             <dt>{{ copy().common.subtotal }}</dt>
             <dd>{{ money(cart.subtotal()) }}</dd>
           </div>
-          <div>
+          <div class="summary-row">
             <dt>{{ copy().common.deliveryFee }}</dt>
-            <dd>{{ money(displayedDeliveryFee()) }}</dd>
+            @if (orderType() === 'Takeaway') {
+              <dd class="summary-free">{{ copy().checkout.free }}</dd>
+            } @else {
+              <dd>{{ money(displayedDeliveryFee()) }}</dd>
+            }
           </div>
-          <div class="checkout-summary__total">
+          <div class="summary-row checkout-summary__total">
             <dt>{{ copy().common.total }}</dt>
             <dd>{{ money(displayedTotal()) }}</dd>
           </div>
         </dl>
-        <p class="authority-note">{{ copy().checkout.authoritativeNotice }}</p>
+
+        <div class="authority-note-box">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          <p class="authority-note">{{ copy().checkout.authoritativeNotice }}</p>
+        </div>
+
         <button
-          class="button button--primary button--wide"
+          class="button button--primary button--wide desktop-submit-btn"
           type="submit"
           [disabled]="sending() || cart.items().length === 0"
         >
-          {{ sending() ? copy().checkout.submitting : copy().checkout.submit }}
+          @if (sending()) {
+            <span class="submit-spinner" aria-hidden="true"></span>
+            <span>{{ copy().checkout.submitting }}</span>
+          } @else {
+            <span class="submit-label">{{ copy().checkout.submit }}</span>
+            <span class="submit-total-tag">{{ money(displayedTotal()) }}</span>
+          }
         </button>
       </aside>
+    </div>
+
+    <!-- Mobile Bottom Action Bar -->
+    <div class="mobile-action-bar" aria-label="Mobile order submission bar">
+      <div class="mobile-action-bar__info">
+        <span class="mobile-action-bar__label">{{ copy().common.total }}</span>
+        <strong class="mobile-action-bar__amount">{{ money(displayedTotal()) }}</strong>
+      </div>
+      <button
+        class="button button--primary mobile-action-bar__btn"
+        type="submit"
+        [disabled]="sending() || cart.items().length === 0"
+      >
+        @if (sending()) {
+          <span class="submit-spinner" aria-hidden="true"></span>
+          <span>{{ copy().checkout.submitting }}</span>
+        } @else {
+          <span>{{ copy().checkout.submit }}</span>
+        }
+      </button>
     </div>
   </form>
 </main>
