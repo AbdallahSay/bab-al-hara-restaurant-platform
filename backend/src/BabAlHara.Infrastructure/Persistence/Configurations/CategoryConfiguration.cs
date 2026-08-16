@@ -19,5 +19,11 @@ public sealed class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.Property(category => category.DisplayOrder).IsRequired();
         builder.Property(category => category.IsActive).IsRequired();
         builder.HasIndex(category => new { category.IsActive, category.DisplayOrder });
+
+        builder.HasData(
+            new { Id = new Guid("10000000-0000-0000-0000-000000000001"), NameAr = "المشاوي", NameEn = "Grills", DisplayOrder = 10, IsActive = true },
+            new { Id = new Guid("10000000-0000-0000-0000-000000000002"), NameAr = "السندوتشات", NameEn = "Sandwiches", DisplayOrder = 20, IsActive = true },
+            new { Id = new Guid("10000000-0000-0000-0000-000000000003"), NameAr = "المقبلات", NameEn = "Sides", DisplayOrder = 30, IsActive = true },
+            new { Id = new Guid("10000000-0000-0000-0000-000000000004"), NameAr = "المشروبات", NameEn = "Drinks", DisplayOrder = 40, IsActive = true });
     }
 }

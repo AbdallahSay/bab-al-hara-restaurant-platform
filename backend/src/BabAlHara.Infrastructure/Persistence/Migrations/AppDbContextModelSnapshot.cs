@@ -52,6 +52,40 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_Categories_DisplayOrder", "[DisplayOrder] >= 0");
                         });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("10000000-0000-0000-0000-000000000001"),
+                            DisplayOrder = 10,
+                            IsActive = true,
+                            NameAr = "المشاوي",
+                            NameEn = "Grills"
+                        },
+                        new
+                        {
+                            Id = new Guid("10000000-0000-0000-0000-000000000002"),
+                            DisplayOrder = 20,
+                            IsActive = true,
+                            NameAr = "السندوتشات",
+                            NameEn = "Sandwiches"
+                        },
+                        new
+                        {
+                            Id = new Guid("10000000-0000-0000-0000-000000000003"),
+                            DisplayOrder = 30,
+                            IsActive = true,
+                            NameAr = "المقبلات",
+                            NameEn = "Sides"
+                        },
+                        new
+                        {
+                            Id = new Guid("10000000-0000-0000-0000-000000000004"),
+                            DisplayOrder = 40,
+                            IsActive = true,
+                            NameAr = "المشروبات",
+                            NameEn = "Drinks"
+                        });
                 });
 
             modelBuilder.Entity("BabAlHara.Domain.Catalog.MenuItem", b =>
@@ -110,6 +144,120 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("CK_MenuItems_Price", "[Price] >= 0");
                         });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000001"),
+                            CategoryId = new Guid("10000000-0000-0000-0000-000000000001"),
+                            DescriptionAr = "كفتة وكباب وشيش طاووق مع خضار مشوية.",
+                            DescriptionEn = "Kofta, kebab, and shish tawook with grilled vegetables.",
+                            ImageReference = "/images/menu/mixed-grill.webp",
+                            IsActive = true,
+                            IsAvailable = true,
+                            NameAr = "مشكل مشاوي باب الحارة",
+                            NameEn = "Bab Al Hara mixed grill",
+                            PreparationMinutes = 28,
+                            Price = 295m
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000002"),
+                            CategoryId = new Guid("10000000-0000-0000-0000-000000000001"),
+                            DescriptionAr = "دجاج متبل على الفحم مع ثومية ومخلل.",
+                            DescriptionEn = "Charcoal-grilled marinated chicken with garlic sauce and pickles.",
+                            ImageReference = "/images/menu/grilled-chicken.webp",
+                            IsActive = true,
+                            IsAvailable = true,
+                            NameAr = "نصف فرخة مشوية",
+                            NameEn = "Half grilled chicken",
+                            PreparationMinutes = 25,
+                            Price = 180m
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000003"),
+                            CategoryId = new Guid("10000000-0000-0000-0000-000000000002"),
+                            DescriptionAr = "كفتة مشوية في عيش بلدي مع طحينة وسلطة.",
+                            DescriptionEn = "Grilled kofta in baladi bread with tahini and salad.",
+                            ImageReference = "/images/menu/kofta-sandwich.webp",
+                            IsActive = true,
+                            IsAvailable = true,
+                            NameAr = "سندوتش كفتة",
+                            NameEn = "Kofta sandwich",
+                            PreparationMinutes = 14,
+                            Price = 85m
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000004"),
+                            CategoryId = new Guid("10000000-0000-0000-0000-000000000002"),
+                            DescriptionAr = "شيش طاووق مشوي مع ثومية وخيار مخلل.",
+                            DescriptionEn = "Grilled shish tawook with garlic sauce and pickled cucumber.",
+                            ImageReference = "/images/menu/shish-sandwich.webp",
+                            IsActive = true,
+                            IsAvailable = true,
+                            NameAr = "سندوتش شيش طاووق",
+                            NameEn = "Shish tawook sandwich",
+                            PreparationMinutes = 14,
+                            Price = 78m
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000005"),
+                            CategoryId = new Guid("10000000-0000-0000-0000-000000000003"),
+                            DescriptionAr = "حمص كريمي بزيت الزيتون والبابريكا.",
+                            DescriptionEn = "Creamy hummus finished with olive oil and paprika.",
+                            ImageReference = "/images/menu/hummus.webp",
+                            IsActive = true,
+                            IsAvailable = true,
+                            NameAr = "حمص بالطحينة",
+                            NameEn = "Hummus",
+                            PreparationMinutes = 6,
+                            Price = 48m
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000006"),
+                            CategoryId = new Guid("10000000-0000-0000-0000-000000000003"),
+                            DescriptionAr = "خضار طازجة وخبز محمص بدبس الرمان.",
+                            DescriptionEn = "Fresh vegetables and toasted bread with pomegranate molasses.",
+                            ImageReference = "/images/menu/fattoush.webp",
+                            IsActive = true,
+                            IsAvailable = true,
+                            NameAr = "فتوش",
+                            NameEn = "Fattoush",
+                            PreparationMinutes = 8,
+                            Price = 55m
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000007"),
+                            CategoryId = new Guid("10000000-0000-0000-0000-000000000004"),
+                            DescriptionAr = "ليمون طازج ونعناع محضر عند الطلب.",
+                            DescriptionEn = "Fresh lemon and mint, blended to order.",
+                            ImageReference = "/images/menu/mint-lemonade.webp",
+                            IsActive = true,
+                            IsAvailable = true,
+                            NameAr = "ليمون بالنعناع",
+                            NameEn = "Mint lemonade",
+                            PreparationMinutes = 5,
+                            Price = 42m
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000008"),
+                            CategoryId = new Guid("10000000-0000-0000-0000-000000000004"),
+                            DescriptionAr = "مشروب تمر هندي شرقي بارد.",
+                            DescriptionEn = "Chilled traditional tamarind drink.",
+                            ImageReference = "/images/menu/tamarind.webp",
+                            IsActive = true,
+                            IsAvailable = false,
+                            NameAr = "تمر هندي",
+                            NameEn = "Tamarind",
+                            PreparationMinutes = 3,
+                            Price = 35m
+                        });
                 });
 
             modelBuilder.Entity("BabAlHara.Domain.Delivery.DeliveryArea", b =>
@@ -146,6 +294,35 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("CK_DeliveryAreas_DeliveryFee", "[DeliveryFee] >= 0");
 
                             t.HasCheckConstraint("CK_DeliveryAreas_EstimatedDeliveryMinutes", "[EstimatedDeliveryMinutes] BETWEEN 1 AND 480");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000001"),
+                            DeliveryFee = 35m,
+                            EstimatedDeliveryMinutes = 45,
+                            IsActive = true,
+                            NameAr = "مدينة نصر",
+                            NameEn = "Nasr City"
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000002"),
+                            DeliveryFee = 40m,
+                            EstimatedDeliveryMinutes = 50,
+                            IsActive = true,
+                            NameAr = "مصر الجديدة",
+                            NameEn = "Heliopolis"
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000003"),
+                            DeliveryFee = 55m,
+                            EstimatedDeliveryMinutes = 60,
+                            IsActive = true,
+                            NameAr = "القاهرة الجديدة",
+                            NameEn = "New Cairo"
                         });
                 });
 
