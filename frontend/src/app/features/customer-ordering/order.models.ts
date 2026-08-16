@@ -1,4 +1,4 @@
-export interface Category {
+﻿export interface Category {
   readonly id: string;
   readonly nameAr: string;
   readonly nameEn: string;
@@ -72,6 +72,17 @@ export interface KitchenOrder {
   readonly address: string | null;
   readonly customerNote: string | null;
   readonly items: readonly KitchenOrderItem[];
+}
+
+export interface OrderStatusChangedEvent {
+  readonly publicCode: string;
+  readonly status: OrderStatus;
+  readonly updatedAt?: string;
+}
+
+export interface MenuItemAvailabilityChangedEvent {
+  readonly menuItemId: string;
+  readonly isAvailable: boolean;
 }
 
 export interface ProblemDetails {
