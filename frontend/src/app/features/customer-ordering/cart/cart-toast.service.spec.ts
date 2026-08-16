@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { CartToastService } from './cart-toast.service';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertOptions, SweetAlertResult } from 'sweetalert2';
 
 describe('CartToastService', () => {
   let service: CartToastService;
@@ -23,7 +23,11 @@ describe('CartToastService', () => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(CartToastService);
     // spy on fire
-    vi.spyOn(Swal, 'fire').mockResolvedValue({} as any);
+    vi.spyOn(Swal, 'fire').mockResolvedValue({
+      isConfirmed: false,
+      isDenied: false,
+      isDismissed: true,
+    } as SweetAlertResult);
   });
 
   afterEach(() => {
@@ -33,34 +37,34 @@ describe('CartToastService', () => {
   it('should call showAddedToast with correct title for new item in English', () => {
     service.showAddedToast('Burger', false, 'en');
     expect(Swal.fire).toHaveBeenCalled();
-    const args = vi.mocked(Swal.fire).mock.calls[0]![0] as any;
-    expect(args.title).toBe('Added to cart');
-    expect(args.text).toBe('Burger was added successfully');
+    const args = vi.mocked(Swal.fire).mock.calls[0]?.[0] as SweetAlertOptions | undefined;
+    expect(args?.title).toBe('Added to cart');
+    expect(args?.text).toBe('Burger was added successfully');
   });
 
   it('should call showAddedToast with correct title for updated item in Arabic', () => {
     service.showAddedToast('Burger', true, 'ar');
     expect(Swal.fire).toHaveBeenCalled();
-    const args = vi.mocked(Swal.fire).mock.calls[0]![0] as any;
-    expect(args.title).toBe('تم تحديث الكمية في السلة');
-    expect(args.text).toBeUndefined();
+    const args = vi.mocked(Swal.fire).mock.calls[0]?.[0] as SweetAlertOptions | undefined;
+    expect(args?.title).toBe('تم تحديث الكمية في السلة');
+    expect(args?.text).toBeUndefined();
   });
 
   it('should set rtl based on document dir', () => {
     document.documentElement.dir = 'rtl';
     service.showAddedToast('Burger', false, 'ar');
     expect(Swal.fire).toHaveBeenCalled();
-    const args = vi.mocked(Swal.fire).mock.calls[0]![0] as any;
+    const args = vi.mocked(Swal.fire).mock.calls[0]?.[0] as SweetAlertOptions | undefined;
 
     // Simulate didOpen
     const popup = document.createElement('div');
-    args.didOpen(popup);
+    args?.didOpen?.(popup);
     expect(popup.getAttribute('dir')).toBe('rtl');
 
     document.documentElement.dir = 'ltr';
     service.showAddedToast('Burger', false, 'en');
-    const args2 = vi.mocked(Swal.fire).mock.calls[1]![0] as any;
-    args2.didOpen(popup);
+    const args2 = vi.mocked(Swal.fire).mock.calls[1]?.[0] as SweetAlertOptions | undefined;
+    args2?.didOpen?.(popup);
     expect(popup.getAttribute('dir')).toBe('ltr');
   });
 });

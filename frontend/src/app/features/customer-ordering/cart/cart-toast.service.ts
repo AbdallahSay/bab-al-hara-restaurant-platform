@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { UI_COPY } from '../../../core/i18n/translations';
 
 @Injectable({
@@ -14,7 +14,7 @@ export class CartToastService {
     const title = wasUpdated ? copy.updatedToast : copy.addedToast;
     const text = wasUpdated ? null : copy.addedToastSubtitle.replace('{{itemName}}', itemName);
 
-    const swalOptions: any = {
+    const swalOptions: SweetAlertOptions = {
       toast: true,
       position: 'top-end',
       timer: prefersReducedMotion ? 0 : 2000,

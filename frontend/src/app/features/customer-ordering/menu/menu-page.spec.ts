@@ -1,3 +1,4 @@
+import { EnvironmentProviders, Provider } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -163,7 +164,10 @@ describe('MenuPage', () => {
     api: Partial<CustomerApiService>,
     cartToastMock?: Partial<CartToastService>,
   ): Promise<void> {
-    const providers: any[] = [provideRouter([]), { provide: CustomerApiService, useValue: api }];
+    const providers: (Provider | EnvironmentProviders)[] = [
+      provideRouter([]),
+      { provide: CustomerApiService, useValue: api },
+    ];
     if (cartToastMock) {
       providers.push({ provide: CartToastService, useValue: cartToastMock });
     } else {
