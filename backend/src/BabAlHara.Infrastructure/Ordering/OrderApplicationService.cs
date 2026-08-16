@@ -239,6 +239,7 @@ public sealed partial class OrderApplicationService(
             order.DeliveryAreaNameEn,
             order.Address,
             order.CustomerNote,
+            order.RowVersion != null ? Convert.ToBase64String(order.RowVersion) : null,
             order.Items.Select(item => new KitchenOrderItemDto(
                 item.ProductNameAr,
                 item.ProductNameEn,

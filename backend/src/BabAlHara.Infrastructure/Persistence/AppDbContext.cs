@@ -25,6 +25,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
 
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
+    public DbSet<OrderStatusHistory> OrderStatusHistories => Set<OrderStatusHistory>();
+
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         ArgumentNullException.ThrowIfNull(configurationBuilder);

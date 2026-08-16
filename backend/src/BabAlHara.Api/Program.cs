@@ -88,7 +88,11 @@ builder.Services
             new JsonStringEnumConverter());
     });
 
-builder.Services.AddSingleton<INewOrderNotifier, SignalRNewOrderNotifier>();
+builder.Services.AddSingleton<SignalRKitchenRealtimeNotifier>();
+builder.Services.AddSingleton<IKitchenRealtimeNotifier>(sp =>
+    sp.GetRequiredService<SignalRKitchenRealtimeNotifier>());
+builder.Services.AddSingleton<INewOrderNotifier>(sp =>
+    sp.GetRequiredService<SignalRKitchenRealtimeNotifier>());
 
 //
 // Authorization
@@ -101,7 +105,10 @@ builder.Services
         policy =>
             policy
                 .RequireAuthenticatedUser()
-                .RequireRole(DevelopmentDataSeeder.KitchenRole));
+                .RequireRole(
+                    DevelopmentDataSeeder.KitchenRole,
+                    DevelopmentDataSeeder.ManagerRole,
+                    DevelopmentDataSeeder.AdminRole));
 
 //
 // Staff Authentication Cookie

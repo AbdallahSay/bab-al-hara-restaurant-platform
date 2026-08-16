@@ -34,6 +34,7 @@ public sealed class PersistenceConfigurationTests
         Assert.Contains(entityTypes, entity => entity.ClrType == typeof(Domain.Delivery.DeliveryArea));
         Assert.Contains(entityTypes, entity => entity.ClrType == typeof(Domain.Ordering.Order));
         Assert.Contains(entityTypes, entity => entity.ClrType == typeof(Domain.Ordering.OrderItem));
+        Assert.Contains(entityTypes, entity => entity.ClrType == typeof(Domain.Ordering.OrderStatusHistory));
         Assert.Equal(18, AppDbContext.DefaultDecimalPrecision);
         Assert.Equal(2, AppDbContext.DefaultDecimalScale);
     }

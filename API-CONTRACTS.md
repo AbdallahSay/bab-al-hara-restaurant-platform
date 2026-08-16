@@ -2,7 +2,7 @@
 
 This is a contract map, not the final OpenAPI specification. Codex should turn accepted endpoints into explicit request/response DTOs and OpenAPI definitions.
 
-## Implemented customer-ordering slice
+## Implemented customer-ordering & kitchen-operations slice
 
 Implemented endpoints are JSON and use string enum names. EF entities are never serialized as API contracts.
 
@@ -24,26 +24,35 @@ The request has no price, subtotal, delivery-fee, total, payment-method, payment
 
 ### Staff session and kitchen
 
-- `GET /api/staff/session`
-- `POST /api/staff/session` with antiforgery token; rate limited; non-enumerating error
-- `DELETE /api/staff/session` with Kitchen authorization and antiforgery token
-- `GET /api/kitchen/orders/active` with Kitchen authorization
+- `GET /api/staff/session` -> `StaffSessionResponse(isAuthenticated, displayName)`
+- `POST /api/staff/session` with antiforgery token; rate limited; validates staff credentials (Kitchen, Manager, Admin, Cashier, Driver)
+- `DELETE /api/staff/session` with authorization and antiforgery token
 
-The browser session uses an ASP.NET Core Identity `HttpOnly` same-site cookie. Angular stores no authentication token.
+### Kitchen Operations Endpoints (Kitchen, Manager, Admin authorized)
+
+- `GET /api/kitchen/orders/active` -> active `KitchenOrderDto[]` (Pending, Confirmed, Preparing, Ready queue) with RowVersion
+- `GET /api/kitchen/orders/{publicCode}` -> `KitchenOrderDetailsDto` including complete item snapshot, RowVersion, and audit history
+- `GET /api/kitchen/orders/{publicCode}/history` -> `OrderStatusHistoryDto[]`
+- `POST /api/kitchen/orders/{publicCode}/confirm` -> transitions from Pending to Confirmed; accepts `{ rowVersion?: string, notes?: string }`
+- `POST /api/kitchen/orders/{publicCode}/start-preparing` (alias `/prepare`) -> transitions from Confirmed/Pending to Preparing; accepts `{ rowVersion?: string, notes?: string }`
+- `POST /api/kitchen/orders/{publicCode}/mark-ready` (alias `/ready`) -> transitions from Preparing to Ready; accepts `{ rowVersion?: string, notes?: string }`
+- `POST /api/kitchen/orders/{publicCode}/transition` -> unified transition endpoint with `{ targetStatus: string, rowVersion?: string, notes?: string }`
+- `POST /api/kitchen/menu-items/{id}/availability` (alias `POST /api/menu/items/{id}/availability`) -> `{ isAvailable: boolean }` updates availability and broadcasts event
+
+Concurrency Handling:
+- Order modifications enforce SQL Server `rowversion` concurrency token.
+- Concurrent updates or stale rowversions return `409 Conflict` with `code: "concurrency_conflict"`.
+- Illegal status transitions return `400 Bad Request` with `code: "invalid_order_transition"`.
 
 ### SignalR
 
 - Hub: `/hubs/kitchen`, Kitchen policy required
-- Server-to-client method: `NewOrder(KitchenOrderDto)`
+- Server-to-client methods:
+  - `NewOrder(KitchenOrderDto)`
+  - `OrderStatusChanged(OrderStatusChangedEvent)` with `{ publicCode, previousStatus, newStatus, changedAtUtc, rowVersion }`
+  - `MenuItemAvailabilityChanged(MenuItemAvailabilityChangedEvent)` with `{ menuItemId, isAvailable }`
 
-`KitchenOrderDto` includes public code, created time, order type/status, customer name, fulfilment snapshots, customer note, and item name/quantity snapshots. It contains no internal order IDs or customer phone. The event fires after the order commit. Initial load and reconnect use the active-orders API as the source of truth.
-
-## Public/customer catalog
-- GET `/api/menu/categories`
-- GET `/api/menu/items`
-- GET `/api/menu/items/{id}`
-
-Filters may include category and availability, but do not over-generalize query systems unnecessarily.
+The events fire after database transaction commits. Initial load and reconnect use the active-orders API as the source of truth.
 
 ## Customer ordering
 - POST `/api/orders`
@@ -52,23 +61,14 @@ Filters may include category and availability, but do not over-generalize query 
 - GET `/api/me/orders/{id}`
 - POST `/api/me/orders/{id}/reorder-preview`
 
-## Order commands
-Prefer command-specific endpoints over arbitrary status mutation.
-
-Examples:
-- POST `/api/orders/{id}/confirm`
-- POST `/api/orders/{id}/start-preparing`
-- POST `/api/orders/{id}/mark-ready`
-- POST `/api/orders/{id}/assign-driver`
-- POST `/api/orders/{id}/start-delivery`
-- POST `/api/orders/{id}/mark-delivered`
+## Order commands (Full lifecycle across phases)
+- POST `/api/kitchen/orders/{publicCode}/confirm` (Kitchen phase)
+- POST `/api/kitchen/orders/{publicCode}/start-preparing` (Kitchen phase)
+- POST `/api/kitchen/orders/{publicCode}/mark-ready` (Kitchen phase)
+- POST `/api/orders/{id}/assign-driver` (Cashier/Driver phase)
+- POST `/api/orders/{id}/start-delivery` (Driver phase)
+- POST `/api/orders/{id}/mark-delivered` (Driver phase)
 - POST `/api/orders/{id}/cancel` (when allowed)
-
-Each endpoint must enforce allowed transitions and actor permissions.
-
-## Kitchen
-- GET `/api/kitchen/orders/active`
-- POST `/api/menu/items/{id}/availability`
 
 ## Cashier
 - GET `/api/cashier/orders`
@@ -101,19 +101,7 @@ Each endpoint must enforce allowed transitions and actor permissions.
 - POST `/api/admin/employees/{id}/role`
 
 ## Payments
-Exact Paymob endpoints depend on implementation details and provider flow.
-Expected internal responsibilities:
 - create payment session/intention
 - receive Paymob webhook
 - query payment status for UI
 - authorized refund operation
-
-## SignalR
-Suggested hub responsibilities:
-- customer order tracking group by order identifier/authorization
-- kitchen operational group
-- cashier operational group
-- driver-specific group
-- manager/admin monitoring group where justified
-
-Events are notifications of changed state, not authoritative state themselves.

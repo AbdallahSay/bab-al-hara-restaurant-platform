@@ -1,4 +1,5 @@
 using BabAlHara.Infrastructure.Identity;
+using BabAlHara.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Identity;
 
@@ -42,7 +43,22 @@ public static class SecurityEndpoints
                     var user = string.IsNullOrWhiteSpace(request.Email)
                         ? null
                         : await userManager.FindByEmailAsync(request.Email.Trim());
-                    if (user is null || !await userManager.IsInRoleAsync(user, "Kitchen"))
+                    if (user is null)
+                    {
+                        return Results.Problem(
+                            statusCode: StatusCodes.Status401Unauthorized,
+                            title: "Sign-in failed.",
+                            detail: "The email or password is incorrect.");
+                    }
+
+                    var isStaff =
+                        await userManager.IsInRoleAsync(user, DevelopmentDataSeeder.KitchenRole) ||
+                        await userManager.IsInRoleAsync(user, DevelopmentDataSeeder.ManagerRole) ||
+                        await userManager.IsInRoleAsync(user, DevelopmentDataSeeder.AdminRole) ||
+                        await userManager.IsInRoleAsync(user, DevelopmentDataSeeder.CashierRole) ||
+                        await userManager.IsInRoleAsync(user, DevelopmentDataSeeder.DriverRole);
+
+                    if (!isStaff)
                     {
                         return Results.Problem(
                             statusCode: StatusCodes.Status401Unauthorized,
@@ -75,7 +91,7 @@ public static class SecurityEndpoints
                     await signInManager.SignOutAsync();
                     return Results.NoContent();
                 })
-            .RequireAuthorization(AuthorizationPolicies.Kitchen)
+            .RequireAuthorization()
             .WithMetadata(new RequireAntiforgeryTokenAttribute(true))
             .WithName("DeleteStaffSession")
             .Produces(StatusCodes.Status204NoContent);

@@ -65,6 +65,7 @@ public static class DependencyInjection
         services.AddScoped<IDeliveryAreaQueryService, DeliveryAreaQueryService>();
         services.AddScoped<IOrderApplicationService, OrderApplicationService>();
         services.AddScoped<IKitchenOrderQueryService, KitchenOrderQueryService>();
+        services.AddScoped<IKitchenOrderCommandService, KitchenOrderCommandService>();
         services.AddScoped<DevelopmentDataSeeder>();
 
         return services;
