@@ -23,7 +23,17 @@ jobs:
       - name: Checkout application
         uses: actions/checkout@v4
         with:
-          ref: feature/customer-ordering
+          ref: main
+
+      - name: Show deployment source
+        shell: pwsh
+        run: |
+          Write-Host "============================================"
+          Write-Host "Deployment source"
+          Write-Host "Branch: main"
+          Write-Host "Commit:"
+          git rev-parse HEAD
+          Write-Host "============================================"
 
       # ============================================================
       # FRONTEND - ANGULAR
@@ -284,6 +294,8 @@ jobs:
       - name: Deployment completed
         shell: pwsh
         run: |
+          $commit = git rev-parse HEAD
+
           Write-Host "============================================"
           Write-Host "Bab Al Hara deployment completed."
           Write-Host ""
@@ -291,7 +303,10 @@ jobs:
           Write-Host "https://bab-al-hara.runasp.net"
           Write-Host ""
           Write-Host "Branch deployed:"
-          Write-Host "feature/customer-ordering"
+          Write-Host "main"
+          Write-Host ""
+          Write-Host "Commit deployed:"
+          Write-Host $commit
           Write-Host ""
           Write-Host "SQL Server migrations: applied"
           Write-Host "Angular: deployed"
