@@ -5,7 +5,7 @@ public sealed class Order
     private static readonly Dictionary<OrderStatus, HashSet<OrderStatus>> AllowedTransitions =
         new()
         {
-            [OrderStatus.Pending] = [OrderStatus.Confirmed, OrderStatus.Preparing],
+            [OrderStatus.Pending] = [OrderStatus.Confirmed],
             [OrderStatus.Confirmed] = [OrderStatus.Preparing],
             [OrderStatus.Preparing] = [OrderStatus.Ready],
             [OrderStatus.Ready] = [OrderStatus.OnTheWay],

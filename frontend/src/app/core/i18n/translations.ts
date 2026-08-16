@@ -1,4 +1,4 @@
-export type Language = 'ar' | 'en';
+﻿export type Language = 'ar' | 'en';
 
 export interface UiCopy {
   readonly brand: {
@@ -117,6 +117,8 @@ export interface UiCopy {
     readonly loading: string;
     readonly emptyTitle: string;
     readonly emptyBody: string;
+    readonly emptyFilterTitle: string;
+    readonly emptyFilterBody: string;
     readonly queueError: string;
     readonly connected: string;
     readonly connecting: string;
@@ -133,6 +135,40 @@ export interface UiCopy {
     readonly address: string;
     readonly note: string;
     readonly items: string;
+    readonly takeawayBadge: string;
+    readonly deliveryBadge: string;
+    readonly orderCode: string;
+    readonly allOrders: string;
+    readonly pendingFilter: string;
+    readonly confirmedFilter: string;
+    readonly preparingFilter: string;
+    readonly readyFilter: string;
+    readonly confirmOrder: string;
+    readonly startPreparing: string;
+    readonly markReady: string;
+    readonly readyForPickup: string;
+    readonly updating: string;
+    readonly refresh: string;
+    readonly orderUpdatedByOther: string;
+    readonly actionError: string;
+    readonly manageAvailability: string;
+    readonly availabilityTitle: string;
+    readonly availabilitySubtitle: string;
+    readonly available: string;
+    readonly unavailable: string;
+    readonly markAsAvailable: string;
+    readonly markAsUnavailable: string;
+    readonly toggleConfirmTitle: string;
+    readonly toggleConfirmMessage: string;
+    readonly confirm: string;
+    readonly cancel: string;
+    readonly close: string;
+    readonly saving: string;
+    readonly availabilityUpdated: string;
+    readonly availabilityError: string;
+    readonly searchItems: string;
+    readonly allItems: string;
+    readonly unavailableCount: string;
     readonly status: Readonly<Record<string, string>>;
   };
 }
@@ -255,22 +291,58 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       loading: 'جاري تحميل الطلبات…',
       emptyTitle: 'لا توجد طلبات حالية',
       emptyBody: 'ستظهر الطلبات الجديدة هنا فور تأكيدها.',
+      emptyFilterTitle: 'لا توجد طلبات في هذا القسم',
+      emptyFilterBody: 'لا توجد طلبات تطابق التصفية المحددة حالياً.',
       queueError: 'تعذر تحميل الطلبات المحفوظة. أعد المحاولة.',
       connected: 'متصل بالتحديثات المباشرة',
-      connecting: 'جاري الاتصال',
-      reconnecting: 'انقطع الاتصال، جاري إعادة الاتصال',
+      connecting: 'جاري الاتصال…',
+      reconnecting: 'انقطع الاتصال، جاري إعادة الاتصال…',
       disconnected: 'التحديث المباشر متوقف',
       soundEnable: 'تشغيل تنبيه الصوت',
       soundEnabled: 'تنبيه الصوت يعمل',
-      newOrder: 'طلب جديد',
+      newOrder: 'طلب جديد!',
       received: 'وصل الساعة',
-      elapsed: 'منذ',
+      elapsed: 'الانتظار',
       minute: 'دقيقة',
       minutes: 'دقائق',
       customer: 'العميل',
       address: 'العنوان',
-      note: 'ملاحظة',
+      note: 'ملاحظة خاصة',
       items: 'الأصناف',
+      takeawayBadge: 'استلام فرع',
+      deliveryBadge: 'توصيل',
+      orderCode: 'طلب #',
+      allOrders: 'كل الطلبات',
+      pendingFilter: 'جديد',
+      confirmedFilter: 'مؤكد',
+      preparingFilter: 'قيد التحضير',
+      readyFilter: 'جاهز',
+      confirmOrder: 'تأكيد الطلب',
+      startPreparing: 'بدء التحضير',
+      markReady: 'جاهز للتسليم',
+      readyForPickup: 'جاهز للتسليم',
+      updating: 'جاري التحديث…',
+      refresh: 'تحديث البيانات',
+      orderUpdatedByOther: 'تم تحديث هذا الطلب من قبل مستخدم آخر، تم تحديث الشاشة.',
+      actionError: 'تعذر تحديث حالة الطلب. حاول مرة أخرى.',
+      manageAvailability: 'توفر الأصناف',
+      availabilityTitle: 'إدارة توفر أصناف القائمة',
+      availabilitySubtitle: 'تحديث حالة الأصناف المتوفرة والنافذة فورياً لجميع العملاء.',
+      available: 'متوفر',
+      unavailable: 'غير متاح (نفذ)',
+      markAsAvailable: 'تعيين كمتوفر',
+      markAsUnavailable: 'تعيين كغير متاح (نافذ)',
+      toggleConfirmTitle: 'تأكيد تغيير حالة الصنف',
+      toggleConfirmMessage: 'هل أنت متأكد من تغيير حالة الصنف إلى',
+      confirm: 'تأكيد التغيير',
+      cancel: 'إلغاء',
+      close: 'إغلاق',
+      saving: 'جاري الحفظ…',
+      availabilityUpdated: 'تم تحديث حالة الصنف بنجاح.',
+      availabilityError: 'تعذر تحديث حالة الصنف. حاول مرة أخرى.',
+      searchItems: 'بحث عن صنف…',
+      allItems: 'كل الأقسام',
+      unavailableCount: 'صنف غير متاح',
       status: {
         Pending: 'جديد',
         Confirmed: 'مؤكد',
@@ -391,30 +463,66 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       customerMenu: 'Open customer menu',
     },
     kitchen: {
-      title: 'Kitchen screen',
-      currentOrders: 'Current orders',
+      title: 'Kitchen Screen',
+      currentOrders: 'Active Orders',
       connectionLabel: 'Kitchen connection status',
       queueLabel: 'Current kitchen orders',
       signOut: 'Sign out',
-      loading: 'Loading current orders…',
-      emptyTitle: 'No current orders',
+      loading: 'Loading orders…',
+      emptyTitle: 'No active orders',
       emptyBody: 'New confirmed orders will appear here immediately.',
+      emptyFilterTitle: 'No orders in this section',
+      emptyFilterBody: 'There are no orders matching the selected filter right now.',
       queueError: 'Saved orders could not be loaded. Try again.',
       connected: 'Live updates connected',
-      connecting: 'Connecting to live updates',
-      reconnecting: 'Connection lost, reconnecting',
+      connecting: 'Connecting…',
+      reconnecting: 'Connection lost, reconnecting…',
       disconnected: 'Live updates disconnected',
       soundEnable: 'Enable sound alert',
       soundEnabled: 'Sound alert enabled',
-      newOrder: 'New order',
+      newOrder: 'New order!',
       received: 'Received at',
       elapsed: 'Waiting',
-      minute: 'minute',
-      minutes: 'minutes',
+      minute: 'min',
+      minutes: 'mins',
       customer: 'Customer',
       address: 'Address',
-      note: 'Note',
+      note: 'Special Note',
       items: 'Items',
+      takeawayBadge: 'Takeaway',
+      deliveryBadge: 'Delivery',
+      orderCode: 'Order #',
+      allOrders: 'All Orders',
+      pendingFilter: 'Pending',
+      confirmedFilter: 'Confirmed',
+      preparingFilter: 'Preparing',
+      readyFilter: 'Ready',
+      confirmOrder: 'Confirm Order',
+      startPreparing: 'Start Preparing',
+      markReady: 'Mark Ready',
+      readyForPickup: 'Ready for Collection',
+      updating: 'Updating…',
+      refresh: 'Refresh data',
+      orderUpdatedByOther: 'This order was updated by another user. Display refreshed.',
+      actionError: 'Failed to update order status. Try again.',
+      manageAvailability: 'Item Availability',
+      availabilityTitle: 'Menu Item Availability',
+      availabilitySubtitle: 'Update available and sold-out items across all ordering channels.',
+      available: 'Available',
+      unavailable: 'Unavailable (Sold Out)',
+      markAsAvailable: 'Mark as Available',
+      markAsUnavailable: 'Mark as Unavailable (Sold Out)',
+      toggleConfirmTitle: 'Confirm Status Change',
+      toggleConfirmMessage: 'Are you sure you want to change this item status to',
+      confirm: 'Confirm Change',
+      cancel: 'Cancel',
+      close: 'Close',
+      saving: 'Saving…',
+      availabilityUpdated: 'Item availability updated successfully.',
+      availabilityError: 'Failed to update item availability. Try again.',
+      searchItems: 'Search items…',
+      allItems: 'All Categories',
+      unavailableCount: 'unavailable items',
       status: {
         Pending: 'New',
         Confirmed: 'Confirmed',
