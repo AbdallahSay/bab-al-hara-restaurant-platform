@@ -27,5 +27,10 @@ public sealed class DeliveryAreaConfiguration : IEntityTypeConfiguration<Deliver
         builder.Property(area => area.EstimatedDeliveryMinutes).IsRequired();
         builder.Property(area => area.IsActive).IsRequired();
         builder.HasIndex(area => new { area.IsActive, area.NameEn });
+
+        builder.HasData(
+            new { Id = new Guid("30000000-0000-0000-0000-000000000001"), NameAr = "مدينة نصر", NameEn = "Nasr City", DeliveryFee = 35m, EstimatedDeliveryMinutes = 45, IsActive = true },
+            new { Id = new Guid("30000000-0000-0000-0000-000000000002"), NameAr = "مصر الجديدة", NameEn = "Heliopolis", DeliveryFee = 40m, EstimatedDeliveryMinutes = 50, IsActive = true },
+            new { Id = new Guid("30000000-0000-0000-0000-000000000003"), NameAr = "القاهرة الجديدة", NameEn = "New Cairo", DeliveryFee = 55m, EstimatedDeliveryMinutes = 60, IsActive = true });
     }
 }
