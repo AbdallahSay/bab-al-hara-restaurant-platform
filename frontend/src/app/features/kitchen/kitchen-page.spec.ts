@@ -1,4 +1,4 @@
-﻿import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Subject, of, throwError } from 'rxjs';
 
@@ -124,6 +124,33 @@ describe('KitchenPage', () => {
 
     expect(component['isSubmitting']('BH-PENDING')).toBe(false);
     expect(component['orders']()[0]?.status).toBe('Confirmed');
+  });
+
+  it('verifies Pending orders cannot offer Start Preparing and Confirmed orders advance to Preparing', async () => {
+    let prepareCalledWith = '';
+    const initialConfirmedOrder: KitchenOrder = {
+      ...INITIAL_ORDER_PENDING,
+      status: 'Confirmed',
+    };
+
+    const { fixture, component } = await createFixture([initialConfirmedOrder], {
+      startPreparing: (code: string) => {
+        prepareCalledWith = code;
+        return of({ ...initialConfirmedOrder, status: 'Preparing' });
+      },
+    });
+
+    expect(fixture.nativeElement.querySelector('.action-button--confirm')).toBeNull();
+    const prepareButton = fixture.nativeElement.querySelector(
+      '.action-button--prepare',
+    ) as HTMLButtonElement;
+    expect(prepareButton).toBeTruthy();
+
+    prepareButton.click();
+    fixture.detectChanges();
+
+    expect(prepareCalledWith).toBe('BH-PENDING');
+    expect(component['orders']()[0]?.status).toBe('Preparing');
   });
 
   it('advances order from Preparing to Ready', async () => {

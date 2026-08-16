@@ -70,20 +70,19 @@ public sealed class OrderStateTransitionTests
     }
 
     [Fact]
-    public void OrderDirectPendingToPreparingSucceeds()
+    public void OrderDirectPendingToPreparingThrowsInvalidOperationException()
     {
         var order = CreateSampleOrder();
         var now = DateTimeOffset.UtcNow;
 
-        order.TransitionStatus(OrderStatus.Preparing, "user-1", "Chef Ahmad", "Kitchen", now);
-        Assert.Equal(OrderStatus.Preparing, order.Status);
-        Assert.Single(order.StatusHistory);
-        var firstHistory = order.StatusHistory.First();
-        Assert.Equal(OrderStatus.Pending, firstHistory.PreviousStatus);
-        Assert.Equal(OrderStatus.Preparing, firstHistory.NewStatus);
+        Assert.False(order.CanTransitionTo(OrderStatus.Preparing));
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            order.TransitionStatus(OrderStatus.Preparing, "user-1", "Chef Ahmad", "Kitchen", now));
+        Assert.Contains("Cannot transition an order from Pending to Preparing", ex.Message);
     }
 
     [Theory]
+    [InlineData(OrderStatus.Pending, OrderStatus.Preparing)]
     [InlineData(OrderStatus.Pending, OrderStatus.Ready)]
     [InlineData(OrderStatus.Pending, OrderStatus.OnTheWay)]
     [InlineData(OrderStatus.Pending, OrderStatus.Delivered)]
@@ -171,12 +170,14 @@ public sealed class OrderStateTransitionTests
 
         if (status == OrderStatus.Preparing)
         {
+            order.TransitionTo(OrderStatus.Confirmed);
             order.TransitionTo(OrderStatus.Preparing);
             return order;
         }
 
         if (status == OrderStatus.Ready)
         {
+            order.TransitionTo(OrderStatus.Confirmed);
             order.TransitionTo(OrderStatus.Preparing);
             order.TransitionTo(OrderStatus.Ready);
             return order;
@@ -184,6 +185,7 @@ public sealed class OrderStateTransitionTests
 
         if (status == OrderStatus.OnTheWay)
         {
+            order.TransitionTo(OrderStatus.Confirmed);
             order.TransitionTo(OrderStatus.Preparing);
             order.TransitionTo(OrderStatus.Ready);
             order.TransitionTo(OrderStatus.OnTheWay);
@@ -192,6 +194,7 @@ public sealed class OrderStateTransitionTests
 
         if (status == OrderStatus.Delivered)
         {
+            order.TransitionTo(OrderStatus.Confirmed);
             order.TransitionTo(OrderStatus.Preparing);
             order.TransitionTo(OrderStatus.Ready);
             order.TransitionTo(OrderStatus.OnTheWay);

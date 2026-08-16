@@ -143,7 +143,7 @@ public sealed class KitchenApiTests(OrderingApiFactory factory) : IClassFixture<
     public async Task UnifiedTransitionEndpointWorksForKitchenTransitions()
     {
         await factory.ResetAsync();
-        var order = await CreateSampleOrderInDbAsync("BH-UNIFIED-001", OrderStatus.Pending);
+        var order = await CreateSampleOrderInDbAsync("BH-UNIFIED-001", OrderStatus.Confirmed);
 
         var kitchenClient = await factory.CreateAuthenticatedStaffClientAsync(
             "kitchen@bab-al-hara.local",
@@ -152,7 +152,7 @@ public sealed class KitchenApiTests(OrderingApiFactory factory) : IClassFixture<
 
         var response = await kitchenClient.PostAsJsonAsync(
             $"/api/kitchen/orders/{order.PublicCode}/transition",
-            new { targetStatus = "Preparing", notes = "Direct start" });
+            new { targetStatus = "Preparing", notes = "Start preparing" });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var dto = await response.Content.ReadFromJsonAsync<KitchenOrderDto>(JsonOptions);
@@ -170,6 +170,17 @@ public sealed class KitchenApiTests(OrderingApiFactory factory) : IClassFixture<
             "kitchen@bab-al-hara.local",
             "Kitchen",
             "Chef Mustafa");
+
+        // Illegal: Pending -> Preparing (must be Confirmed first)
+        var badPrepareResp = await kitchenClient.PostAsJsonAsync(
+            $"/api/kitchen/orders/{order.PublicCode}/start-preparing",
+            new { });
+        Assert.Equal(HttpStatusCode.BadRequest, badPrepareResp.StatusCode);
+
+        var problemPrepare = await badPrepareResp.Content.ReadFromJsonAsync<ProblemDetails>(JsonOptions);
+        Assert.NotNull(problemPrepare);
+        Assert.True(problemPrepare.Extensions.ContainsKey("code"));
+        Assert.Equal("invalid_order_transition", problemPrepare.Extensions["code"]?.ToString());
 
         // Illegal: Pending -> Ready
         var badResp = await kitchenClient.PostAsJsonAsync(
@@ -406,15 +417,18 @@ public sealed class KitchenApiTests(OrderingApiFactory factory) : IClassFixture<
         }
         else if (status == OrderStatus.Preparing)
         {
+            order.TransitionTo(OrderStatus.Confirmed);
             order.TransitionTo(OrderStatus.Preparing);
         }
         else if (status == OrderStatus.Ready)
         {
+            order.TransitionTo(OrderStatus.Confirmed);
             order.TransitionTo(OrderStatus.Preparing);
             order.TransitionTo(OrderStatus.Ready);
         }
         else if (status == OrderStatus.Delivered)
         {
+            order.TransitionTo(OrderStatus.Confirmed);
             order.TransitionTo(OrderStatus.Preparing);
             order.TransitionTo(OrderStatus.Ready);
             order.TransitionTo(OrderStatus.OnTheWay);
