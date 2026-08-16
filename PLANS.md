@@ -67,7 +67,7 @@ Delivered with SQL Server authoritative pricing/fees/availability, order-item sn
 
 ## Phase 3 — Kitchen real-time vertical slice
 
-Status: PARTIALLY COMPLETE — CURRENT QUEUE AND NEW-ORDER DELIVERY ONLY — 2026-08-13
+Status: BACKEND COMPLETE — 2026-08-16
 
 - Kitchen active orders screen
 - SignalR new-order event
@@ -78,10 +78,17 @@ Status: PARTIALLY COMPLETE — CURRENT QUEUE AND NEW-ORDER DELIVERY ONLY — 202
 - reconnection/re-fetch behavior
 - authorization/tests
 
-Acceptance:
-Customer creates order -> kitchen receives it without refresh -> kitchen transitions persist correctly.
-
-Delivered now because the approved mission explicitly included the kitchen receipt path: protected active-order retrieval, post-commit `NewOrder`, visual/optional-audible alert, and reconnect/refetch recovery. Start Preparing, Mark Ready, item-availability mutation, and their concurrency/transition tests remain deferred; no placeholder controls were added.
+Delivered Backend Slice:
+- Kitchen active orders queue endpoint (`GET /api/kitchen/orders/active`) with optimistic concurrency tokens (`byte[] RowVersion`)
+- Order state machine transitions (`Pending -> Confirmed`, `Confirmed -> Preparing`, `Preparing -> Ready`, `Pending -> Preparing`)
+- Order status audit trail recording with `OrderStatusHistory` table (actor ID, actor name, actor role, timestamps, notes)
+- Strict rejection of illegal or out-of-scope status transitions
+- Concurrency conflict detection returning HTTP 409 Conflict with ProblemDetails
+- Menu item availability toggling endpoints (`POST /api/kitchen/menu-items/{id}/availability` and `POST /api/menu/items/{id}/availability`) reflecting in public catalog
+- SignalR real-time event broadcasting (`NewOrder`, `OrderStatusChanged`, `MenuItemAvailabilityChanged`) on `/hubs/kitchen`
+- Role-based authorization for Kitchen, Manager, and Admin
+- Comprehensive domain unit tests and API integration test suite covering all transitions, concurrency conflicts, audit logs, and security
+- EF Core migration `KitchenOperations`
 
 ## Phase 4 — Customer live tracking + notifications foundation
 

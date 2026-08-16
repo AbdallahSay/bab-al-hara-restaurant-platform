@@ -35,6 +35,7 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(order => order.CustomerNote).HasMaxLength(500);
         builder.Property(order => order.PaymentMethod).HasConversion<string>().HasMaxLength(20).IsRequired();
         builder.Property(order => order.PaymentStatus).HasConversion<string>().HasMaxLength(20).IsRequired();
+        builder.Property(order => order.RowVersion).IsRowVersion();
         builder.HasIndex(order => order.PublicCode).IsUnique();
         builder.HasIndex(order => order.CreatedAt).IsDescending(true);
         builder.HasIndex(order => new { order.Status, order.CreatedAt }).IsDescending(false, true);
@@ -47,6 +48,11 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasMany(order => order.Items)
             .WithOne(item => item.Order)
             .HasForeignKey(item => item.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder
+            .HasMany(order => order.StatusHistory)
+            .WithOne(history => history.Order)
+            .HasForeignKey(history => history.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

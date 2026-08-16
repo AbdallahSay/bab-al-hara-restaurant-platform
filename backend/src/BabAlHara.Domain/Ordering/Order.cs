@@ -2,17 +2,18 @@ namespace BabAlHara.Domain.Ordering;
 
 public sealed class Order
 {
-    private static readonly Dictionary<OrderStatus, OrderStatus> AllowedTransitions =
-        new Dictionary<OrderStatus, OrderStatus>
+    private static readonly Dictionary<OrderStatus, HashSet<OrderStatus>> AllowedTransitions =
+        new()
         {
-            [OrderStatus.Pending] = OrderStatus.Confirmed,
-            [OrderStatus.Confirmed] = OrderStatus.Preparing,
-            [OrderStatus.Preparing] = OrderStatus.Ready,
-            [OrderStatus.Ready] = OrderStatus.OnTheWay,
-            [OrderStatus.OnTheWay] = OrderStatus.Delivered,
+            [OrderStatus.Pending] = [OrderStatus.Confirmed, OrderStatus.Preparing],
+            [OrderStatus.Confirmed] = [OrderStatus.Preparing],
+            [OrderStatus.Preparing] = [OrderStatus.Ready],
+            [OrderStatus.Ready] = [OrderStatus.OnTheWay],
+            [OrderStatus.OnTheWay] = [OrderStatus.Delivered],
         };
 
     private readonly List<OrderItem> items = [];
+    private readonly List<OrderStatusHistory> statusHistory = [];
 
     private Order()
     {
@@ -101,7 +102,11 @@ public sealed class Order
 
     public PaymentStatus PaymentStatus { get; private set; }
 
+    public byte[] RowVersion { get; private set; } = [];
+
     public IReadOnlyCollection<OrderItem> Items => items;
+
+    public IReadOnlyCollection<OrderStatusHistory> StatusHistory => statusHistory;
 
     public void AddItem(
         Guid id,
@@ -123,15 +128,42 @@ public sealed class Order
         Total = Subtotal + DeliveryFee;
     }
 
-    public void TransitionTo(OrderStatus nextStatus)
+    public bool CanTransitionTo(OrderStatus nextStatus) =>
+        AllowedTransitions.TryGetValue(Status, out var allowed) && allowed.Contains(nextStatus);
+
+    public OrderStatusHistory TransitionStatus(
+        OrderStatus nextStatus,
+        string? actorId,
+        string? actorName,
+        string? actorRole,
+        DateTimeOffset changedAtUtc,
+        string? notes = null)
     {
-        if (!AllowedTransitions.TryGetValue(Status, out var allowedStatus) || allowedStatus != nextStatus)
+        if (!CanTransitionTo(nextStatus))
         {
             throw new InvalidOperationException($"Cannot transition an order from {Status} to {nextStatus}.");
         }
 
+        var previousStatus = Status;
         Status = nextStatus;
+
+        var history = new OrderStatusHistory(
+            Guid.NewGuid(),
+            Id,
+            previousStatus,
+            nextStatus,
+            actorId,
+            actorName,
+            actorRole,
+            changedAtUtc,
+            notes);
+
+        statusHistory.Add(history);
+        return history;
     }
+
+    public void TransitionTo(OrderStatus nextStatus) =>
+        TransitionStatus(nextStatus, null, null, null, DateTimeOffset.UtcNow);
 
     private static string RequireText(string value, string parameterName) =>
         string.IsNullOrWhiteSpace(value)

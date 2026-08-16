@@ -8,6 +8,8 @@ namespace BabAlHara.Api.Features.Kitchen;
 public interface IKitchenClient
 {
     Task NewOrder(KitchenOrderDto order);
+    Task OrderStatusChanged(OrderStatusChangedEvent evt);
+    Task MenuItemAvailabilityChanged(MenuItemAvailabilityChangedEvent evt);
 }
 
 [Authorize(Policy = AuthorizationPolicies.Kitchen)]

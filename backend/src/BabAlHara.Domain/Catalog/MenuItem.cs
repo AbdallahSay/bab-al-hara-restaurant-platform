@@ -59,6 +59,11 @@ public sealed class MenuItem
 
     public bool IsAvailable { get; private set; }
 
+    public void SetAvailability(bool isAvailable)
+    {
+        IsAvailable = isAvailable;
+    }
+
     private static string RequireText(string value, string parameterName) =>
         string.IsNullOrWhiteSpace(value)
             ? throw new ArgumentException("A non-empty value is required.", parameterName)

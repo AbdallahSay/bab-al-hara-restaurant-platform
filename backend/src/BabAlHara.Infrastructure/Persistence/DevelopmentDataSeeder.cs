@@ -12,6 +12,11 @@ public sealed class DevelopmentDataSeeder(
     RoleManager<IdentityRole<Guid>> roleManager)
 {
     public const string KitchenRole = "Kitchen";
+    public const string ManagerRole = "Manager";
+    public const string AdminRole = "Admin";
+    public const string CashierRole = "Cashier";
+    public const string DriverRole = "Driver";
+
     public const string KitchenEmail = "kitchen@bab-al-hara.local";
 
     public async Task SeedAsync(
@@ -47,11 +52,16 @@ public sealed class DevelopmentDataSeeder(
 
     private async Task SeedKitchenUserAsync(string kitchenPassword)
     {
-        if (!await roleManager.RoleExistsAsync(KitchenRole))
+        var roles = new[] { KitchenRole, ManagerRole, AdminRole, CashierRole, DriverRole };
+        foreach (var role in roles)
         {
-            var roleResult = await roleManager.CreateAsync(
-                new IdentityRole<Guid> { Id = SeedIds.KitchenRoleId, Name = KitchenRole });
-            ThrowIfFailed(roleResult, "create the Kitchen role");
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                var roleId = role == KitchenRole ? SeedIds.KitchenRoleId : Guid.NewGuid();
+                var roleResult = await roleManager.CreateAsync(
+                    new IdentityRole<Guid> { Id = roleId, Name = role });
+                ThrowIfFailed(roleResult, $"create the {role} role");
+            }
         }
 
         var user = await userManager.FindByEmailAsync(KitchenEmail);
