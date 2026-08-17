@@ -251,9 +251,6 @@ export interface UiCopy {
     readonly soundEnable: string;
     readonly soundEnabled: string;
     readonly newOrder: string;
-    readonly agingNormal: string;
-    readonly agingAttention: string;
-    readonly agingOverdue: string;
     readonly subtotal: string;
     readonly deliveryFee: string;
     readonly completing: string;
@@ -639,9 +636,6 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       soundEnable: 'تشغيل الصوت',
       soundEnabled: 'الصوت مفعّل',
       newOrder: 'طلب جاهز جديد!',
-      agingNormal: 'عادي',
-      agingAttention: 'انتباه',
-      agingOverdue: 'متأخر',
       subtotal: 'المجموع الفرعي',
       deliveryFee: 'رسوم التوصيل',
       completing: 'جاري الإنهاء...',
@@ -1033,9 +1027,6 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       soundEnable: 'Enable sound',
       soundEnabled: 'Sound enabled',
       newOrder: 'New ready order!',
-      agingNormal: 'Normal',
-      agingAttention: 'Attention',
-      agingOverdue: 'Overdue',
       subtotal: 'Subtotal',
       deliveryFee: 'Delivery fee',
       completing: 'Completing...',

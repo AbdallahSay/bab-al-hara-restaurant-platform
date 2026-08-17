@@ -21,8 +21,7 @@ import { CashierOrderDto, CashierOrderItemDto, DriverSummaryDto } from './cashie
 import { StaffSessionService } from '../kitchen/staff-session.service';
 
 export type PageState = 'loading' | 'ready' | 'error';
-export type QueueFilter = 'all' | 'takeaway' | 'delivery' | 'unpaid' | 'urgent';
-export type AgingCategory = 'normal' | 'attention' | 'overdue';
+export type QueueFilter = 'all' | 'takeaway' | 'delivery' | 'unpaid';
 
 @Component({
   selector: 'app-cashier-page',
@@ -79,7 +78,6 @@ export class CashierPage implements OnInit, OnDestroy {
       if (filter === 'takeaway' && order.orderType !== 'Takeaway') return false;
       if (filter === 'delivery' && order.orderType !== 'Delivery') return false;
       if (filter === 'unpaid' && order.paymentStatus !== 'Pending') return false;
-      if (filter === 'urgent' && this.elapsedMinutes(order.createdAt) < 15) return false;
 
       // Text search filter
       if (query) {
@@ -113,9 +111,6 @@ export class CashierPage implements OnInit, OnDestroy {
   );
   protected readonly unpaidCount = computed(
     () => this.orders().filter((o) => o.paymentStatus === 'Pending').length,
-  );
-  protected readonly urgentCount = computed(
-    () => this.orders().filter((o) => this.elapsedMinutes(o.createdAt) >= 15).length,
   );
 
   protected readonly allExpanded = computed(() => {
@@ -271,17 +266,8 @@ export class CashierPage implements OnInit, OnDestroy {
     return `${minutes} ${minutes === 1 ? this.copy().cashier.minute : this.copy().cashier.minutes}`;
   }
 
-  protected getAgingCategory(value: string): AgingCategory {
-    const minutes = this.elapsedMinutes(value);
-    if (minutes >= 20) return 'overdue';
-    if (minutes >= 10) return 'attention';
-    return 'normal';
-  }
-
-  protected agingCategoryLabel(category: AgingCategory): string {
-    if (category === 'overdue') return this.copy().cashier.agingOverdue;
-    if (category === 'attention') return this.copy().cashier.agingAttention;
-    return this.copy().cashier.agingNormal;
+  protected isLongWait(value: string): boolean {
+    return this.elapsedMinutes(value) >= 15;
   }
 
   protected realtimeLabel(): string {

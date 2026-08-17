@@ -228,16 +228,6 @@
       background: var(--color-warning-soft);
       color: var(--color-warning);
     }
-
-    &--urgent {
-      background: var(--color-danger-soft);
-      color: var(--color-danger);
-    }
-  }
-
-  &--urgent.is-active {
-    background: var(--color-danger);
-    border-color: var(--color-danger);
   }
 }
 
@@ -385,16 +375,6 @@
   &:hover {
     border-color: var(--color-primary);
   }
-
-  &--urgent {
-    border-color: var(--color-danger);
-    border-inline-start-width: 4px;
-  }
-
-  &--attention {
-    border-color: var(--color-warning);
-    border-inline-start-width: 4px;
-  }
 }
 
 .order-ticket__header {
@@ -444,14 +424,9 @@
   font-weight: 750;
   color: var(--color-ink-muted);
 
-  &--attention {
-    color: #b45309;
-    font-weight: 800;
-  }
-
-  &--overdue {
-    color: var(--color-danger);
-    font-weight: 900;
+  &--long-wait {
+    color: var(--color-ink);
+    font-weight: 850;
   }
 }
 

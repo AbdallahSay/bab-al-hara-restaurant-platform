@@ -277,17 +277,19 @@ describe('CashierPage', () => {
     expect(fixture.nativeElement.querySelectorAll('.order-ticket__details').length).toBe(0);
   });
 
-  it('displays aging badges with appropriate urgency styling', async () => {
+  it('displays elapsed time badges with long-wait styling when applicable', async () => {
     const { fixture } = await createFixture([
       INITIAL_ORDER_TAKEAWAY,
       INITIAL_ORDER_DELIVERY_UNASSIGNED,
     ]);
     const agingBadges = fixture.nativeElement.querySelectorAll('.aging-badge');
 
-    // Index 0: INITIAL_ORDER_DELIVERY_UNASSIGNED (25m -> overdue)
-    // Index 1: INITIAL_ORDER_TAKEAWAY (5m -> normal)
-    expect(agingBadges[0]?.classList.contains('aging-badge--overdue')).toBe(true);
-    expect(agingBadges[1]?.classList.contains('aging-badge--normal')).toBe(true);
+    // Index 0: INITIAL_ORDER_DELIVERY_UNASSIGNED (25m -> long-wait)
+    // Index 1: INITIAL_ORDER_TAKEAWAY (5m)
+    expect(agingBadges[0]?.classList.contains('aging-badge--long-wait')).toBe(true);
+    expect(agingBadges[1]?.classList.contains('aging-badge--long-wait')).toBe(false);
+    expect(agingBadges[0]?.textContent).toContain('25');
+    expect(agingBadges[1]?.textContent).toContain('5');
   });
 
   it('initiates takeaway handoff, confirms successfully, and removes order', async () => {

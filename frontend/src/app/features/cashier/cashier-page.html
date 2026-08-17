@@ -126,20 +126,6 @@
         <span>💵 {{ copy().cashier.collect }}</span>
         <span class="count-badge count-badge--unpaid">{{ unpaidCount() }}</span>
       </button>
-
-      @if (urgentCount() > 0) {
-        <button
-          type="button"
-          role="tab"
-          class="filter-pill filter-pill--urgent"
-          [class.is-active]="selectedFilter() === 'urgent'"
-          [attr.aria-selected]="selectedFilter() === 'urgent'"
-          (click)="setFilter('urgent')"
-        >
-          <span>⚠️ {{ copy().cashier.agingOverdue }}</span>
-          <span class="count-badge count-badge--urgent">{{ urgentCount() }}</span>
-        </button>
-      }
     </div>
 
     <div class="toolbar-actions">
@@ -228,10 +214,8 @@
             class="order-ticket"
             [class.order-ticket--takeaway]="order.orderType === 'Takeaway'"
             [class.order-ticket--delivery]="order.orderType === 'Delivery'"
-            [class.order-ticket--urgent]="getAgingCategory(order.createdAt) === 'overdue'"
-            [class.order-ticket--attention]="getAgingCategory(order.createdAt) === 'attention'"
           >
-            <!-- Card Header: Type Badge, Public Code, Aging Time -->
+            <!-- Card Header: Type Badge, Public Code, Elapsed Time -->
             <header class="order-ticket__header">
               <div class="ticket-type-group">
                 <span
@@ -244,20 +228,8 @@
                 <h2 class="ticket-code" dir="ltr">#{{ order.publicCode }}</h2>
               </div>
 
-              <div
-                class="aging-badge"
-                [class.aging-badge--normal]="getAgingCategory(order.createdAt) === 'normal'"
-                [class.aging-badge--attention]="getAgingCategory(order.createdAt) === 'attention'"
-                [class.aging-badge--overdue]="getAgingCategory(order.createdAt) === 'overdue'"
-                [title]="agingCategoryLabel(getAgingCategory(order.createdAt))"
-              >
-                @if (getAgingCategory(order.createdAt) === 'overdue') {
-                  <span class="aging-icon">⚠️</span>
-                } @else if (getAgingCategory(order.createdAt) === 'attention') {
-                  <span class="aging-icon">⏳</span>
-                } @else {
-                  <span class="aging-icon">⏱️</span>
-                }
+              <div class="aging-badge" [class.aging-badge--long-wait]="isLongWait(order.createdAt)">
+                <span class="aging-icon" aria-hidden="true">⏱️</span>
                 <strong>{{ elapsedLabel(order.createdAt) }}</strong>
               </div>
             </header>
