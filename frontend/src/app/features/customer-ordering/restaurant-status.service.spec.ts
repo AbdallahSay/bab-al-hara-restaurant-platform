@@ -1,4 +1,4 @@
-﻿import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { of, throwError, firstValueFrom } from 'rxjs';
 
 import { LanguageService } from '../../core/i18n/language.service';
@@ -11,6 +11,10 @@ describe('RestaurantStatusService', () => {
   let getRestaurantStatusMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
+    localStorage.clear();
+    localStorage.setItem('bab-al-hara.language', 'ar');
+    document.documentElement.lang = 'ar';
+    document.documentElement.dir = 'rtl';
     getRestaurantStatusMock = vi.fn();
 
     TestBed.configureTestingModule({
@@ -28,6 +32,13 @@ describe('RestaurantStatusService', () => {
 
     service = TestBed.inject(RestaurantStatusService);
     languageService = TestBed.inject(LanguageService);
+    languageService.setLanguage('ar');
+  });
+
+  afterEach(() => {
+    localStorage.clear();
+    document.documentElement.lang = 'ar';
+    document.documentElement.dir = 'rtl';
   });
 
   it('initializes with null status and isPaused false', () => {
