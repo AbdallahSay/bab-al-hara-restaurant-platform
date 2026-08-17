@@ -1,3 +1,4 @@
+using BabAlHara.Api.Features.OrderTracking;
 using BabAlHara.Application.Ordering;
 using Microsoft.AspNetCore.Antiforgery;
 
@@ -15,6 +16,8 @@ public static class OrderEndpoints
                 async (
                     CreateOrderRequest request,
                     IOrderApplicationService service,
+                    HttpContext httpContext,
+                    IWebHostEnvironment env,
                     CancellationToken cancellationToken) =>
                 {
                     var command = new CreateOrderCommand(
@@ -30,6 +33,17 @@ public static class OrderEndpoints
                     var outcome = await service.CreateAsync(command, cancellationToken);
                     if (outcome.IsSuccess)
                     {
+                        if (!string.IsNullOrWhiteSpace(outcome.RawTrackingToken) && outcome.TrackingTokenExpiresAtUtc.HasValue)
+                        {
+                            TrackingCookieHelper.AppendTrackingCookie(
+                                httpContext.Response,
+                                outcome.Order!.PublicCode,
+                                outcome.RawTrackingToken,
+                                outcome.TrackingTokenExpiresAtUtc.Value,
+                                env.IsDevelopment(),
+                                httpContext.Request.IsHttps);
+                        }
+
                         return Results.Created($"/api/orders/{outcome.Order!.PublicCode}", outcome.Order);
                     }
 

@@ -37,6 +37,11 @@ public sealed class CustomerOrderTrackingService(AppDbContext dbContext) : ICust
             return null;
         }
 
+        if (order.TrackingTokenExpiresAtUtc.HasValue && order.TrackingTokenExpiresAtUtc.Value <= DateTimeOffset.UtcNow)
+        {
+            return null;
+        }
+
         return MapToDto(order);
     }
 

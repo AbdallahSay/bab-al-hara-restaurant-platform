@@ -68,6 +68,7 @@ public sealed class Order
         TrackingTokenHash = string.IsNullOrWhiteSpace(trackingTokenHash)
             ? Guid.NewGuid().ToString("N")
             : trackingTokenHash.Trim();
+        TrackingTokenExpiresAtUtc = createdAt.AddDays(7);
     }
 
     public Guid Id { get; private set; }
@@ -116,9 +117,18 @@ public sealed class Order
 
     public string TrackingTokenHash { get; private set; } = string.Empty;
 
+    public DateTimeOffset? TrackingTokenExpiresAtUtc { get; private set; }
+
     public void SetTrackingTokenHash(string hash)
     {
         TrackingTokenHash = RequireText(hash, nameof(hash));
+        TrackingTokenExpiresAtUtc ??= CreatedAt.AddDays(7);
+    }
+
+    public void SetTrackingCredentials(string hash, DateTimeOffset expiresAtUtc)
+    {
+        TrackingTokenHash = RequireText(hash, nameof(hash));
+        TrackingTokenExpiresAtUtc = expiresAtUtc;
     }
 
     public IReadOnlyCollection<OrderItem> Items => items;

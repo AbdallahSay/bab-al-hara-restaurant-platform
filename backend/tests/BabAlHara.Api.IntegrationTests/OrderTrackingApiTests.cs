@@ -1,12 +1,15 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using BabAlHara.Api.Features.OrderTracking;
 using BabAlHara.Application.Cashier;
 using BabAlHara.Application.Kitchen;
 using BabAlHara.Application.Ordering;
 using BabAlHara.Application.Tracking;
 using BabAlHara.Domain.Ordering;
+using Microsoft.EntityFrameworkCore;
 
 namespace BabAlHara.Api.IntegrationTests;
 
@@ -18,7 +21,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
         Converters = { new JsonStringEnumConverter() },
     };
 
-    private static async Task<(string PublicCode, string TrackingToken, HttpResponseMessage Response)> CreateGuestDeliveryOrderAsync(HttpClient client)
+    private static async Task<(string PublicCode, string CookieHeader, string RawToken, HttpResponseMessage Response)> CreateGuestDeliveryOrderAsync(HttpClient client)
     {
         var csrfResponse = await client.GetAsync("/api/security/csrf");
         var csrfJson = await csrfResponse.Content.ReadFromJsonAsync<JsonElement>();
@@ -45,15 +48,31 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
         var response = await client.PostAsync("/api/orders", request.Content);
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
-        var created = await response.Content.ReadFromJsonAsync<CreatedOrderDto>(JsonOptions);
+        var rawJson = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(rawJson);
+        Assert.False(doc.RootElement.TryGetProperty("trackingToken", out _));
+        Assert.False(doc.RootElement.TryGetProperty("rawToken", out _));
+        Assert.False(doc.RootElement.TryGetProperty("trackingSecret", out _));
+
+        var created = JsonSerializer.Deserialize<CreatedOrderDto>(rawJson, JsonOptions);
         Assert.NotNull(created);
         Assert.NotEmpty(created.PublicCode);
-        Assert.NotEmpty(created.TrackingToken);
 
-        return (created.PublicCode, created.TrackingToken, response);
+        // Find tracking cookie
+        var setCookieHeaders = response.Headers.GetValues("Set-Cookie").ToList();
+        var trackingSetCookie = setCookieHeaders.FirstOrDefault(c => c.Contains($"Tracking-{created.PublicCode}"));
+        Assert.NotNull(trackingSetCookie);
+        Assert.Contains("httponly", trackingSetCookie, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("path=/", trackingSetCookie, StringComparison.OrdinalIgnoreCase);
+
+        // Extract cookie name=value for request Cookie header
+        var cookiePair = trackingSetCookie.Split(';')[0];
+        var rawToken = cookiePair.Split('=')[1];
+
+        return (created.PublicCode, cookiePair, rawToken, response);
     }
 
-    private static async Task<(string PublicCode, string TrackingToken)> CreateGuestTakeawayOrderAsync(HttpClient client)
+    private static async Task<(string PublicCode, string CookieHeader, string RawToken)> CreateGuestTakeawayOrderAsync(HttpClient client)
     {
         var csrfResponse = await client.GetAsync("/api/security/csrf");
         var csrfJson = await csrfResponse.Content.ReadFromJsonAsync<JsonElement>();
@@ -80,21 +99,49 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
         var response = await client.PostAsync("/api/orders", request.Content);
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
-        var created = await response.Content.ReadFromJsonAsync<CreatedOrderDto>(JsonOptions);
+        var rawJson = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(rawJson);
+        Assert.False(doc.RootElement.TryGetProperty("trackingToken", out _));
+
+        var created = JsonSerializer.Deserialize<CreatedOrderDto>(rawJson, JsonOptions);
         Assert.NotNull(created);
-        return (created.PublicCode, created.TrackingToken);
+
+        var setCookieHeaders = response.Headers.GetValues("Set-Cookie").ToList();
+        var trackingSetCookie = setCookieHeaders.First(c => c.Contains($"Tracking-{created.PublicCode}"));
+        var cookiePair = trackingSetCookie.Split(';')[0];
+        var rawToken = cookiePair.Split('=')[1];
+
+        return (created.PublicCode, cookiePair, rawToken);
     }
 
     [Fact]
-    public async Task GetTrackingValidTokenReturnsCorrectOrderData()
+    public async Task OrderCreationSetsHttpOnlyTrackingCookieAndOmitsRawTokenFromResponse()
     {
         await factory.ResetAsync();
         var client = factory.CreateClient();
 
-        var (publicCode, trackingToken, _) = await CreateGuestDeliveryOrderAsync(client);
+        var (publicCode, cookieHeader, rawToken, response) = await CreateGuestDeliveryOrderAsync(client);
+
+        Assert.NotEmpty(publicCode);
+        Assert.NotEmpty(cookieHeader);
+        Assert.NotEmpty(rawToken);
+
+        var setCookie = response.Headers.GetValues("Set-Cookie").First(c => c.Contains(publicCode));
+        Assert.Contains("httponly", setCookie, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("samesite=lax", setCookie, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("max-age=", setCookie, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task GetTrackingValidCookieReturnsCorrectOrderData()
+    {
+        await factory.ResetAsync();
+        var client = factory.CreateClient();
+
+        var (publicCode, cookieHeader, _, _) = await CreateGuestDeliveryOrderAsync(client);
 
         using var trackingRequest = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
-        trackingRequest.Headers.Add("X-Tracking-Token", trackingToken);
+        trackingRequest.Headers.Add("Cookie", cookieHeader);
 
         var response = await client.SendAsync(trackingRequest);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -112,55 +159,110 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
     }
 
     [Fact]
-    public async Task GetTrackingNoTokenReturns401()
+    public async Task GetTrackingNoCookieReturns401()
     {
         await factory.ResetAsync();
         var client = factory.CreateClient();
-        var (publicCode, _, _) = await CreateGuestDeliveryOrderAsync(client);
+        var (publicCode, _, _, _) = await CreateGuestDeliveryOrderAsync(client);
 
-        var response = await client.GetAsync($"/api/orders/track/{publicCode}");
+        var unauthClient = factory.CreateClient();
+        var response = await unauthClient.GetAsync($"/api/orders/track/{publicCode}");
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]
-    public async Task GetTrackingInvalidTokenReturns401()
+    public async Task GetTrackingInvalidCookieValueReturns401()
     {
         await factory.ResetAsync();
         var client = factory.CreateClient();
-        var (publicCode, _, _) = await CreateGuestDeliveryOrderAsync(client);
+        var (publicCode, _, _, _) = await CreateGuestDeliveryOrderAsync(client);
 
+        var unauthClient = factory.CreateClient();
         using var request = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
-        request.Headers.Add("X-Tracking-Token", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        request.Headers.Add("Cookie", $"BabAlHara-Tracking-{publicCode}=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 
-        var response = await client.SendAsync(request);
+        var response = await unauthClient.SendAsync(request);
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]
-    public async Task GetTrackingMalformedTokenReturns401()
+    public async Task GetTrackingMalformedCookieValueReturns401()
     {
         await factory.ResetAsync();
         var client = factory.CreateClient();
-        var (publicCode, _, _) = await CreateGuestDeliveryOrderAsync(client);
+        var (publicCode, _, _, _) = await CreateGuestDeliveryOrderAsync(client);
 
+        var unauthClient = factory.CreateClient();
         using var request = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
-        request.Headers.Add("X-Tracking-Token", "not-a-base-64-url-!!!@@@###$$$%%%");
+        request.Headers.Add("Cookie", $"BabAlHara-Tracking-{publicCode}=not-a-base64url-!!!@@@###");
 
-        var response = await client.SendAsync(request);
+        var response = await unauthClient.SendAsync(request);
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]
-    public async Task GetTrackingTokenForDifferentOrderReturns401()
+    public async Task GetTrackingCookieForDifferentOrderReturns401()
     {
         await factory.ResetAsync();
-        var client = factory.CreateClient();
+        var client1 = factory.CreateClient();
+        var client2 = factory.CreateClient();
 
-        var (order1Code, _, _) = await CreateGuestDeliveryOrderAsync(client);
-        var (_, order2Token, _) = await CreateGuestDeliveryOrderAsync(client);
+        var (order1Code, _, _, _) = await CreateGuestDeliveryOrderAsync(client1);
+        var (order2Code, order2Cookie, _, _) = await CreateGuestDeliveryOrderAsync(client2);
 
+        // Send order2 cookie on a clean client when requesting order1 tracking
+        var unauthClient = factory.CreateClient();
         using var request = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{order1Code}");
-        request.Headers.Add("X-Tracking-Token", order2Token);
+        request.Headers.Add("Cookie", order2Cookie);
+
+        var response = await unauthClient.SendAsync(request);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task MultipleOrdersOnSameClientCoexistWithoutOverwriting()
+    {
+        await factory.ResetAsync();
+        var client = factory.CreateClient();
+
+        var (order1Code, order1Cookie, _, _) = await CreateGuestDeliveryOrderAsync(client);
+        var (order2Code, order2Cookie, _, _) = await CreateGuestDeliveryOrderAsync(client);
+
+        // Combined cookie header as sent by a browser that has placed both orders
+        var combinedCookies = $"{order1Cookie}; {order2Cookie}";
+
+        using var req1 = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{order1Code}");
+        req1.Headers.Add("Cookie", combinedCookies);
+        var resp1 = await client.SendAsync(req1);
+        Assert.Equal(HttpStatusCode.OK, resp1.StatusCode);
+        var track1 = await resp1.Content.ReadFromJsonAsync<CustomerOrderTrackingDto>(JsonOptions);
+        Assert.Equal(order1Code, track1!.PublicCode);
+
+        using var req2 = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{order2Code}");
+        req2.Headers.Add("Cookie", combinedCookies);
+        var resp2 = await client.SendAsync(req2);
+        Assert.Equal(HttpStatusCode.OK, resp2.StatusCode);
+        var track2 = await resp2.Content.ReadFromJsonAsync<CustomerOrderTrackingDto>(JsonOptions);
+        Assert.Equal(order2Code, track2!.PublicCode);
+    }
+
+    [Fact]
+    public async Task ExpiredTrackingTokenReturns401()
+    {
+        await factory.ResetAsync();
+        var client = factory.CreateClient();
+        var (publicCode, cookieHeader, _, _) = await CreateGuestDeliveryOrderAsync(client);
+
+        // Manually expire the token in database
+        await using (var dbContext = factory.CreateDbContext())
+        {
+            var order = await dbContext.Orders.FirstAsync(o => o.PublicCode == publicCode);
+            order.SetTrackingCredentials(order.TrackingTokenHash, DateTimeOffset.UtcNow.AddMinutes(-5));
+            await dbContext.SaveChangesAsync();
+        }
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
+        request.Headers.Add("Cookie", cookieHeader);
 
         var response = await client.SendAsync(request);
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -171,10 +273,10 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
     {
         await factory.ResetAsync();
         var client = factory.CreateClient();
-        var (publicCode, trackingToken, _) = await CreateGuestDeliveryOrderAsync(client);
+        var (publicCode, cookieHeader, _, _) = await CreateGuestDeliveryOrderAsync(client);
 
         using var trackingRequest = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
-        trackingRequest.Headers.Add("X-Tracking-Token", trackingToken);
+        trackingRequest.Headers.Add("Cookie", cookieHeader);
 
         var response = await client.SendAsync(trackingRequest);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -194,6 +296,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
         Assert.False(root.TryGetProperty("RowVersion", out _));
         Assert.False(root.TryGetProperty("trackingTokenHash", out _));
         Assert.False(root.TryGetProperty("TrackingTokenHash", out _));
+        Assert.False(root.TryGetProperty("trackingTokenExpiresAtUtc", out _));
     }
 
     [Fact]
@@ -201,10 +304,10 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
     {
         await factory.ResetAsync();
         var client = factory.CreateClient();
-        var (publicCode, _, _) = await CreateGuestDeliveryOrderAsync(client);
+        var (publicCode, _, _, _) = await CreateGuestDeliveryOrderAsync(client);
 
-        using var request = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
-        var response = await client.SendAsync(request);
+        var unauthClient = factory.CreateClient();
+        var response = await unauthClient.GetAsync($"/api/orders/track/{publicCode}");
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
@@ -213,7 +316,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
     {
         await factory.ResetAsync();
         var client = factory.CreateClient();
-        var (publicCode, trackingToken, _) = await CreateGuestDeliveryOrderAsync(client);
+        var (publicCode, cookieHeader, _, _) = await CreateGuestDeliveryOrderAsync(client);
 
         var kitchenClient = await factory.CreateAuthenticatedStaffClientAsync(
             "kitchen@bab-al-hara.local",
@@ -224,7 +327,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
         Assert.Equal(HttpStatusCode.OK, confirmResp.StatusCode);
 
         using var trackingReq1 = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
-        trackingReq1.Headers.Add("X-Tracking-Token", trackingToken);
+        trackingReq1.Headers.Add("Cookie", cookieHeader);
         var trackResp1 = await client.SendAsync(trackingReq1);
         var track1 = await trackResp1.Content.ReadFromJsonAsync<CustomerOrderTrackingDto>(JsonOptions);
         Assert.NotNull(track1);
@@ -239,7 +342,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
         Assert.Equal(HttpStatusCode.OK, readyResp.StatusCode);
 
         using var trackingReq2 = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
-        trackingReq2.Headers.Add("X-Tracking-Token", trackingToken);
+        trackingReq2.Headers.Add("Cookie", cookieHeader);
         var trackResp2 = await client.SendAsync(trackingReq2);
         var track2 = await trackResp2.Content.ReadFromJsonAsync<CustomerOrderTrackingDto>(JsonOptions);
         Assert.NotNull(track2);
@@ -255,7 +358,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
     {
         await factory.ResetAsync();
         var client = factory.CreateClient();
-        var (publicCode, trackingToken, _) = await CreateGuestDeliveryOrderAsync(client);
+        var (publicCode, cookieHeader, _, _) = await CreateGuestDeliveryOrderAsync(client);
 
         var kitchenClient = await factory.CreateAuthenticatedStaffClientAsync(
             "kitchen@bab-al-hara.local",
@@ -284,7 +387,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
         Assert.Equal(HttpStatusCode.OK, startResp.StatusCode);
 
         using var trackingReq1 = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
-        trackingReq1.Headers.Add("X-Tracking-Token", trackingToken);
+        trackingReq1.Headers.Add("Cookie", cookieHeader);
         var trackResp1 = await client.SendAsync(trackingReq1);
         var track1 = await trackResp1.Content.ReadFromJsonAsync<CustomerOrderTrackingDto>(JsonOptions);
         Assert.NotNull(track1);
@@ -295,7 +398,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
         Assert.Equal(HttpStatusCode.OK, deliveredResp.StatusCode);
 
         using var trackingReq2 = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
-        trackingReq2.Headers.Add("X-Tracking-Token", trackingToken);
+        trackingReq2.Headers.Add("Cookie", cookieHeader);
         var trackResp2 = await client.SendAsync(trackingReq2);
         var track2 = await trackResp2.Content.ReadFromJsonAsync<CustomerOrderTrackingDto>(JsonOptions);
         Assert.NotNull(track2);
@@ -311,7 +414,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
     {
         await factory.ResetAsync();
         var client = factory.CreateClient();
-        var (publicCode, trackingToken) = await CreateGuestTakeawayOrderAsync(client);
+        var (publicCode, cookieHeader, _) = await CreateGuestTakeawayOrderAsync(client);
 
         var kitchenClient = await factory.CreateAuthenticatedStaffClientAsync(
             "kitchen@bab-al-hara.local",
@@ -337,7 +440,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
         Assert.Equal(HttpStatusCode.OK, handoffResp.StatusCode);
 
         using var trackingReq = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
-        trackingReq.Headers.Add("X-Tracking-Token", trackingToken);
+        trackingReq.Headers.Add("Cookie", cookieHeader);
         var trackResp = await client.SendAsync(trackingReq);
         var track = await trackResp.Content.ReadFromJsonAsync<CustomerOrderTrackingDto>(JsonOptions);
         Assert.NotNull(track);
@@ -352,7 +455,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
     {
         await factory.ResetAsync();
         var client = factory.CreateClient();
-        var (publicCode, trackingToken) = await CreateGuestTakeawayOrderAsync(client);
+        var (publicCode, cookieHeader, _) = await CreateGuestTakeawayOrderAsync(client);
 
         var kitchenClient = await factory.CreateAuthenticatedStaffClientAsync(
             "kitchen@bab-al-hara.local",
@@ -378,7 +481,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
         Assert.Equal(HttpStatusCode.OK, handoffResp.StatusCode);
 
         using var request = new HttpRequestMessage(HttpMethod.Get, $"/api/orders/track/{publicCode}");
-        request.Headers.Add("X-Tracking-Token", trackingToken);
+        request.Headers.Add("Cookie", cookieHeader);
         var response = await client.SendAsync(request);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -392,7 +495,7 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
     {
         await factory.ResetAsync();
         var client = factory.CreateClient();
-        var (publicCode, _, _) = await CreateGuestDeliveryOrderAsync(client);
+        var (publicCode, _, _, _) = await CreateGuestDeliveryOrderAsync(client);
 
         var kitchenClient = await factory.CreateAuthenticatedStaffClientAsync(
             "kitchen@bab-al-hara.local",
@@ -404,5 +507,15 @@ public sealed class OrderTrackingApiTests(OrderingApiFactory factory) : IClassFi
 
         Assert.DoesNotContain("trackingToken", rawJson, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("trackingTokenHash", rawJson, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void TrackingCookieHelperReturnsCorrectPrefixes()
+    {
+        var devCookie = TrackingCookieHelper.GetCookieName("BH-1234", isDevelopment: true);
+        var prodCookie = TrackingCookieHelper.GetCookieName("BH-1234", isDevelopment: false);
+
+        Assert.Equal("BabAlHara-Tracking-BH-1234", devCookie);
+        Assert.Equal("__Host-BabAlHara-Tracking-BH-1234", prodCookie);
     }
 }
