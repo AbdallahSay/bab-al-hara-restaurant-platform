@@ -25,7 +25,8 @@ public sealed record CreatedOrderDto(
     decimal DeliveryFee,
     decimal Total,
     PaymentMethod PaymentMethod,
-    PaymentStatus PaymentStatus);
+    PaymentStatus PaymentStatus,
+    string TrackingToken);
 
 public sealed record OrderRejection(string Code, string Message, bool IsConflict = false);
 

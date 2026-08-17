@@ -3,6 +3,7 @@ using System.Text.Json;
 using BabAlHara.Application.Driver;
 using BabAlHara.Application.Kitchen;
 using BabAlHara.Application.Ordering;
+using BabAlHara.Application.Tracking;
 using BabAlHara.Domain.Catalog;
 using BabAlHara.Domain.Delivery;
 using BabAlHara.Infrastructure.Identity;
@@ -38,6 +39,7 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
 
     public RecordingKitchenRealtimeNotifier Notifier { get; } = new();
     public RecordingDriverRealtimeNotifier DriverNotifier { get; } = new();
+    public RecordingCustomerOrderTrackingNotifier TrackingNotifier { get; } = new();
 
     public async Task InitializeAsync()
     {
@@ -57,6 +59,7 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
     {
         Notifier.Clear();
         DriverNotifier.Clear();
+        TrackingNotifier.Clear();
         orderCodeGenerator.UseDefault();
 
         await using var dbContext = CreateDbContext();
@@ -211,6 +214,8 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
                 new Dictionary<string, string?> { ["RateLimiting:GuestOrderPermitLimit"] = "1000" });
             configuration.AddInMemoryCollection(
                 new Dictionary<string, string?> { ["RateLimiting:StaffSignInPermitLimit"] = "1000" });
+            configuration.AddInMemoryCollection(
+                new Dictionary<string, string?> { ["RateLimiting:TrackingReadPermitLimit"] = "1000" });
         });
         builder.ConfigureServices(services =>
         {
@@ -219,11 +224,13 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
             services.RemoveAll<IKitchenRealtimeNotifier>();
             services.RemoveAll<INewOrderNotifier>();
             services.RemoveAll<IDriverRealtimeNotifier>();
+            services.RemoveAll<ICustomerOrderTrackingNotifier>();
             services.RemoveAll<IOrderCodeGenerator>();
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
             services.AddSingleton<IKitchenRealtimeNotifier>(Notifier);
             services.AddSingleton<INewOrderNotifier>(Notifier);
             services.AddSingleton<IDriverRealtimeNotifier>(DriverNotifier);
+            services.AddSingleton<ICustomerOrderTrackingNotifier>(TrackingNotifier);
             services.AddSingleton<IOrderCodeGenerator>(orderCodeGenerator);
         });
     }
@@ -309,6 +316,21 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
             driverAssignedEvents.Clear();
             statusChanges.Clear();
         }
+    }
+
+    public sealed class RecordingCustomerOrderTrackingNotifier : ICustomerOrderTrackingNotifier
+    {
+        private readonly List<string> notifiedCodes = [];
+
+        public IReadOnlyList<string> NotifiedCodes => notifiedCodes;
+
+        public Task NotifyOrderUpdatedAsync(string publicCode, CancellationToken cancellationToken)
+        {
+            notifiedCodes.Add(publicCode);
+            return Task.CompletedTask;
+        }
+
+        public void Clear() => notifiedCodes.Clear();
     }
 
     private sealed class SwitchingOrderCodeGenerator : IOrderCodeGenerator

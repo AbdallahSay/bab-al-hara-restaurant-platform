@@ -38,8 +38,10 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(order => order.DriverId);
         builder.Property(order => order.DriverName).HasMaxLength(120);
         builder.Property(order => order.DriverAssignedAtUtc);
+        builder.Property(order => order.TrackingTokenHash).HasColumnType("varchar(64)").HasMaxLength(64).IsRequired().HasDefaultValue("");
         builder.Property(order => order.RowVersion).IsRowVersion();
         builder.HasIndex(order => order.PublicCode).IsUnique();
+        builder.HasIndex(order => order.TrackingTokenHash).IsUnique();
         builder.HasIndex(order => order.CreatedAt).IsDescending(true);
         builder.HasIndex(order => new { order.Status, order.CreatedAt }).IsDescending(false, true);
         builder.HasIndex(order => new { order.DriverId, order.Status });

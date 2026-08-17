@@ -1,5 +1,6 @@
 using BabAlHara.Application.Kitchen;
 using BabAlHara.Application.Ordering;
+using BabAlHara.Application.Tracking;
 using BabAlHara.Domain.Delivery;
 using BabAlHara.Domain.Ordering;
 using BabAlHara.Infrastructure.Persistence;
@@ -12,6 +13,7 @@ public sealed partial class OrderApplicationService(
     AppDbContext dbContext,
     IOrderCodeGenerator orderCodeGenerator,
     INewOrderNotifier newOrderNotifier,
+    ICustomerOrderTrackingService trackingService,
     TimeProvider timeProvider,
     ILogger<OrderApplicationService> logger) : IOrderApplicationService
 {
@@ -96,6 +98,10 @@ public sealed partial class OrderApplicationService(
                 menuItem.Price);
         }
 
+        var rawToken = trackingService.GenerateTrackingToken();
+        var tokenHash = trackingService.HashToken(rawToken);
+        order.SetTrackingTokenHash(tokenHash);
+
         dbContext.Orders.Add(order);
 
         // A single SaveChanges call persists the complete aggregate in EF Core's automatic transaction.
@@ -124,7 +130,8 @@ public sealed partial class OrderApplicationService(
             order.DeliveryFee,
             order.Total,
             order.PaymentMethod,
-            order.PaymentStatus));
+            order.PaymentStatus,
+            rawToken));
     }
 
     private static CreateOrderOutcome? ValidateCommand(CreateOrderCommand command)

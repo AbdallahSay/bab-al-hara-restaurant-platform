@@ -1,4 +1,5 @@
 using BabAlHara.Application.Cashier;
+using BabAlHara.Application.Tracking;
 using BabAlHara.Domain.Ordering;
 using BabAlHara.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,8 @@ namespace BabAlHara.Infrastructure.Cashier;
 
 public sealed class CashierApplicationService(
     AppDbContext dbContext,
-    ICashierOrderCompletedNotifier notifier) : ICashierOrderService
+    ICashierOrderCompletedNotifier notifier,
+    ICustomerOrderTrackingNotifier trackingNotifier) : ICashierOrderService
 {
     public async Task<IReadOnlyList<CashierOrderDto>> GetReadyOrdersAsync(CancellationToken cancellationToken)
     {
@@ -110,6 +112,15 @@ public sealed class CashierApplicationService(
         );
 
         await notifier.NotifyAsync(dto, cancellationToken);
+
+        try
+        {
+            await trackingNotifier.NotifyOrderUpdatedAsync(order.PublicCode, CancellationToken.None);
+        }
+        catch
+        {
+            // Best-effort: tracking notification failure must not affect cashier handoff result
+        }
 
         return CompleteCashTakeawayResult.Success;
     }
