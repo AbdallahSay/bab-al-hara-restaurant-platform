@@ -216,6 +216,58 @@ export interface UiCopy {
     readonly area: string;
     readonly signOut: string;
   };
+  readonly driver: {
+    readonly title: string;
+    readonly signIn: string;
+    readonly activeDeliveries: string;
+    readonly completedDeliveries: string;
+    readonly noActiveOrders: string;
+    readonly noActiveOrdersSub: string;
+    readonly noCompletedOrders: string;
+    readonly orderCode: string;
+    readonly statusReady: string;
+    readonly statusOnTheWay: string;
+    readonly statusDelivered: string;
+    readonly customer: string;
+    readonly callCustomer: string;
+    readonly phone: string;
+    readonly deliveryDestination: string;
+    readonly area: string;
+    readonly address: string;
+    readonly deliveryNote: string;
+    readonly items: string;
+    readonly showItems: string;
+    readonly hideItems: string;
+    readonly itemCount: string;
+    readonly payment: string;
+    readonly codAmount: string;
+    readonly paidOnline: string;
+    readonly cashOnDelivery: string;
+    readonly startDeliveryAction: string;
+    readonly markDeliveredAction: string;
+    readonly startDeliveryConfirmTitle: string;
+    readonly startDeliveryConfirmBody: string;
+    readonly startDeliveryConfirmYes: string;
+    readonly markDeliveredConfirmTitle: string;
+    readonly markDeliveredConfirmBody: string;
+    readonly markDeliveredConfirmYes: string;
+    readonly cancel: string;
+    readonly actionInProgress: string;
+    readonly actionSuccess: string;
+    readonly staleError: string;
+    readonly actionError: string;
+    readonly loading: string;
+    readonly loadError: string;
+    readonly refresh: string;
+    readonly connected: string;
+    readonly connecting: string;
+    readonly reconnecting: string;
+    readonly disconnected: string;
+    readonly elapsed: string;
+    readonly minute: string;
+    readonly minutes: string;
+    readonly signOut: string;
+  };
 }
 
 export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
@@ -442,6 +494,58 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       area: 'المنطقة',
       signOut: 'تسجيل الخروج',
     },
+    driver: {
+      title: 'توصيل الطلبات',
+      signIn: 'تسجيل دخول السائق',
+      activeDeliveries: 'الطلبات الجارية',
+      completedDeliveries: 'الطلبات المسلّمة',
+      noActiveOrders: 'لا توجد طلبات جارية للتوصيل',
+      noActiveOrdersSub: 'ستظهر الطلبات المعيّنة لك هنا فور تجهيزها بالمطعم.',
+      noCompletedOrders: 'لا توجد طلبات مسلّمة اليوم',
+      orderCode: 'طلب #',
+      statusReady: 'جاهز للاستلام بالمطعم',
+      statusOnTheWay: 'في الطريق للعميل',
+      statusDelivered: 'تم التسليم',
+      customer: 'بيانات العميل',
+      callCustomer: 'اتصال بالعميل',
+      phone: 'رقم الهاتف',
+      deliveryDestination: 'عنوان التوصيل',
+      area: 'المنطقة',
+      address: 'العنوان بالتفصيل',
+      deliveryNote: 'ملاحظات التوصيل',
+      items: 'محتويات الطلب',
+      showItems: 'عرض الأصناف',
+      hideItems: 'إخفاء الأصناف',
+      itemCount: 'أصناف',
+      payment: 'الدفع والتحصيل',
+      codAmount: 'المطلوب تحصيله',
+      paidOnline: 'مدفوع مسبقاً',
+      cashOnDelivery: 'الدفع عند الاستلام (كاش)',
+      startDeliveryAction: 'بدء التوصيل',
+      markDeliveredAction: 'تم التسليم',
+      startDeliveryConfirmTitle: 'تأكيد استلام الطلب وبدء التحرك',
+      startDeliveryConfirmBody: 'هل استلمت وجبة الطلب من المطبخ وبدأت التوجه لعنوان العميل؟',
+      startDeliveryConfirmYes: 'نعم، ابدأ التوصيل',
+      markDeliveredConfirmTitle: 'تأكيد تسليم الطلب والتحصيل',
+      markDeliveredConfirmBody: 'هل قمت بتسليم الطلب للعميل واستلام المبلغ المطلوب بالكامل؟',
+      markDeliveredConfirmYes: 'نعم، تم التسليم',
+      cancel: 'تراجع',
+      actionInProgress: 'جاري التحديث…',
+      actionSuccess: 'تم تحديث حالة الطلب بنجاح',
+      staleError: 'تم تعديل بيانات هذا الطلب من عملية أخرى. جاري تحديث الشاشة…',
+      actionError: 'حدث خطأ أثناء تحديث الطلب. يرجى المحاولة مرة أخرى.',
+      loading: 'جاري تحميل طلبات التوصيل…',
+      loadError: 'تعذر تحميل بيانات الطلبات',
+      refresh: 'تحديث البيانات',
+      connected: 'متصل بالتحديثات المباشرة',
+      connecting: 'جاري الاتصال…',
+      reconnecting: 'جاري إعادة الاتصال…',
+      disconnected: 'التحديث المباشر متوقف',
+      elapsed: 'الانتظار',
+      minute: 'دقيقة',
+      minutes: 'دقائق',
+      signOut: 'تسجيل الخروج',
+    },
   },
   en: {
     brand: {
@@ -665,6 +769,60 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       note: 'Note',
       address: 'Address',
       area: 'Area',
+      signOut: 'Sign out',
+    },
+    driver: {
+      title: 'Driver Deliveries',
+      signIn: 'Driver Sign In',
+      activeDeliveries: 'Active Deliveries',
+      completedDeliveries: 'Delivered Orders',
+      noActiveOrders: 'No active deliveries',
+      noActiveOrdersSub: 'Assigned orders ready for pickup will appear here.',
+      noCompletedOrders: 'No delivered orders today',
+      orderCode: 'Order #',
+      statusReady: 'Ready for Pickup',
+      statusOnTheWay: 'On the Way',
+      statusDelivered: 'Delivered',
+      customer: 'Customer Info',
+      callCustomer: 'Call Customer',
+      phone: 'Phone Number',
+      deliveryDestination: 'Delivery Address',
+      area: 'Area',
+      address: 'Full Address',
+      deliveryNote: 'Delivery Note',
+      items: 'Order Items',
+      showItems: 'Show items',
+      hideItems: 'Hide items',
+      itemCount: 'items',
+      payment: 'Payment & Collection',
+      codAmount: 'Amount to collect',
+      paidOnline: 'Prepaid',
+      cashOnDelivery: 'Cash on Delivery',
+      startDeliveryAction: 'Start Delivery',
+      markDeliveredAction: 'Mark Delivered',
+      startDeliveryConfirmTitle: 'Start Delivery Confirmation',
+      startDeliveryConfirmBody:
+        'Have you collected the order from the kitchen and started heading to the customer?',
+      startDeliveryConfirmYes: 'Yes, start delivery',
+      markDeliveredConfirmTitle: 'Confirm Delivery & Collection',
+      markDeliveredConfirmBody:
+        'Have you handed over the order to the customer and collected the required amount?',
+      markDeliveredConfirmYes: 'Yes, mark delivered',
+      cancel: 'Cancel',
+      actionInProgress: 'Updating…',
+      actionSuccess: 'Order updated successfully',
+      staleError: 'Order data was updated by another action. Refreshing…',
+      actionError: 'An error occurred while updating the order. Please try again.',
+      loading: 'Loading delivery orders…',
+      loadError: 'Failed to load delivery orders',
+      refresh: 'Refresh data',
+      connected: 'Live updates connected',
+      connecting: 'Connecting…',
+      reconnecting: 'Reconnecting…',
+      disconnected: 'Live updates disconnected',
+      elapsed: 'Waiting',
+      minute: 'min',
+      minutes: 'mins',
       signOut: 'Sign out',
     },
   },

@@ -1,0 +1,352 @@
+<main class="driver-app" [attr.dir]="language.direction()">
+  <!-- Top Bar / App Header -->
+  <header class="driver-header">
+    <div class="driver-header__container">
+      <div class="driver-header__brand">
+        <h1 class="driver-header__title">🛵 {{ copy().driver.title }}</h1>
+        <div class="driver-header__status" [class]="'status--' + realtime.status()">
+          <span class="status-dot"></span>
+          <span class="status-text">{{ realtimeLabel() }}</span>
+        </div>
+      </div>
+
+      <div class="driver-header__actions">
+        <div class="lang-toggle" role="group" [attr.aria-label]="copy().brand.languageLabel">
+          <button
+            type="button"
+            class="lang-btn"
+            [class.lang-btn--active]="language.current() === 'ar'"
+            (click)="setLanguage('ar')"
+            [attr.aria-pressed]="language.current() === 'ar'"
+          >
+            {{ copy().brand.arabic }}
+          </button>
+          <button
+            type="button"
+            class="lang-btn"
+            [class.lang-btn--active]="language.current() === 'en'"
+            (click)="setLanguage('en')"
+            [attr.aria-pressed]="language.current() === 'en'"
+          >
+            {{ copy().brand.english }}
+          </button>
+        </div>
+
+        <button
+          type="button"
+          class="sign-out-btn"
+          (click)="signOut()"
+          [attr.aria-label]="copy().driver.signOut"
+        >
+          🚪 {{ copy().driver.signOut }}
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Workspace -->
+  <div class="driver-workspace">
+    @if (state() === 'loading') {
+      <div class="state-view state-view--loading" role="status">
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="state-message">{{ copy().driver.loading }}</p>
+      </div>
+    } @else if (state() === 'error') {
+      <div class="state-view state-view--error" role="alert">
+        <div class="error-icon" aria-hidden="true">⚠️</div>
+        <h2 class="state-title">{{ copy().driver.loadError }}</h2>
+        <button type="button" class="button button--primary" (click)="loadOrders()">
+          🔄 {{ copy().driver.refresh }}
+        </button>
+      </div>
+    } @else {
+      <!-- Active Deliveries Section -->
+      <section
+        class="delivery-section delivery-section--active"
+        aria-labelledby="active-orders-heading"
+      >
+        <div class="section-header">
+          <h2 id="active-orders-heading" class="section-title">
+            {{ copy().driver.activeDeliveries }}
+            <span class="count-badge">{{ activeOrders().length }}</span>
+          </h2>
+          <button
+            type="button"
+            class="refresh-btn"
+            (click)="loadOrders()"
+            [attr.aria-label]="copy().driver.refresh"
+          >
+            🔄 {{ copy().driver.refresh }}
+          </button>
+        </div>
+
+        @if (activeOrders().length === 0) {
+          <div class="empty-state">
+            <span class="empty-state__icon" aria-hidden="true">🛵</span>
+            <h3 class="empty-state__title">{{ copy().driver.noActiveOrders }}</h3>
+            <p class="empty-state__body">{{ copy().driver.noActiveOrdersSub }}</p>
+          </div>
+        } @else {
+          <div class="orders-grid">
+            @for (order of activeOrders(); track order.id) {
+              <article
+                class="order-card"
+                [class.order-card--in-transit]="order.status === 'OnTheWay'"
+                [class.order-card--ready]="order.status === 'Ready'"
+                [attr.data-order-id]="order.id"
+              >
+                <!-- Order Header: Code, Status Badge, Elapsed Time -->
+                <header class="order-card__header">
+                  <div class="order-card__ident">
+                    <span class="order-card__code"
+                      >{{ copy().driver.orderCode }}{{ order.publicCode }}</span
+                    >
+                    <span class="order-card__elapsed">⏱️ {{ elapsedLabel(order.createdAt) }}</span>
+                  </div>
+                  <div
+                    class="order-card__status-badge"
+                    [class]="'badge--' + order.status.toLowerCase()"
+                  >
+                    @if (order.status === 'OnTheWay') {
+                      <span>🚚 {{ copy().driver.statusOnTheWay }}</span>
+                    } @else {
+                      <span>📦 {{ copy().driver.statusReady }}</span>
+                    }
+                  </div>
+                </header>
+
+                <!-- Feedback Banners -->
+                @if (staleOrders().has(order.id)) {
+                  <div class="order-card__alert order-card__alert--warning" role="alert">
+                    ⚠️ {{ copy().driver.staleError }}
+                  </div>
+                }
+                @if (errorOrders().has(order.id)) {
+                  <div class="order-card__alert order-card__alert--danger" role="alert">
+                    ❌ {{ copy().driver.actionError }}
+                  </div>
+                }
+
+                <!-- Customer & Destination Group -->
+                <div class="order-card__body">
+                  <!-- Destination Block -->
+                  <div class="info-block info-block--destination">
+                    <div class="info-block__label">📍 {{ copy().driver.deliveryDestination }}</div>
+                    @if (order.deliveryAreaNameAr || order.deliveryAreaNameEn) {
+                      <div class="area-tag">{{ areaName(order) }}</div>
+                    }
+                    <div class="address-text">{{ order.address }}</div>
+                    @if (order.customerNote) {
+                      <div class="note-box">
+                        <span class="note-box__label">💬 {{ copy().driver.deliveryNote }}:</span>
+                        <span class="note-box__text">{{ order.customerNote }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Customer Block with 1-Tap Phone Call -->
+                  <div class="info-block info-block--customer">
+                    <div class="customer-row">
+                      <div class="customer-info">
+                        <div class="info-block__label">👤 {{ copy().driver.customer }}</div>
+                        <div class="customer-name">{{ order.customerName }}</div>
+                      </div>
+                      <a
+                        [href]="'tel:' + order.customerPhone"
+                        class="call-btn"
+                        [attr.aria-label]="copy().driver.callCustomer + ': ' + order.customerPhone"
+                      >
+                        📞 {{ order.customerPhone }}
+                      </a>
+                    </div>
+                  </div>
+
+                  <!-- COD & Financial Block (UNMISTAKABLE) -->
+                  <div
+                    class="info-block info-block--payment"
+                    [class.payment--cod]="isCOD(order)"
+                    [class.payment--prepaid]="!isCOD(order)"
+                  >
+                    @if (isCOD(order)) {
+                      <div class="payment-cod">
+                        <div class="payment-cod__header">
+                          <span class="payment-badge payment-badge--cod"
+                            >💵 {{ copy().driver.cashOnDelivery }}</span
+                          >
+                        </div>
+                        <div class="payment-cod__amount">
+                          <span class="payment-cod__label">{{ copy().driver.codAmount }}:</span>
+                          <span class="payment-cod__value"
+                            >{{ order.total }} {{ copy().common.currency }}</span
+                          >
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="payment-prepaid">
+                        <span class="payment-badge payment-badge--paid"
+                          >✅ {{ copy().driver.paidOnline }}</span
+                        >
+                        <div class="payment-prepaid__note">0 {{ copy().common.currency }}</div>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Items Breakdown (Collapsible) -->
+                  <div class="order-card__items">
+                    <button
+                      type="button"
+                      class="items-toggle-btn"
+                      (click)="toggleItems(order.id)"
+                      [attr.aria-expanded]="isItemsExpanded(order.id)"
+                    >
+                      <span>📋 {{ copy().driver.items }} ({{ order.items.length }})</span>
+                      <span class="toggle-icon">{{ isItemsExpanded(order.id) ? '▲' : '▼' }}</span>
+                    </button>
+
+                    @if (isItemsExpanded(order.id)) {
+                      <ul class="items-list">
+                        @for (item of order.items; track $index) {
+                          <li class="items-list__item">
+                            <span class="item-qty">{{ item.quantity }}×</span>
+                            <span class="item-name">{{ itemName(item) }}</span>
+                          </li>
+                        }
+                      </ul>
+                    }
+                  </div>
+                </div>
+
+                <!-- Primary Operational Action Dominance -->
+                <footer class="order-card__footer">
+                  @if (order.status === 'Ready') {
+                    <button
+                      type="button"
+                      class="action-btn action-btn--start"
+                      [disabled]="inFlightOrders().has(order.id)"
+                      (click)="requestStartDelivery(order)"
+                    >
+                      @if (inFlightOrders().has(order.id)) {
+                        ⏳ {{ copy().driver.actionInProgress }}
+                      } @else {
+                        🛵 {{ copy().driver.startDeliveryAction }}
+                      }
+                    </button>
+                  } @else if (order.status === 'OnTheWay') {
+                    <button
+                      type="button"
+                      class="action-btn action-btn--deliver"
+                      [disabled]="inFlightOrders().has(order.id)"
+                      (click)="requestMarkDelivered(order)"
+                    >
+                      @if (inFlightOrders().has(order.id)) {
+                        ⏳ {{ copy().driver.actionInProgress }}
+                      } @else {
+                        ✅ {{ copy().driver.markDeliveredAction }}
+                      }
+                    </button>
+                  }
+                </footer>
+              </article>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Completed Deliveries (Subordinate) -->
+      @if (completedOrders().length > 0) {
+        <section
+          class="delivery-section delivery-section--completed"
+          aria-labelledby="completed-orders-heading"
+        >
+          <h2 id="completed-orders-heading" class="section-title section-title--subordinate">
+            {{ copy().driver.completedDeliveries }}
+            <span class="count-badge count-badge--subtle">{{ completedOrders().length }}</span>
+          </h2>
+
+          <div class="completed-list">
+            @for (order of completedOrders(); track order.id) {
+              <article class="completed-card">
+                <div class="completed-card__main">
+                  <div class="completed-card__title">
+                    <span class="order-code"
+                      >{{ copy().driver.orderCode }}{{ order.publicCode }}</span
+                    >
+                    <span class="customer-name">{{ order.customerName }}</span>
+                  </div>
+                  <div class="completed-card__meta">
+                    @if (order.deliveryAreaNameAr || order.deliveryAreaNameEn) {
+                      <span class="area-text">{{ areaName(order) }}</span>
+                    }
+                    <span class="address-snippet">{{ order.address }}</span>
+                  </div>
+                </div>
+                <div class="completed-card__side">
+                  <span class="badge badge--delivered">✔ {{ copy().driver.statusDelivered }}</span>
+                  <span class="total-text">{{ order.total }} {{ copy().common.currency }}</span>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+      }
+    }
+  </div>
+
+  <!-- Accessible Action Confirmation Modal -->
+  @if (confirmingAction(); as action) {
+    <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-card">
+        <h3 id="modal-title" class="modal-card__title">
+          {{
+            action.type === 'start-delivery'
+              ? copy().driver.startDeliveryConfirmTitle
+              : copy().driver.markDeliveredConfirmTitle
+          }}
+        </h3>
+
+        <div class="modal-card__order-info">
+          <span class="modal-order-code"
+            >{{ copy().driver.orderCode }}{{ action.order.publicCode }}</span
+          >
+          <span class="modal-customer">{{ action.order.customerName }}</span>
+        </div>
+
+        <p class="modal-card__body">
+          {{
+            action.type === 'start-delivery'
+              ? copy().driver.startDeliveryConfirmBody
+              : copy().driver.markDeliveredConfirmBody
+          }}
+        </p>
+
+        @if (action.type === 'mark-delivered' && isCOD(action.order)) {
+          <div class="modal-cod-reminder">
+            <span class="modal-cod-label">💵 {{ copy().driver.codAmount }}:</span>
+            <span class="modal-cod-amount"
+              >{{ action.order.total }} {{ copy().common.currency }}</span
+            >
+          </div>
+        }
+
+        <div class="modal-card__actions">
+          <button
+            type="button"
+            class="modal-btn modal-btn--confirm"
+            [class.modal-btn--start]="action.type === 'start-delivery'"
+            [class.modal-btn--deliver]="action.type === 'mark-delivered'"
+            (click)="executeConfirmedAction()"
+          >
+            {{
+              action.type === 'start-delivery'
+                ? copy().driver.startDeliveryConfirmYes
+                : copy().driver.markDeliveredConfirmYes
+            }}
+          </button>
+          <button type="button" class="modal-btn modal-btn--cancel" (click)="cancelConfirmation()">
+            {{ copy().driver.cancel }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</main>

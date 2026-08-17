@@ -1,0 +1,286 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
+import { interval } from 'rxjs';
+
+import { localizedText } from '../../core/i18n/formatters';
+import { LanguageService } from '../../core/i18n/language.service';
+import { Language } from '../../core/i18n/translations';
+import { StaffSessionService } from '../kitchen/staff-session.service';
+import { DriverApiService } from './driver-api.service';
+import { DriverHubService } from './driver-hub.service';
+import { DriverOrderDto, DriverOrderItemDto, DriverOrderStatus } from './driver.models';
+
+type PageState = 'loading' | 'ready' | 'error';
+type ConfirmActionType = 'start-delivery' | 'mark-delivered';
+
+interface ConfirmationState {
+  readonly orderId: string;
+  readonly type: ConfirmActionType;
+  readonly order: DriverOrderDto;
+}
+
+@Component({
+  selector: 'app-driver-page',
+  templateUrl: './driver-page.html',
+  styleUrl: './driver-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class DriverPage implements OnInit, OnDestroy {
+  private readonly api = inject(DriverApiService);
+  private readonly sessions = inject(StaffSessionService);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+
+  protected readonly language = inject(LanguageService);
+  protected readonly copy = this.language.copy;
+  protected readonly realtime = inject(DriverHubService);
+  protected readonly state = signal<PageState>('loading');
+  protected readonly orders = signal<readonly DriverOrderDto[]>([]);
+  protected readonly now = signal(Date.now());
+
+  protected readonly inFlightOrders = signal<Set<string>>(new Set());
+  protected readonly staleOrders = signal<Set<string>>(new Set());
+  protected readonly errorOrders = signal<Set<string>>(new Set());
+  protected readonly expandedItems = signal<Set<string>>(new Set());
+
+  // Modal / prompt confirmation state
+  protected readonly confirmingAction = signal<ConfirmationState | null>(null);
+
+  protected readonly activeOrders = computed(() => {
+    const list = this.orders().filter((o) => o.status === 'Ready' || o.status === 'OnTheWay');
+    return list.sort((a, b) => {
+      // Prioritize OnTheWay (currently in transit) first, then Ready
+      if (a.status === 'OnTheWay' && b.status !== 'OnTheWay') return -1;
+      if (b.status === 'OnTheWay' && a.status !== 'OnTheWay') return 1;
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
+  });
+
+  protected readonly completedOrders = computed(() => {
+    const list = this.orders().filter((o) => o.status === 'Delivered');
+    return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  });
+
+  ngOnInit(): void {
+    this.sessions
+      .getSession()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (session) => {
+          if (!session.isAuthenticated) {
+            void this.router.navigate(['/driver/sign-in']);
+            return;
+          }
+          this.startSync();
+        },
+        error: () => void this.router.navigate(['/driver/sign-in']),
+      });
+
+    interval(30_000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.now.set(Date.now()));
+  }
+
+  ngOnDestroy(): void {
+    void this.realtime.stop();
+  }
+
+  protected setLanguage(language: Language): void {
+    this.language.setLanguage(language);
+  }
+
+  protected loadOrders(): void {
+    this.state.set('loading');
+    this.api
+      .getAssignedOrders()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (orders) => {
+          this.orders.set(orders);
+          this.state.set('ready');
+          this.confirmingAction.set(null);
+          this.inFlightOrders.set(new Set());
+          this.staleOrders.set(new Set());
+          this.errorOrders.set(new Set());
+        },
+        error: (error: { readonly status?: number }) => {
+          if (error.status === 401 || error.status === 403) {
+            void this.router.navigate(['/driver/sign-in']);
+          } else {
+            this.state.set('error');
+          }
+        },
+      });
+  }
+
+  protected signOut(): void {
+    this.sessions
+      .signOut()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: () => void this.router.navigate(['/driver/sign-in']) });
+  }
+
+  protected areaName(order: DriverOrderDto): string {
+    return localizedText(
+      this.language.current(),
+      order.deliveryAreaNameAr ?? '',
+      order.deliveryAreaNameEn ?? '',
+    );
+  }
+
+  protected itemName(item: DriverOrderItemDto): string {
+    return localizedText(this.language.current(), item.productNameAr, item.productNameEn);
+  }
+
+  protected elapsedMinutes(value: string): number {
+    return Math.max(0, Math.floor((this.now() - new Date(value).getTime()) / 60_000));
+  }
+
+  protected elapsedLabel(value: string): string {
+    const minutes = this.elapsedMinutes(value);
+    return `${minutes} ${minutes === 1 ? this.copy().driver.minute : this.copy().driver.minutes}`;
+  }
+
+  protected statusLabel(status: DriverOrderStatus): string {
+    switch (status) {
+      case 'Ready':
+        return this.copy().driver.statusReady;
+      case 'OnTheWay':
+        return this.copy().driver.statusOnTheWay;
+      case 'Delivered':
+        return this.copy().driver.statusDelivered;
+    }
+  }
+
+  protected realtimeLabel(): string {
+    return this.copy().driver[this.realtime.status()];
+  }
+
+  protected isCOD(order: DriverOrderDto): boolean {
+    return order.paymentMethod === 'Cash' && order.paymentStatus === 'Pending';
+  }
+
+  protected isItemsExpanded(orderId: string): boolean {
+    return this.expandedItems().has(orderId);
+  }
+
+  protected toggleItems(orderId: string): void {
+    const set = new Set(this.expandedItems());
+    if (set.has(orderId)) {
+      set.delete(orderId);
+    } else {
+      set.add(orderId);
+    }
+    this.expandedItems.set(set);
+  }
+
+  protected requestStartDelivery(order: DriverOrderDto): void {
+    this.confirmingAction.set({
+      orderId: order.id,
+      type: 'start-delivery',
+      order,
+    });
+  }
+
+  protected requestMarkDelivered(order: DriverOrderDto): void {
+    this.confirmingAction.set({
+      orderId: order.id,
+      type: 'mark-delivered',
+      order,
+    });
+  }
+
+  protected cancelConfirmation(): void {
+    this.confirmingAction.set(null);
+  }
+
+  protected executeConfirmedAction(): void {
+    const action = this.confirmingAction();
+    if (!action) return;
+
+    const { order, type } = action;
+    if (this.inFlightOrders().has(order.id)) return;
+
+    const inFlight = new Set(this.inFlightOrders());
+    inFlight.add(order.id);
+    this.inFlightOrders.set(inFlight);
+    this.confirmingAction.set(null);
+
+    // Clear previous errors for this order
+    const stales = new Set(this.staleOrders());
+    stales.delete(order.id);
+    this.staleOrders.set(stales);
+
+    const errors = new Set(this.errorOrders());
+    errors.delete(order.id);
+    this.errorOrders.set(errors);
+
+    const apiCall =
+      type === 'start-delivery'
+        ? this.api.startDelivery(order.id, order.rowVersion)
+        : this.api.markDelivered(order.id, order.rowVersion);
+
+    apiCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => {
+      const currentInFlight = new Set(this.inFlightOrders());
+      currentInFlight.delete(order.id);
+      this.inFlightOrders.set(currentInFlight);
+
+      if (result === 'success') {
+        const nextStatus: DriverOrderStatus = type === 'start-delivery' ? 'OnTheWay' : 'Delivered';
+        this.orders.update((list) =>
+          list.map((o) => (o.id === order.id ? { ...o, status: nextStatus } : o)),
+        );
+      } else if (result === 'stale') {
+        const currentStale = new Set(this.staleOrders());
+        currentStale.add(order.id);
+        this.staleOrders.set(currentStale);
+
+        // Auto refresh after delay
+        setTimeout(() => this.loadOrders(), 2500);
+      } else {
+        const currentErrors = new Set(this.errorOrders());
+        currentErrors.add(order.id);
+        this.errorOrders.set(currentErrors);
+      }
+    });
+  }
+
+  private startSync(): void {
+    this.loadOrders();
+
+    this.realtime.orderAssigned$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((newOrder) => {
+      this.orders.update((list) => {
+        const exists = list.some((o) => o.id === newOrder.id);
+        return exists
+          ? list.map((o) => (o.id === newOrder.id ? newOrder : o))
+          : [newOrder, ...list];
+      });
+    });
+
+    this.realtime.orderUpdated$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((updated) => {
+      this.orders.update((list) => list.map((o) => (o.id === updated.id ? updated : o)));
+    });
+
+    this.realtime.orderCompleted$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((orderId) => {
+      this.orders.update((list) =>
+        list.map((o) => (o.id === orderId ? { ...o, status: 'Delivered' as const } : o)),
+      );
+    });
+
+    this.realtime.reconnected$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadOrders());
+
+    void this.realtime.start().catch(() => undefined);
+  }
+}

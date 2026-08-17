@@ -3,4 +3,5 @@ export const environment = {
   apiBaseUrl: '/api',
   kitchenHubUrl: '/hubs/kitchen',
   cashierHubUrl: '/hubs/cashier',
+  driverHubUrl: '/hubs/driver',
 } as const;
