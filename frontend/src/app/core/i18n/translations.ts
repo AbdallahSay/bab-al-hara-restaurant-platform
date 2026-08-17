@@ -24,6 +24,9 @@ export interface UiCopy {
     readonly takeaway: string;
     readonly delivery: string;
     readonly cash: string;
+    readonly restaurantPausedFallback: string;
+    readonly restaurantPausedBrowsingNotice: string;
+    readonly restaurantPausedSubmitTooltip: string;
   };
   readonly menu: {
     readonly eyebrow: string;
@@ -98,6 +101,8 @@ export interface UiCopy {
     readonly orderTypeDelivery: string;
     readonly savedContactNotice: string;
     readonly clearSavedContact: string;
+    readonly restaurantNotAcceptingOrdersError: string;
+    readonly restaurantPausedButtonNotice: string;
   };
   readonly success: {
     readonly eyebrow: string;
@@ -375,6 +380,141 @@ export interface UiCopy {
       readonly delivered: string;
     };
   };
+  readonly management: {
+    readonly title: string;
+    readonly menuTitle: string;
+    readonly hubTitle: string;
+    readonly signInTitle: string;
+    readonly signInSubtitle: string;
+    readonly signIn: string;
+    readonly signingIn: string;
+    readonly email: string;
+    readonly password: string;
+    readonly signOut: string;
+    readonly overview: string;
+    readonly navHub: string;
+    readonly navMenu: string;
+    readonly viewCustomerMenu: string;
+    readonly restaurantControl: {
+      readonly title: string;
+      readonly subtitle: string;
+      readonly acceptingOrders: string;
+      readonly openBadge: string;
+      readonly pausedBadge: string;
+      readonly pauseMessageAr: string;
+      readonly pauseMessageEn: string;
+      readonly pauseMessageArPlaceholder: string;
+      readonly pauseMessageEnPlaceholder: string;
+      readonly charCount: string;
+      readonly lastUpdated: string;
+      readonly updatedBy: string;
+      readonly saveButton: string;
+      readonly saving: string;
+      readonly savedSuccess: string;
+      readonly saveError: string;
+      readonly staleError: string;
+      readonly refreshPrompt: string;
+    };
+    readonly stats: {
+      readonly title: string;
+      readonly totalCategories: string;
+      readonly activeCategories: string;
+      readonly totalMenuItems: string;
+      readonly availableItems: string;
+      readonly soldOutItems: string;
+      readonly archivedItems: string;
+    };
+    readonly categories: {
+      readonly title: string;
+      readonly subtitle: string;
+      readonly newCategory: string;
+      readonly editCategory: string;
+      readonly nameAr: string;
+      readonly nameEn: string;
+      readonly displayOrder: string;
+      readonly status: string;
+      readonly active: string;
+      readonly archived: string;
+      readonly itemCount: string;
+      readonly actions: string;
+      readonly edit: string;
+      readonly activate: string;
+      readonly archive: string;
+      readonly save: string;
+      readonly saving: string;
+      readonly cancel: string;
+      readonly createSuccess: string;
+      readonly updateSuccess: string;
+      readonly toggleSuccess: string;
+      readonly error: string;
+      readonly staleError: string;
+      readonly emptyTitle: string;
+      readonly emptyBody: string;
+      readonly nameArRequired: string;
+      readonly nameEnRequired: string;
+      readonly displayOrderInvalid: string;
+    };
+    readonly menuItems: {
+      readonly title: string;
+      readonly subtitle: string;
+      readonly newItem: string;
+      readonly editItem: string;
+      readonly filterCategory: string;
+      readonly allCategories: string;
+      readonly searchPlaceholder: string;
+      readonly image: string;
+      readonly nameAr: string;
+      readonly nameEn: string;
+      readonly descriptionAr: string;
+      readonly descriptionEn: string;
+      readonly category: string;
+      readonly selectCategory: string;
+      readonly price: string;
+      readonly preparationMinutes: string;
+      readonly displayOrder: string;
+      readonly availability: string;
+      readonly available: string;
+      readonly unavailable: string;
+      readonly status: string;
+      readonly active: string;
+      readonly archived: string;
+      readonly actions: string;
+      readonly edit: string;
+      readonly toggleAvailability: string;
+      readonly toggleStatus: string;
+      readonly save: string;
+      readonly saving: string;
+      readonly cancel: string;
+      readonly createSuccess: string;
+      readonly updateSuccess: string;
+      readonly availabilitySuccess: string;
+      readonly statusSuccess: string;
+      readonly error: string;
+      readonly staleError: string;
+      readonly emptyTitle: string;
+      readonly emptyBody: string;
+      readonly noFilteredItems: string;
+      readonly selectImage: string;
+      readonly customImage: string;
+      readonly imageRequired: string;
+      readonly nameArRequired: string;
+      readonly nameEnRequired: string;
+      readonly priceInvalid: string;
+      readonly prepTimeInvalid: string;
+      readonly displayOrderInvalid: string;
+      readonly categoryRequired: string;
+    };
+    readonly tabs: {
+      readonly categories: string;
+      readonly menuItems: string;
+    };
+    readonly errors: {
+      readonly loadFailed: string;
+      readonly retry: string;
+      readonly unauthorized: string;
+      readonly forbidden: string;
+    };
+  };
 }
 
 export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
@@ -402,6 +542,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       takeaway: 'استلام من الفرع',
       delivery: 'توصيل',
       cash: 'الدفع عند الاستلام',
+      restaurantPausedFallback: 'المطعم لا يستقبل طلبات جديدة مؤقتًا',
+      restaurantPausedBrowsingNotice: 'يمكنك تصفح القائمة وإضافة الأصناف إلى السلة للطلب لاحقًا.',
+      restaurantPausedSubmitTooltip: 'المطعم متوقف مؤقتًا عن استقبال الطلبات',
     },
     menu: {
       eyebrow: 'اطلب مباشرة',
@@ -476,6 +619,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       orderTypeDelivery: 'توصيل للمنزل',
       savedContactNotice: 'استخدمنا بياناتك المحفوظة على هذا الجهاز',
       clearSavedContact: 'مسح البيانات المحفوظة',
+      restaurantNotAcceptingOrdersError:
+        'المطعم متوقف مؤقتًا عن استقبال طلبات جديدة. تم الاحتفاظ بسلتك ويمكنك إرسال الطلب فور استئناف العمل.',
+      restaurantPausedButtonNotice: 'المطعم متوقف مؤقتًا عن استقبال الطلبات',
     },
     success: {
       eyebrow: 'تم استلام الطلب',
@@ -767,6 +913,141 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         delivered: 'تم تسليم طلبك',
       },
     },
+    management: {
+      title: 'لوحة تحكم الإدارة',
+      menuTitle: 'إدارة قائمة الطعام والأصناف',
+      hubTitle: 'مركز العمليات والإدارة',
+      signInTitle: 'تسجيل دخول الإدارة',
+      signInSubtitle: 'لوحة تحكم المشرفين والمديرين لمتابعة وتشغيل باب الحارة',
+      signIn: 'تسجيل الدخول',
+      signingIn: 'جاري تسجيل الدخول…',
+      email: 'البريد الإلكتروني',
+      password: 'كلمة المرور',
+      signOut: 'تسجيل الخروج',
+      overview: 'نظرة عامة',
+      navHub: 'مركز الإدارة',
+      navMenu: 'إدارة القائمة والأصناف',
+      viewCustomerMenu: 'عرض قائمة العملاء',
+      restaurantControl: {
+        title: 'حالة استقبال الطلبات',
+        subtitle: 'التحكم في فتح المطعم أو إيقاف استقبال الطلبات مؤقتاً مع رسالة توضيحية للعملاء',
+        acceptingOrders: 'استقبال الطلبات الآن',
+        openBadge: 'مفتوح ويستقبل الطلبات',
+        pausedBadge: 'متوقف مؤقتاً',
+        pauseMessageAr: 'رسالة الإيقاف المؤقت (بالعربية)',
+        pauseMessageEn: 'رسالة الإيقاف المؤقت (بالإنجليزية)',
+        pauseMessageArPlaceholder: 'مثال: نعتذر، نستقبل طلباتكم بعد ساعة بسبب ضغط العمل.',
+        pauseMessageEnPlaceholder: 'e.g. Sorry, we are temporarily paused due to high rush.',
+        charCount: 'حرف',
+        lastUpdated: 'آخر تحديث',
+        updatedBy: 'بواسطة',
+        saveButton: 'حفظ حالة المطعم',
+        saving: 'جاري الحفظ…',
+        savedSuccess: 'تم تحديث حالة المطعم بنجاح.',
+        saveError: 'حدث خطأ أثناء حفظ حالة المطعم. يرجى المحاولة مرة أخرى.',
+        staleError: 'تم تعديل حالة المطعم بواسطة مدير آخر. تم تحديث البيانات المعروضة.',
+        refreshPrompt: 'تحديث البيانات',
+      },
+      stats: {
+        title: 'إحصائيات القائمة',
+        totalCategories: 'إجمالي الأقسام',
+        activeCategories: 'الأقسام النشطة',
+        totalMenuItems: 'إجمالي الأصناف',
+        availableItems: 'الأصناف المتوفرة',
+        soldOutItems: 'أصناف غير متوفرة (نفدت)',
+        archivedItems: 'أصناف مؤرشفة',
+      },
+      categories: {
+        title: 'أقسام القائمة',
+        subtitle: 'إدارة وتصنيف أقسام المنيو وترتيب ظهورها',
+        newCategory: 'إضافة قسم جديد',
+        editCategory: 'تعديل القسم',
+        nameAr: 'اسم القسم (عربي)',
+        nameEn: 'اسم القسم (إنجليزي)',
+        displayOrder: 'ترتيب العرض',
+        status: 'الحالة',
+        active: 'نشط',
+        archived: 'مؤرشف',
+        itemCount: 'عدد الأصناف',
+        actions: 'إجراءات',
+        edit: 'تعديل',
+        activate: 'تنشيط',
+        archive: 'أرشفة',
+        save: 'حفظ القسم',
+        saving: 'جاري الحفظ…',
+        cancel: 'إلغاء',
+        createSuccess: 'تمت إضافة القسم بنجاح.',
+        updateSuccess: 'تم تحديث بيانات القسم بنجاح.',
+        toggleSuccess: 'تم تغيير حالة القسم بنجاح.',
+        error: 'حدث خطأ أثناء معالجة بيانات القسم.',
+        staleError: 'تم تعديل بيانات القسم بواسطة مستخدم آخر. يرجى إعادة المحاولة.',
+        emptyTitle: 'لا توجد أقسام مسجلة',
+        emptyBody: 'ابدأ بإضافة أول قسم لتنظيم قائمة الطعام.',
+        nameArRequired: 'الاسم بالعربية مطلوب.',
+        nameEnRequired: 'الاسم بالإنجليزية مطلوب.',
+        displayOrderInvalid: 'ترتيب العرض يجب أن يكون 0 أو أكثر.',
+      },
+      menuItems: {
+        title: 'أصناف القائمة',
+        subtitle: 'إدارة تفاصيل الأصناف، الأسعار، التوفر، وحالة النشر',
+        newItem: 'إضافة صنف جديد',
+        editItem: 'تعديل الصنف',
+        filterCategory: 'تصفية حسب القسم',
+        allCategories: 'جميع الأقسام',
+        searchPlaceholder: 'بحث عن صنف بالاسم أو الوصف…',
+        image: 'الصورة',
+        nameAr: 'اسم الصنف (عربي)',
+        nameEn: 'اسم الصنف (إنجليزي)',
+        descriptionAr: 'الوصف (عربي)',
+        descriptionEn: 'الوصف (إنجليزي)',
+        category: 'القسم',
+        selectCategory: 'اختر القسم',
+        price: 'السعر (ج.م)',
+        preparationMinutes: 'وقت التحضير (بالدقائق)',
+        displayOrder: 'ترتيب العرض',
+        availability: 'التوفر للطلب',
+        available: 'متوفر',
+        unavailable: 'غير متوفر (نفد)',
+        status: 'حالة النشر',
+        active: 'نشط في القائمة',
+        archived: 'مؤرشف (مخفي)',
+        actions: 'إجراءات',
+        edit: 'تعديل',
+        toggleAvailability: 'تغيير التوفر',
+        toggleStatus: 'تغيير حالة النشر',
+        save: 'حفظ الصنف',
+        saving: 'جاري الحفظ…',
+        cancel: 'إلغاء',
+        createSuccess: 'تمت إضافة الصنف بنجاح.',
+        updateSuccess: 'تم تحديث بيانات الصنف بنجاح.',
+        availabilitySuccess: 'تم تحديث توفر الصنف بنجاح.',
+        statusSuccess: 'تم تحديث حالة الصنف بنجاح.',
+        error: 'حدث خطأ أثناء معالجة بيانات الصنف.',
+        staleError: 'تم تعديل بيانات الصنف بواسطة مستخدم آخر. يرجى إعادة المحاولة.',
+        emptyTitle: 'لا توجد أصناف في هذا القسم',
+        emptyBody: 'أضف أصناف جديدة لتظهر للعملاء في قائمة الطعام.',
+        noFilteredItems: 'لا توجد أصناف مطابقة لبحثك',
+        selectImage: 'اختر صورة من القائمة',
+        customImage: 'رابط أو مسار صورة مخصص',
+        imageRequired: 'صورة الصنف مطلوبة.',
+        nameArRequired: 'اسم الصنف بالعربية مطلوب.',
+        nameEnRequired: 'اسم الصنف بالإنجليزية مطلوب.',
+        priceInvalid: 'السعر يجب أن يكون أكبر من 0.',
+        prepTimeInvalid: 'وقت التحضير يجب أن يكون بين 1 و 240 دقيقة.',
+        displayOrderInvalid: 'ترتيب العرض يجب أن يكون 0 أو أكثر.',
+        categoryRequired: 'يجب اختيار قسم للصنف.',
+      },
+      tabs: {
+        categories: 'الأقسام',
+        menuItems: 'الأصناف',
+      },
+      errors: {
+        loadFailed: 'تعذر تحميل البيانات. يرجى إعادة المحاولة.',
+        retry: 'إعادة المحاولة',
+        unauthorized: 'يرجى تسجيل الدخول بحساب مدير للمتابعة.',
+        forbidden: 'غير مصرح لك بالوصول إلى لوحة الإدارة.',
+      },
+    },
   },
   en: {
     brand: {
@@ -792,6 +1073,10 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       takeaway: 'Takeaway',
       delivery: 'Delivery',
       cash: 'Cash',
+      restaurantPausedFallback: 'The restaurant is temporarily paused for new orders',
+      restaurantPausedBrowsingNotice:
+        'You can still browse the menu and add items to your cart for later.',
+      restaurantPausedSubmitTooltip: 'The restaurant is temporarily paused for orders',
     },
     menu: {
       eyebrow: 'Order directly',
@@ -867,6 +1152,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       orderTypeDelivery: 'Delivery to address',
       savedContactNotice: 'We filled in your saved details on this device',
       clearSavedContact: 'Clear saved details',
+      restaurantNotAcceptingOrdersError:
+        'The restaurant is temporarily paused for new orders. Your cart has been saved and you can submit once orders resume.',
+      restaurantPausedButtonNotice: 'The restaurant is temporarily paused for orders',
     },
     success: {
       eyebrow: 'Order received',
@@ -1163,6 +1451,142 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         readyTakeaway: 'Your order is ready for pickup',
         onTheWay: 'Your order is on the way',
         delivered: 'Your order has been delivered',
+      },
+    },
+    management: {
+      title: 'Management Dashboard',
+      menuTitle: 'Menu & Catalog Management',
+      hubTitle: 'Operations & Management Hub',
+      signInTitle: 'Management Sign In',
+      signInSubtitle: 'Operations and catalog control for Bab Al Hara supervisors and managers',
+      signIn: 'Sign In',
+      signingIn: 'Signing in…',
+      email: 'Email',
+      password: 'Password',
+      signOut: 'Sign Out',
+      overview: 'Overview',
+      navHub: 'Management Hub',
+      navMenu: 'Menu & Catalog',
+      viewCustomerMenu: 'View Customer Menu',
+      restaurantControl: {
+        title: 'Order Acceptance Status',
+        subtitle:
+          'Control online order acceptance or temporarily pause the restaurant with a customer notice',
+        acceptingOrders: 'Accepting Orders Now',
+        openBadge: 'Open & Accepting Orders',
+        pausedBadge: 'Temporarily Paused',
+        pauseMessageAr: 'Pause Notice (Arabic)',
+        pauseMessageEn: 'Pause Notice (English)',
+        pauseMessageArPlaceholder: 'e.g. نعتذر، نستقبل طلباتكم بعد ساعة بسبب ضغط العمل.',
+        pauseMessageEnPlaceholder: 'e.g. Sorry, we are temporarily paused due to kitchen rush.',
+        charCount: 'chars',
+        lastUpdated: 'Last updated',
+        updatedBy: 'By',
+        saveButton: 'Save Status',
+        saving: 'Saving…',
+        savedSuccess: 'Restaurant status updated successfully.',
+        saveError: 'Failed to update restaurant status. Please try again.',
+        staleError: 'Restaurant status was updated by another manager. Data refreshed.',
+        refreshPrompt: 'Refresh Data',
+      },
+      stats: {
+        title: 'Catalog Statistics',
+        totalCategories: 'Total Categories',
+        activeCategories: 'Active Categories',
+        totalMenuItems: 'Total Menu Items',
+        availableItems: 'Available Items',
+        soldOutItems: 'Sold Out Items',
+        archivedItems: 'Archived Items',
+      },
+      categories: {
+        title: 'Menu Categories',
+        subtitle: 'Manage categories and display ordering',
+        newCategory: 'Add New Category',
+        editCategory: 'Edit Category',
+        nameAr: 'Category Name (Arabic)',
+        nameEn: 'Category Name (English)',
+        displayOrder: 'Display Order',
+        status: 'Status',
+        active: 'Active',
+        archived: 'Archived',
+        itemCount: 'Item Count',
+        actions: 'Actions',
+        edit: 'Edit',
+        activate: 'Activate',
+        archive: 'Archive',
+        save: 'Save Category',
+        saving: 'Saving…',
+        cancel: 'Cancel',
+        createSuccess: 'Category created successfully.',
+        updateSuccess: 'Category updated successfully.',
+        toggleSuccess: 'Category status changed successfully.',
+        error: 'Failed to save category. Please try again.',
+        staleError: 'Category was modified by another user. Please retry.',
+        emptyTitle: 'No categories found',
+        emptyBody: 'Create your first category to organize the menu.',
+        nameArRequired: 'Arabic name is required.',
+        nameEnRequired: 'English name is required.',
+        displayOrderInvalid: 'Display order must be 0 or higher.',
+      },
+      menuItems: {
+        title: 'Menu Items',
+        subtitle: 'Manage item details, pricing, availability, and active status',
+        newItem: 'Add New Item',
+        editItem: 'Edit Item',
+        filterCategory: 'Filter by Category',
+        allCategories: 'All Categories',
+        searchPlaceholder: 'Search items by name or description…',
+        image: 'Image',
+        nameAr: 'Item Name (Arabic)',
+        nameEn: 'Item Name (English)',
+        descriptionAr: 'Description (Arabic)',
+        descriptionEn: 'Description (English)',
+        category: 'Category',
+        selectCategory: 'Select Category',
+        price: 'Price (EGP)',
+        preparationMinutes: 'Prep Time (mins)',
+        displayOrder: 'Display Order',
+        availability: 'Ordering Availability',
+        available: 'Available',
+        unavailable: 'Sold Out',
+        status: 'Catalog Status',
+        active: 'Active in Menu',
+        archived: 'Archived (Hidden)',
+        actions: 'Actions',
+        edit: 'Edit',
+        toggleAvailability: 'Toggle Availability',
+        toggleStatus: 'Toggle Status',
+        save: 'Save Item',
+        saving: 'Saving…',
+        cancel: 'Cancel',
+        createSuccess: 'Menu item created successfully.',
+        updateSuccess: 'Menu item updated successfully.',
+        availabilitySuccess: 'Item availability updated successfully.',
+        statusSuccess: 'Item catalog status updated successfully.',
+        error: 'Failed to save menu item. Please try again.',
+        staleError: 'Menu item was modified by another user. Please retry.',
+        emptyTitle: 'No items in this category',
+        emptyBody: 'Add new items to show them in the customer menu.',
+        noFilteredItems: 'No items match your search',
+        selectImage: 'Select Preset Image',
+        customImage: 'Custom Image URL/Path',
+        imageRequired: 'Item image is required.',
+        nameArRequired: 'Arabic item name is required.',
+        nameEnRequired: 'English item name is required.',
+        priceInvalid: 'Price must be greater than 0.',
+        prepTimeInvalid: 'Preparation time must be between 1 and 240 minutes.',
+        displayOrderInvalid: 'Display order must be 0 or higher.',
+        categoryRequired: 'Category is required.',
+      },
+      tabs: {
+        categories: 'Categories',
+        menuItems: 'Menu Items',
+      },
+      errors: {
+        loadFailed: 'Failed to load data. Please retry.',
+        retry: 'Retry',
+        unauthorized: 'Please sign in with a manager account to proceed.',
+        forbidden: 'You do not have permission to access management.',
       },
     },
   },

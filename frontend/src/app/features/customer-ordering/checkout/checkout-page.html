@@ -12,6 +12,8 @@
     </div>
   </div>
 
+  <app-restaurant-paused-banner />
+
   <nav class="checkout-stepper" [attr.aria-label]="copy().checkout.title">
     <ol class="stepper-list">
       <li
@@ -488,16 +490,22 @@
         <button
           class="button button--primary button--wide desktop-submit-btn"
           type="submit"
-          [disabled]="sending() || cart.items().length === 0"
+          [disabled]="sending() || cart.items().length === 0 || statusService.isPaused()"
+          [attr.title]="statusService.isPaused() ? statusService.pauseMessage() : null"
         >
           @if (sending()) {
             <span class="submit-spinner" aria-hidden="true"></span>
             <span>{{ copy().checkout.submitting }}</span>
+          } @else if (statusService.isPaused()) {
+            <span>{{ copy().checkout.restaurantPausedButtonNotice }}</span>
           } @else {
             <span class="submit-label">{{ copy().checkout.submit }}</span>
             <span class="submit-total-tag">{{ money(displayedTotal()) }}</span>
           }
         </button>
+        @if (statusService.isPaused()) {
+          <p class="submit-paused-notice" role="status">{{ statusService.pauseMessage() }}</p>
+        }
       </aside>
     </div>
 
@@ -510,11 +518,14 @@
       <button
         class="button button--primary mobile-action-bar__btn"
         type="submit"
-        [disabled]="sending() || cart.items().length === 0"
+        [disabled]="sending() || cart.items().length === 0 || statusService.isPaused()"
+        [attr.title]="statusService.isPaused() ? statusService.pauseMessage() : null"
       >
         @if (sending()) {
           <span class="submit-spinner" aria-hidden="true"></span>
           <span>{{ copy().checkout.submitting }}</span>
+        } @else if (statusService.isPaused()) {
+          <span>{{ copy().checkout.restaurantPausedButtonNotice }}</span>
         } @else {
           <span>{{ copy().checkout.submit }}</span>
         }

@@ -3,7 +3,14 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, shareReplay, switchMap } from 'rxjs';
 
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
-import { Category, CreateOrderRequest, CreatedOrder, DeliveryArea, MenuItem } from './order.models';
+import {
+  Category,
+  CreateOrderRequest,
+  CreatedOrder,
+  DeliveryArea,
+  MenuItem,
+  RestaurantPublicStatusResponse,
+} from './order.models';
 
 @Injectable({ providedIn: 'root' })
 export class CustomerApiService {
@@ -21,6 +28,10 @@ export class CustomerApiService {
 
   getDeliveryAreas(): Observable<readonly DeliveryArea[]> {
     return this.http.get<readonly DeliveryArea[]>(`${this.apiBaseUrl}/delivery-areas`);
+  }
+
+  getRestaurantStatus(): Observable<RestaurantPublicStatusResponse> {
+    return this.http.get<RestaurantPublicStatusResponse>(`${this.apiBaseUrl}/restaurant/status`);
   }
 
   createOrder(request: CreateOrderRequest): Observable<CreatedOrder> {

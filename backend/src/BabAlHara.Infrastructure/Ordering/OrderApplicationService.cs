@@ -32,6 +32,18 @@ public sealed partial class OrderApplicationService(
             return validationFailure;
         }
 
+        var control = await dbContext.RestaurantControls
+            .AsNoTracking()
+            .SingleOrDefaultAsync(c => c.Id == BabAlHara.Domain.Ordering.RestaurantControl.SingletonId, cancellationToken);
+
+        if (control is not null && !control.AcceptingOrders)
+        {
+            return CreateOrderOutcome.Failure(
+                "restaurant_not_accepting_orders",
+                "المطعم لا يستقبل طلبات جديدة مؤقتًا",
+                isConflict: true);
+        }
+
         var requestedItemIds = command.Items.Select(line => line.MenuItemId).ToArray();
         var menuItems = await dbContext.MenuItems
             .Include(item => item.Category)

@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { CustomerApiService } from './customer-api.service';
+import { RestaurantPublicStatusResponse } from './order.models';
 
 describe('CustomerApiService', () => {
   beforeEach(() => {
@@ -17,6 +18,29 @@ describe('CustomerApiService', () => {
         },
       ],
     });
+  });
+
+  it('fetches restaurant public status', () => {
+    const service = TestBed.inject(CustomerApiService);
+    const http = TestBed.inject(HttpTestingController);
+    let statusResponse: RestaurantPublicStatusResponse | null = null;
+
+    service.getRestaurantStatus().subscribe((res) => (statusResponse = res));
+
+    const request = http.expectOne('/api/restaurant/status');
+    expect(request.request.method).toBe('GET');
+    request.flush({
+      acceptingOrders: false,
+      messageAr: '?????? ?????? ???? ???????',
+      messageEn: 'Sorry, the restaurant is closed for maintenance',
+    });
+
+    expect(statusResponse).toEqual({
+      acceptingOrders: false,
+      messageAr: '?????? ?????? ???? ???????',
+      messageEn: 'Sorry, the restaurant is closed for maintenance',
+    });
+    http.verify();
   });
 
   it('posts only the explicit order contract with an antiforgery token', () => {

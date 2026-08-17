@@ -121,12 +121,37 @@ Customer sees server-authoritative status progression.
 
 ## Phase 7 — Management/Admin
 
-- menu/category management
-- bilingual item content
-- delivery areas
-- employee accounts and roles
-- order history/filtering
-- audit-sensitive operations
+### Vertical Slice: Management Menu & Restaurant Control
+Status: COMPLETE — 2026-08-17
+
+Delivered:
+- **Management Catalog Backend Slice:**
+  - Full CRUD endpoints for Categories and Menu Items (`/api/management/categories`, `/api/management/menu-items`)
+  - Server-side optimistic concurrency enforcement using `byte[] RowVersion` (returning 409 Conflict with ProblemDetails `stale_conflict`)
+  - Fast status toggle (Active/Archived) for categories and items (`PATCH /api/management/categories/{id}/status`, `PATCH /api/management/menu-items/{id}/status`)
+  - Fast 1-click availability toggle (`PATCH /api/management/menu-items/{id}/availability`) reflecting across customer menu and kitchen
+  - Non-negative display order, bilingual AR/EN validation, preparation minutes (1-240 min)
+  - Protected under `Management` authorization policy (Manager / Admin) with CSRF protection
+- **Restaurant Control Backend Slice:**
+  - Singleton `RestaurantControl` entity with EF Core migration
+  - Public status endpoint `GET /api/restaurant/status` (Anonymous)
+  - Management endpoint `PUT /api/management/restaurant/status` with optimistic concurrency token
+  - Server-authoritative order placement gate: `OrderApplicationService` rejects checkout when `AcceptingOrders == false` with HTTP 409 `restaurant_not_accepting_orders`
+- **Customer Restaurant Status Integration Frontend:**
+  - Integrated `RestaurantStatusService` polling / querying operational status
+  - Clear, non-alarming bilingual `RestaurantPausedBanner` across Menu and Cart
+  - Cart items preserved when paused (customer cart is not wiped)
+  - Checkout submit button disabled with explanation when paused; 409 conflict handled gracefully with retry prompt without wiping cart
+- **Management Frontend:**
+  - Routes `/management`, `/management/menu`, `/management/sign-in` protected by `managementAuthGuard`
+  - `RestaurantStatusCard` component for instant order acceptance toggle, AR/EN pause message editor with 300 char counter, and optimistic concurrency error recovery
+  - Management Hub with live catalog statistics (active categories, available/sold-out/archived items) and quick links
+  - Menu Management screen with tabs for Categories and Menu Items, category pills filter, live search, 1-click availability toggle, 1-click active/archived toggle, create/edit modals with validation
+  - Full bilingual Arabic RTL & English LTR support, responsive touch-first design, comprehensive Vitest specs
+- **Remaining Management Scope (Future phases):**
+  - Delivery areas management
+  - Employee accounts and roles management
+  - Order history/filtering and advanced audit views
 
 ## Phase 8 — Paymob
 

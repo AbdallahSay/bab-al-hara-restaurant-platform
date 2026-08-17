@@ -1,4 +1,4 @@
-import {
+﻿import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -14,16 +14,18 @@ import { forkJoin } from 'rxjs';
 import { formatMoney, localizedText } from '../../../core/i18n/formatters';
 import { LanguageService } from '../../../core/i18n/language.service';
 import { CustomerHeader } from '../../../shared/customer-header/customer-header';
+import { RestaurantPausedBanner } from '../../../shared/restaurant-paused-banner/restaurant-paused-banner';
 import { CartService } from '../cart/cart.service';
 import { CartToastService } from '../cart/cart-toast.service';
 import { CustomerApiService } from '../customer-api.service';
 import { Category, MenuItem } from '../order.models';
+import { RestaurantStatusService } from '../restaurant-status.service';
 
 type MenuState = 'loading' | 'ready' | 'error';
 
 @Component({
   selector: 'app-menu-page',
-  imports: [CustomerHeader, RouterLink],
+  imports: [CustomerHeader, RestaurantPausedBanner, RouterLink],
   templateUrl: './menu-page.html',
   styleUrl: './menu-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,6 +37,7 @@ export class MenuPage implements OnInit {
   protected readonly language = inject(LanguageService);
   protected readonly copy = this.language.copy;
   protected readonly cart = inject(CartService);
+  protected readonly statusService = inject(RestaurantStatusService);
   private readonly cartToast = inject(CartToastService);
   protected readonly state = signal<MenuState>('loading');
   protected readonly addedItemIds = signal<Set<string>>(new Set());
@@ -55,7 +58,11 @@ export class MenuPage implements OnInit {
 
   protected loadMenu(): void {
     this.state.set('loading');
-    forkJoin({ categories: this.api.getCategories(), items: this.api.getMenuItems() })
+    forkJoin({
+      categories: this.api.getCategories(),
+      items: this.api.getMenuItems(),
+      status: this.statusService.loadStatus(),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ categories, items }) => {

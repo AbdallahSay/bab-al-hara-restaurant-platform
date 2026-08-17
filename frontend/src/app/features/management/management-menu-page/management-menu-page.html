@@ -1,0 +1,511 @@
+<div class="mgmt-layout">
+  <header class="mgmt-header">
+    <div class="mgmt-header__brand">
+      <h1 class="brand-title">{{ copy().brand.name }}</h1>
+      <span class="mgmt-badge">{{ copy().management.title }}</span>
+    </div>
+    <div class="mgmt-header__nav">
+      <a routerLink="/management" class="nav-link">{{ copy().management.navHub }}</a>
+      <a routerLink="/management/menu" class="nav-link is-active">{{
+        copy().management.navMenu
+      }}</a>
+      <a routerLink="/" class="nav-link nav-link--customer" target="_blank">
+        {{ copy().management.viewCustomerMenu }} ↗
+      </a>
+    </div>
+    <div class="mgmt-header__actions">
+      <div class="lang-switch">
+        <button
+          type="button"
+          class="lang-btn"
+          [class.is-active]="language.current() === 'ar'"
+          (click)="setLanguage('ar')"
+        >
+          العربية
+        </button>
+        <button
+          type="button"
+          class="lang-btn"
+          [class.is-active]="language.current() === 'en'"
+          (click)="setLanguage('en')"
+        >
+          English
+        </button>
+      </div>
+      <button type="button" class="btn-signout" (click)="signOut()">
+        {{ copy().management.signOut }}
+      </button>
+    </div>
+  </header>
+
+  <main class="mgmt-content">
+    <!-- Header Bar -->
+    <div class="page-title-row">
+      <div>
+        <h2 class="page-title">{{ copy().management.menuTitle }}</h2>
+        <p class="page-subtitle">{{ copy().management.menuItems.subtitle }}</p>
+      </div>
+
+      <div class="header-action-buttons">
+        @if (activeTab() === 'menuItems') {
+          <button type="button" class="btn btn-primary" (click)="openCreateItemModal()">
+            + {{ copy().management.menuItems.newItem }}
+          </button>
+        } @else {
+          <button type="button" class="btn btn-primary" (click)="openCreateCategoryModal()">
+            + {{ copy().management.categories.newCategory }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (feedbackMessage()) {
+      <div class="alert alert-info" role="status">
+        <p>{{ feedbackMessage() }}</p>
+        <button type="button" class="btn-close" (click)="feedbackMessage.set(null)">✕</button>
+      </div>
+    }
+
+    <!-- Tabs -->
+    <div class="tabs-nav" role="tablist">
+      <button
+        type="button"
+        role="tab"
+        class="tab-btn"
+        [class.is-active]="activeTab() === 'menuItems'"
+        [attr.aria-selected]="activeTab() === 'menuItems'"
+        (click)="setTab('menuItems')"
+      >
+        <span>{{ copy().management.tabs.menuItems }}</span>
+        <span class="tab-count">{{ menuItems().length }}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="tab-btn"
+        [class.is-active]="activeTab() === 'categories'"
+        [attr.aria-selected]="activeTab() === 'categories'"
+        (click)="setTab('categories')"
+      >
+        <span>{{ copy().management.tabs.categories }}</span>
+        <span class="tab-count">{{ categories().length }}</span>
+      </button>
+    </div>
+
+    @if (loading()) {
+      <div class="loading-state" role="status">
+        <div class="spinner"></div>
+        <p>{{ copy().common.loading }}</p>
+      </div>
+    } @else if (error()) {
+      <div class="alert alert-error" role="alert">
+        <p>{{ error() }}</p>
+        <button type="button" class="btn btn-sm btn-secondary" (click)="loadAll()">
+          {{ copy().management.errors.retry }}
+        </button>
+      </div>
+    } @else {
+      <!-- Tab 1: Menu Items View -->
+      @if (activeTab() === 'menuItems') {
+        <div class="tab-content">
+          <!-- Filters bar -->
+          <div class="filter-bar">
+            <div class="category-pills">
+              <button
+                type="button"
+                class="pill-btn"
+                [class.is-active]="selectedCategoryId() === null"
+                (click)="selectCategoryFilter(null)"
+              >
+                {{ copy().management.menuItems.allCategories }}
+              </button>
+              @for (cat of categories(); track cat.id) {
+                <button
+                  type="button"
+                  class="pill-btn"
+                  [class.is-active]="selectedCategoryId() === cat.id"
+                  (click)="selectCategoryFilter(cat.id)"
+                >
+                  {{ localizedCategory(cat) }}
+                </button>
+              }
+            </div>
+
+            <div class="search-input-wrapper">
+              <input
+                type="search"
+                class="search-input"
+                [placeholder]="copy().management.menuItems.searchPlaceholder"
+                [value]="searchQuery()"
+                (input)="updateSearch($event)"
+              />
+            </div>
+          </div>
+
+          <!-- Items Table -->
+          @if (filteredMenuItems().length === 0) {
+            <div class="empty-box">
+              <p class="empty-title">{{ copy().management.menuItems.emptyTitle }}</p>
+              <p class="empty-body">
+                {{
+                  searchQuery() || selectedCategoryId()
+                    ? copy().management.menuItems.noFilteredItems
+                    : copy().management.menuItems.emptyBody
+                }}
+              </p>
+            </div>
+          } @else {
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>{{ copy().management.menuItems.image }}</th>
+                    <th>
+                      {{ copy().management.menuItems.nameAr }} /
+                      {{ copy().management.menuItems.nameEn }}
+                    </th>
+                    <th>{{ copy().management.menuItems.category }}</th>
+                    <th>{{ copy().management.menuItems.price }}</th>
+                    <th>{{ copy().management.menuItems.preparationMinutes }}</th>
+                    <th>{{ copy().management.menuItems.availability }}</th>
+                    <th>{{ copy().management.menuItems.status }}</th>
+                    <th>{{ copy().management.menuItems.actions }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of filteredMenuItems(); track item.id) {
+                    <tr [class.is-archived]="!item.isActive" [class.is-soldout]="!item.isAvailable">
+                      <td class="cell-thumb">
+                        <img
+                          [src]="item.imageReference"
+                          [alt]="localizedItem(item)"
+                          class="thumb-img"
+                        />
+                      </td>
+                      <td class="cell-name">
+                        <div class="name-primary">{{ localizedItem(item) }}</div>
+                        <div class="name-secondary">
+                          {{ language.current() === 'ar' ? item.nameEn : item.nameAr }}
+                        </div>
+                      </td>
+                      <td>
+                        <span class="badge badge-cat">
+                          {{
+                            language.current() === 'ar' ? item.categoryNameAr : item.categoryNameEn
+                          }}
+                        </span>
+                      </td>
+                      <td class="cell-price">{{ money(item.price) }}</td>
+                      <td>{{ item.preparationMinutes }} {{ copy().menu.minutes }}</td>
+                      <td>
+                        <button
+                          type="button"
+                          class="status-toggle-btn"
+                          [class.is-available]="item.isAvailable"
+                          [class.is-soldout]="!item.isAvailable"
+                          (click)="toggleItemAvailability(item)"
+                          [title]="copy().management.menuItems.toggleAvailability"
+                        >
+                          <span class="dot"></span>
+                          <span>
+                            {{
+                              item.isAvailable
+                                ? copy().management.menuItems.available
+                                : copy().management.menuItems.unavailable
+                            }}
+                          </span>
+                        </button>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          class="status-toggle-btn"
+                          [class.is-active]="item.isActive"
+                          [class.is-archived]="!item.isActive"
+                          (click)="toggleItemStatus(item)"
+                          [title]="copy().management.menuItems.toggleStatus"
+                        >
+                          <span class="dot"></span>
+                          <span>
+                            {{
+                              item.isActive
+                                ? copy().management.menuItems.active
+                                : copy().management.menuItems.archived
+                            }}
+                          </span>
+                        </button>
+                      </td>
+                      <td class="cell-actions">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-secondary"
+                          (click)="openEditItemModal(item)"
+                        >
+                          {{ copy().management.menuItems.edit }}
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Tab 2: Categories View -->
+      @if (activeTab() === 'categories') {
+        <div class="tab-content">
+          @if (categories().length === 0) {
+            <div class="empty-box">
+              <p class="empty-title">{{ copy().management.categories.emptyTitle }}</p>
+              <p class="empty-body">{{ copy().management.categories.emptyBody }}</p>
+            </div>
+          } @else {
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>{{ copy().management.categories.displayOrder }}</th>
+                    <th>{{ copy().management.categories.nameAr }}</th>
+                    <th>{{ copy().management.categories.nameEn }}</th>
+                    <th>{{ copy().management.categories.itemCount }}</th>
+                    <th>{{ copy().management.categories.status }}</th>
+                    <th>{{ copy().management.categories.actions }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (cat of categories(); track cat.id) {
+                    <tr [class.is-archived]="!cat.isActive">
+                      <td class="cell-order">#{{ cat.displayOrder }}</td>
+                      <td class="font-bold">{{ cat.nameAr }}</td>
+                      <td>{{ cat.nameEn }}</td>
+                      <td>
+                        <span class="badge badge-count">{{ cat.itemCount }}</span>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          class="status-toggle-btn"
+                          [class.is-active]="cat.isActive"
+                          [class.is-archived]="!cat.isActive"
+                          (click)="toggleCategoryStatus(cat)"
+                        >
+                          <span class="dot"></span>
+                          <span>
+                            {{
+                              cat.isActive
+                                ? copy().management.categories.active
+                                : copy().management.categories.archived
+                            }}
+                          </span>
+                        </button>
+                      </td>
+                      <td class="cell-actions">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-secondary"
+                          (click)="openEditCategoryModal(cat)"
+                        >
+                          {{ copy().management.categories.edit }}
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+    }
+  </main>
+
+  <!-- Category Modal -->
+  @if (categoryModalOpen()) {
+    <div class="modal-backdrop">
+      <div class="modal-dialog" role="dialog" aria-modal="true">
+        <header class="modal-header">
+          <h3>
+            {{
+              editingCategory()
+                ? copy().management.categories.editCategory
+                : copy().management.categories.newCategory
+            }}
+          </h3>
+          <button type="button" class="btn-close" (click)="closeCategoryModal()">✕</button>
+        </header>
+
+        @if (categoryError()) {
+          <div class="alert alert-error" role="alert">
+            <p>{{ categoryError() }}</p>
+          </div>
+        }
+
+        <form [formGroup]="categoryForm" (ngSubmit)="saveCategory()" class="modal-form">
+          <div class="form-group">
+            <label for="cat-name-ar">{{ copy().management.categories.nameAr }} *</label>
+            <input id="cat-name-ar" type="text" formControlName="nameAr" dir="rtl" />
+          </div>
+
+          <div class="form-group">
+            <label for="cat-name-en">{{ copy().management.categories.nameEn }} *</label>
+            <input id="cat-name-en" type="text" formControlName="nameEn" dir="ltr" />
+          </div>
+
+          <div class="form-group">
+            <label for="cat-order">{{ copy().management.categories.displayOrder }}</label>
+            <input id="cat-order" type="number" formControlName="displayOrder" min="0" />
+          </div>
+
+          <div class="checkbox-group">
+            <label>
+              <input type="checkbox" formControlName="isActive" />
+              <span>{{ copy().management.categories.active }}</span>
+            </label>
+          </div>
+
+          <footer class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeCategoryModal()">
+              {{ copy().management.categories.cancel }}
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="categorySaving() || categoryForm.invalid"
+            >
+              @if (categorySaving()) {
+                <span>{{ copy().management.categories.saving }}</span>
+              } @else {
+                <span>{{ copy().management.categories.save }}</span>
+              }
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Menu Item Modal -->
+  @if (itemModalOpen()) {
+    <div class="modal-backdrop">
+      <div class="modal-dialog modal-dialog--lg" role="dialog" aria-modal="true">
+        <header class="modal-header">
+          <h3>
+            {{
+              editingItem()
+                ? copy().management.menuItems.editItem
+                : copy().management.menuItems.newItem
+            }}
+          </h3>
+          <button type="button" class="btn-close" (click)="closeItemModal()">✕</button>
+        </header>
+
+        @if (itemError()) {
+          <div class="alert alert-error" role="alert">
+            <p>{{ itemError() }}</p>
+          </div>
+        }
+
+        <form [formGroup]="itemForm" (ngSubmit)="saveMenuItem()" class="modal-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="item-cat">{{ copy().management.menuItems.category }} *</label>
+              <select id="item-cat" formControlName="categoryId">
+                @for (cat of categories(); track cat.id) {
+                  <option [value]="cat.id">{{ localizedCategory(cat) }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="item-price">{{ copy().management.menuItems.price }} (EGP) *</label>
+              <input id="item-price" type="number" step="0.5" min="0.01" formControlName="price" />
+            </div>
+
+            <div class="form-group">
+              <label for="item-name-ar">{{ copy().management.menuItems.nameAr }} *</label>
+              <input id="item-name-ar" type="text" formControlName="nameAr" dir="rtl" />
+            </div>
+
+            <div class="form-group">
+              <label for="item-name-en">{{ copy().management.menuItems.nameEn }} *</label>
+              <input id="item-name-en" type="text" formControlName="nameEn" dir="ltr" />
+            </div>
+
+            <div class="form-group">
+              <label for="item-desc-ar">{{ copy().management.menuItems.descriptionAr }}</label>
+              <textarea
+                id="item-desc-ar"
+                rows="2"
+                formControlName="descriptionAr"
+                dir="rtl"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="item-desc-en">{{ copy().management.menuItems.descriptionEn }}</label>
+              <textarea
+                id="item-desc-en"
+                rows="2"
+                formControlName="descriptionEn"
+                dir="ltr"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="item-img">{{ copy().management.menuItems.image }}</label>
+              <input id="item-img" type="text" formControlName="imageReference" />
+            </div>
+
+            <div class="form-group">
+              <label for="item-prep"
+                >{{ copy().management.menuItems.preparationMinutes }} (min)</label
+              >
+              <input
+                id="item-prep"
+                type="number"
+                formControlName="preparationMinutes"
+                min="1"
+                max="240"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="item-order">{{ copy().management.menuItems.displayOrder }}</label>
+              <input id="item-order" type="number" formControlName="displayOrder" min="0" />
+            </div>
+
+            <div class="checkbox-row">
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="isAvailable" />
+                <span>{{ copy().management.menuItems.available }}</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="isActive" />
+                <span>{{ copy().management.menuItems.active }}</span>
+              </label>
+            </div>
+          </div>
+
+          <footer class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeItemModal()">
+              {{ copy().management.menuItems.cancel }}
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="itemSaving() || itemForm.invalid"
+            >
+              @if (itemSaving()) {
+                <span>{{ copy().management.menuItems.saving }}</span>
+              } @else {
+                <span>{{ copy().management.menuItems.save }}</span>
+              }
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  }
+</div>
