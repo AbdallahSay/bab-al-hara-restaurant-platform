@@ -1,5 +1,6 @@
 using BabAlHara.Application.Driver;
 using BabAlHara.Application.Kitchen;
+using BabAlHara.Application.Tracking;
 using BabAlHara.Domain.Ordering;
 using BabAlHara.Infrastructure.Identity;
 using BabAlHara.Infrastructure.Persistence;
@@ -13,6 +14,7 @@ public sealed partial class DriverApplicationService(
     AppDbContext dbContext,
     UserManager<StaffUser> userManager,
     IDriverRealtimeNotifier realtimeNotifier,
+    ICustomerOrderTrackingNotifier trackingNotifier,
     TimeProvider timeProvider,
     ILogger<DriverApplicationService> logger) : IDriverOrderService
 {
@@ -213,6 +215,15 @@ public sealed partial class DriverApplicationService(
             LogDeliveryStatusBroadcastFailed(logger, order.PublicCode, ex);
         }
 
+        try
+        {
+            await trackingNotifier.NotifyOrderUpdatedAsync(order.PublicCode, CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            LogTrackingBroadcastFailed(logger, order.PublicCode, ex);
+        }
+
         return DriverTransitionResult.Success(orderDto);
     }
 
@@ -298,6 +309,15 @@ public sealed partial class DriverApplicationService(
             LogDeliveryStatusBroadcastFailed(logger, order.PublicCode, ex);
         }
 
+        try
+        {
+            await trackingNotifier.NotifyOrderUpdatedAsync(order.PublicCode, CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            LogTrackingBroadcastFailed(logger, order.PublicCode, ex);
+        }
+
         return DriverTransitionResult.Success(orderDto);
     }
 
@@ -362,6 +382,15 @@ public sealed partial class DriverApplicationService(
         Level = LogLevel.Warning,
         Message = "Failed to broadcast OrderStatusChanged delivery realtime event for order {PublicCode}")]
     private static partial void LogDeliveryStatusBroadcastFailed(
+        ILogger logger,
+        string publicCode,
+        Exception exception);
+
+    [LoggerMessage(
+        EventId = 4003,
+        Level = LogLevel.Warning,
+        Message = "Failed to broadcast customer tracking update for order {PublicCode}")]
+    private static partial void LogTrackingBroadcastFailed(
         ILogger logger,
         string publicCode,
         Exception exception);

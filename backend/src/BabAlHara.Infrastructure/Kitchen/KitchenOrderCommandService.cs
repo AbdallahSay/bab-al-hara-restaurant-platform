@@ -1,4 +1,5 @@
 using BabAlHara.Application.Kitchen;
+using BabAlHara.Application.Tracking;
 using BabAlHara.Domain.Ordering;
 using BabAlHara.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ namespace BabAlHara.Infrastructure.Kitchen;
 public sealed partial class KitchenOrderCommandService(
     AppDbContext dbContext,
     IKitchenRealtimeNotifier realtimeNotifier,
+    ICustomerOrderTrackingNotifier trackingNotifier,
     TimeProvider timeProvider,
     ILogger<KitchenOrderCommandService> logger) : IKitchenOrderCommandService
 {
@@ -102,6 +104,15 @@ public sealed partial class KitchenOrderCommandService(
             LogRealtimeBroadcastFailed(logger, order.PublicCode, ex);
         }
 
+        try
+        {
+            await trackingNotifier.NotifyOrderUpdatedAsync(order.PublicCode, CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            LogTrackingBroadcastFailed(logger, order.PublicCode, ex);
+        }
+
         return OrderTransitionResult.Success(orderDto);
     }
 
@@ -160,6 +171,15 @@ public sealed partial class KitchenOrderCommandService(
         Level = LogLevel.Warning,
         Message = "Failed to broadcast OrderStatusChanged realtime event for order {PublicCode}")]
     private static partial void LogRealtimeBroadcastFailed(
+        ILogger logger,
+        string publicCode,
+        Exception exception);
+
+    [LoggerMessage(
+        EventId = 3003,
+        Level = LogLevel.Warning,
+        Message = "Failed to broadcast customer tracking update for order {PublicCode}")]
+    private static partial void LogTrackingBroadcastFailed(
         ILogger logger,
         string publicCode,
         Exception exception);

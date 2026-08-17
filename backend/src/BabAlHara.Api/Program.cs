@@ -4,6 +4,7 @@ using BabAlHara.Api.Features.Cashier;
 using BabAlHara.Api.Features.Catalog;
 using BabAlHara.Api.Features.Driver;
 using BabAlHara.Api.Features.Kitchen;
+using BabAlHara.Api.Features.OrderTracking;
 using BabAlHara.Api.Features.Ordering;
 using BabAlHara.Api.Platform.Errors;
 using BabAlHara.Api.Platform.Health;
@@ -12,6 +13,7 @@ using BabAlHara.Api.Platform.Security;
 using BabAlHara.Application.Cashier;
 using BabAlHara.Application.Driver;
 using BabAlHara.Application.Kitchen;
+using BabAlHara.Application.Tracking;
 using BabAlHara.Infrastructure;
 using BabAlHara.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -102,6 +104,8 @@ builder.Services.AddSingleton<ICashierOrderCompletedNotifier, SignalRCashierNoti
 builder.Services.AddSingleton<SignalRDriverRealtimeNotifier>();
 builder.Services.AddSingleton<IDriverRealtimeNotifier>(sp =>
     sp.GetRequiredService<SignalRDriverRealtimeNotifier>());
+
+builder.Services.AddScoped<ICustomerOrderTrackingNotifier, SignalRCustomerOrderTrackingNotifier>();
 
 //
 // Authorization
@@ -220,6 +224,26 @@ builder.Services.AddRateLimiter(options =>
                 {
                     PermitLimit = staffSignInPermitLimit,
                     Window = TimeSpan.FromMinutes(5),
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                }));
+
+    var trackingReadPermitLimit =
+        builder.Configuration.GetValue(
+            "RateLimiting:TrackingReadPermitLimit",
+            20);
+
+    options.AddPolicy(
+        "tracking-read",
+        context =>
+            RateLimitPartition.GetSlidingWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown",
+                _ => new SlidingWindowRateLimiterOptions
+                {
+                    PermitLimit = trackingReadPermitLimit,
+                    Window = TimeSpan.FromMinutes(1),
+                    SegmentsPerWindow = 4,
                     QueueLimit = 0,
                     AutoReplenishment = true,
                 }));
@@ -382,6 +406,8 @@ app.MapKitchenEndpoints();
 app.MapCashierEndpoints();
 app.MapDriverEndpoints();
 
+app.MapOrderTrackingEndpoints();
+
 //
 // SignalR
 //
@@ -391,7 +417,7 @@ app.MapHub<CashierHub>("/hubs/cashier");
 
 app.MapHub<DriverHub>("/hubs/driver");
 
-app.MapHub<CashierHub>("/hubs/cashier");
+app.MapHub<OrderTrackingHub>("/hubs/order-tracking");
 
 //
 // Angular SPA Fallback

@@ -31,7 +31,8 @@ public sealed class Order
         string? deliveryAreaNameEn,
         string? address,
         decimal deliveryFee,
-        string? customerNote)
+        string? customerNote,
+        string? trackingTokenHash = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(deliveryFee);
 
@@ -64,6 +65,10 @@ public sealed class Order
         CustomerNote = string.IsNullOrWhiteSpace(customerNote) ? null : customerNote.Trim();
         PaymentMethod = PaymentMethod.Cash;
         PaymentStatus = PaymentStatus.Pending;
+        TrackingTokenHash = string.IsNullOrWhiteSpace(trackingTokenHash)
+            ? Guid.NewGuid().ToString("N")
+            : trackingTokenHash.Trim();
+        TrackingTokenExpiresAtUtc = createdAt.AddDays(7);
     }
 
     public Guid Id { get; private set; }
@@ -109,6 +114,22 @@ public sealed class Order
     public DateTimeOffset? DriverAssignedAtUtc { get; private set; }
 
     public byte[] RowVersion { get; private set; } = [];
+
+    public string TrackingTokenHash { get; private set; } = string.Empty;
+
+    public DateTimeOffset? TrackingTokenExpiresAtUtc { get; private set; }
+
+    public void SetTrackingTokenHash(string hash)
+    {
+        TrackingTokenHash = RequireText(hash, nameof(hash));
+        TrackingTokenExpiresAtUtc ??= CreatedAt.AddDays(7);
+    }
+
+    public void SetTrackingCredentials(string hash, DateTimeOffset expiresAtUtc)
+    {
+        TrackingTokenHash = RequireText(hash, nameof(hash));
+        TrackingTokenExpiresAtUtc = expiresAtUtc;
+    }
 
     public IReadOnlyCollection<OrderItem> Items => items;
 

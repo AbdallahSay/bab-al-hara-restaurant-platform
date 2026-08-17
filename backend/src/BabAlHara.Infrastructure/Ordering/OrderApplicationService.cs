@@ -1,5 +1,6 @@
 using BabAlHara.Application.Kitchen;
 using BabAlHara.Application.Ordering;
+using BabAlHara.Application.Tracking;
 using BabAlHara.Domain.Delivery;
 using BabAlHara.Domain.Ordering;
 using BabAlHara.Infrastructure.Persistence;
@@ -12,6 +13,7 @@ public sealed partial class OrderApplicationService(
     AppDbContext dbContext,
     IOrderCodeGenerator orderCodeGenerator,
     INewOrderNotifier newOrderNotifier,
+    ICustomerOrderTrackingService trackingService,
     TimeProvider timeProvider,
     ILogger<OrderApplicationService> logger) : IOrderApplicationService
 {
@@ -65,7 +67,10 @@ public sealed partial class OrderApplicationService(
         var deliveryAreaOutcome = await ResolveDeliveryAreaAsync(command, cancellationToken);
         if (deliveryAreaOutcome.Rejection is not null)
         {
-            return new CreateOrderOutcome(null, deliveryAreaOutcome.Rejection);
+            return CreateOrderOutcome.Failure(
+                deliveryAreaOutcome.Rejection.Code,
+                deliveryAreaOutcome.Rejection.Message,
+                deliveryAreaOutcome.Rejection.IsConflict);
         }
 
         var now = timeProvider.GetUtcNow();
@@ -96,6 +101,11 @@ public sealed partial class OrderApplicationService(
                 menuItem.Price);
         }
 
+        var rawToken = trackingService.GenerateTrackingToken();
+        var tokenHash = trackingService.HashToken(rawToken);
+        var expiresAtUtc = order.CreatedAt.AddDays(7);
+        order.SetTrackingCredentials(tokenHash, expiresAtUtc);
+
         dbContext.Orders.Add(order);
 
         // A single SaveChanges call persists the complete aggregate in EF Core's automatic transaction.
@@ -112,19 +122,22 @@ public sealed partial class OrderApplicationService(
             LogRealtimeNotificationFailure(logger, order.PublicCode, exception);
         }
 
-        return CreateOrderOutcome.Success(new CreatedOrderDto(
-            order.PublicCode,
-            order.CreatedAt,
-            order.OrderType,
-            order.Status,
-            order.DeliveryAreaNameAr,
-            order.DeliveryAreaNameEn,
-            order.Address,
-            order.Subtotal,
-            order.DeliveryFee,
-            order.Total,
-            order.PaymentMethod,
-            order.PaymentStatus));
+        return CreateOrderOutcome.Success(
+            new CreatedOrderDto(
+                order.PublicCode,
+                order.CreatedAt,
+                order.OrderType,
+                order.Status,
+                order.DeliveryAreaNameAr,
+                order.DeliveryAreaNameEn,
+                order.Address,
+                order.Subtotal,
+                order.DeliveryFee,
+                order.Total,
+                order.PaymentMethod,
+                order.PaymentStatus),
+            rawToken,
+            expiresAtUtc);
     }
 
     private static CreateOrderOutcome? ValidateCommand(CreateOrderCommand command)

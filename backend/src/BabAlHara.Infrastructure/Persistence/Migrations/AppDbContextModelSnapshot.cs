@@ -418,6 +418,17 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTimeOffset?>("TrackingTokenExpiresAtUtc")
+                        .HasPrecision(7)
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("TrackingTokenHash")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasDefaultValue("");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt")
@@ -426,6 +437,9 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                     b.HasIndex("DeliveryAreaId");
 
                     b.HasIndex("PublicCode")
+                        .IsUnique();
+
+                    b.HasIndex("TrackingTokenHash")
                         .IsUnique();
 
                     b.HasIndex("DriverId", "Status");
