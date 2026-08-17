@@ -93,6 +93,43 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BabAlHara.Domain.Catalog.MenuImageAsset", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("Content")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<long>("ContentLength")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasPrecision(7)
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContentHash");
+
+                    b.ToTable("MenuImageAssets", "app");
+                });
+
             modelBuilder.Entity("BabAlHara.Domain.Catalog.MenuItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -115,6 +152,9 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
+
+                    b.Property<Guid?>("ImageAssetId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImageReference")
                         .IsRequired()
@@ -150,6 +190,8 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                         .HasColumnType("rowversion");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ImageAssetId");
 
                     b.HasIndex("CategoryId", "IsActive", "IsAvailable");
 
@@ -836,7 +878,14 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("BabAlHara.Domain.Catalog.MenuImageAsset", "ImageAsset")
+                        .WithMany()
+                        .HasForeignKey("ImageAssetId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Category");
+
+                    b.Navigation("ImageAsset");
                 });
 
             modelBuilder.Entity("BabAlHara.Domain.Ordering.Order", b =>

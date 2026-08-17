@@ -1,4 +1,4 @@
-﻿import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, switchMap } from 'rxjs';
 
@@ -178,6 +178,38 @@ export class ManagementApiService {
         this.http.patch<MenuItemManagementDto>(
           `${this.apiBaseUrl}/management/menu-items/${encodeURIComponent(id)}/status`,
           request,
+          {
+            headers: { 'X-XSRF-TOKEN': token },
+            withCredentials: true,
+          },
+        ),
+      ),
+    );
+  }
+
+  uploadMenuItemImage(id: string, file: File): Observable<MenuItemManagementDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.customerApi.antiforgeryToken().pipe(
+      switchMap((token) =>
+        this.http.post<MenuItemManagementDto>(
+          `${this.apiBaseUrl}/management/menu-items/${encodeURIComponent(id)}/image`,
+          formData,
+          {
+            headers: { 'X-XSRF-TOKEN': token },
+            withCredentials: true,
+          },
+        ),
+      ),
+    );
+  }
+
+  deleteMenuItemImage(id: string): Observable<MenuItemManagementDto> {
+    return this.customerApi.antiforgeryToken().pipe(
+      switchMap((token) =>
+        this.http.delete<MenuItemManagementDto>(
+          `${this.apiBaseUrl}/management/menu-items/${encodeURIComponent(id)}/image`,
           {
             headers: { 'X-XSRF-TOKEN': token },
             withCredentials: true,

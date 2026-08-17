@@ -19,6 +19,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
 
     public DbSet<MenuItem> MenuItems => Set<MenuItem>();
 
+    public DbSet<MenuImageAsset> MenuImageAssets => Set<MenuImageAsset>();
+
     public DbSet<DeliveryArea> DeliveryAreas => Set<DeliveryArea>();
 
     public DbSet<Order> Orders => Set<Order>();

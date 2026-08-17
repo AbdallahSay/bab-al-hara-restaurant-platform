@@ -57,6 +57,10 @@ public sealed class MenuItem
 
     public string ImageReference { get; private set; } = string.Empty;
 
+    public Guid? ImageAssetId { get; private set; }
+
+    public MenuImageAsset? ImageAsset { get; private set; }
+
     public int PreparationMinutes { get; private set; }
 
     public int DisplayOrder { get; private set; }
@@ -66,6 +70,18 @@ public sealed class MenuItem
     public bool IsAvailable { get; private set; }
 
     public byte[]? RowVersion { get; private set; }
+
+    public void SetImageAsset(Guid imageAssetId, string imageReference)
+    {
+        ImageAssetId = imageAssetId;
+        ImageReference = RequireText(imageReference, nameof(imageReference));
+    }
+
+    public void ClearImageAsset(string defaultImageReference = "/images/menu/default.webp")
+    {
+        ImageAssetId = null;
+        ImageReference = RequireText(defaultImageReference, nameof(defaultImageReference));
+    }
 
     public void Update(
         Guid categoryId,

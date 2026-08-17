@@ -112,6 +112,8 @@ public sealed record ManagementCatalogResult<T>(
     bool IsConflict = false,
     bool IsValidation = false);
 
+public sealed record ImageAssetBinary(string ContentType, string ContentHash, byte[] Content);
+
 public interface IMenuQueryService
 {
     Task<IReadOnlyList<CategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken);
@@ -168,5 +170,21 @@ public interface IManagementCatalogService
     Task<ManagementCatalogResult<MenuItemManagementDto>> ToggleMenuItemActiveAsync(
         Guid id,
         ToggleActiveRequest request,
+        CancellationToken cancellationToken);
+
+    Task<ManagementCatalogResult<MenuItemManagementDto>> UploadMenuItemImageAsync(
+        Guid menuItemId,
+        Stream imageStream,
+        string contentType,
+        string? fileName,
+        long contentLength,
+        CancellationToken cancellationToken);
+
+    Task<ManagementCatalogResult<MenuItemManagementDto>> RemoveMenuItemImageAsync(
+        Guid menuItemId,
+        CancellationToken cancellationToken);
+
+    Task<ImageAssetBinary?> GetImageAssetAsync(
+        Guid imageAssetId,
         CancellationToken cancellationToken);
 }

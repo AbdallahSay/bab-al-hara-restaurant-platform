@@ -504,6 +504,26 @@ export interface UiCopy {
       readonly prepTimeInvalid: string;
       readonly displayOrderInvalid: string;
       readonly categoryRequired: string;
+      readonly sectionBasic: string;
+      readonly sectionSelling: string;
+      readonly sectionOrdering: string;
+      readonly sectionImage: string;
+      readonly chooseImage: string;
+      readonly changeImage: string;
+      readonly removeImage: string;
+      readonly imageCardHint: string;
+      readonly dropImageHint: string;
+      readonly uploadingImage: string;
+      readonly imageUploadFailed: string;
+      readonly imageUploadError: string;
+      readonly imageTooLarge: string;
+      readonly imageFormatUnsupported: string;
+      readonly removeImageConfirmTitle: string;
+      readonly removeImageConfirmBody: string;
+      readonly removeImageConfirmYes: string;
+      readonly removeImageConfirmNo: string;
+      readonly noImagePlaceholder: string;
+      readonly retryUpload: string;
     };
     readonly tabs: {
       readonly categories: string;
@@ -1038,6 +1058,26 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         prepTimeInvalid: 'وقت التحضير يجب أن يكون بين 1 و 240 دقيقة.',
         displayOrderInvalid: 'ترتيب العرض يجب أن يكون 0 أو أكثر.',
         categoryRequired: 'يجب اختيار قسم للصنف.',
+        sectionBasic: 'البيانات الأساسية',
+        sectionSelling: 'البيع والأسعار',
+        sectionOrdering: 'التحضير والترتيب',
+        sectionImage: 'صورة الصنف',
+        chooseImage: 'اختر صورة',
+        changeImage: 'تغيير الصورة',
+        removeImage: 'إزالة الصورة',
+        imageCardHint: 'JPG أو PNG أو WEBP (حتى 5 ميجابايت)',
+        dropImageHint: 'اسحب الصورة هنا أو اضغط للاختيار',
+        uploadingImage: 'جارٍ رفع الصورة…',
+        imageUploadFailed: 'تم حفظ الصنف، لكن تعذر رفع الصورة. حاول رفعها مرة أخرى.',
+        imageUploadError: 'حدث خطأ أثناء رفع الصورة.',
+        imageTooLarge: 'حجم الصورة كبير جدًا. اختر صورة أصغر من 5 ميجابايت.',
+        imageFormatUnsupported: 'صيغة الصورة غير مدعومة. استخدم JPG أو PNG أو WEBP.',
+        removeImageConfirmTitle: 'تأكيد إزالة الصورة',
+        removeImageConfirmBody: 'هل أنت متأكد من رغبتك في إزالة صورة هذا الصنف؟',
+        removeImageConfirmYes: 'نعم، أزل الصورة',
+        removeImageConfirmNo: 'إلغاء',
+        noImagePlaceholder: 'لا توجد صورة',
+        retryUpload: 'إعادة محاولة رفع الصورة',
       },
       tabs: {
         categories: 'الأقسام',
@@ -1580,6 +1620,26 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         prepTimeInvalid: 'Preparation time must be between 1 and 240 minutes.',
         displayOrderInvalid: 'Display order must be 0 or higher.',
         categoryRequired: 'Category is required.',
+        sectionBasic: 'Basic Information',
+        sectionSelling: 'Pricing & Availability',
+        sectionOrdering: 'Preparation & Ordering',
+        sectionImage: 'Menu Item Image',
+        chooseImage: 'Choose image',
+        changeImage: 'Change image',
+        removeImage: 'Remove image',
+        imageCardHint: 'JPG, PNG, or WEBP (up to 5 MB)',
+        dropImageHint: 'Drag and drop an image here, or browse',
+        uploadingImage: 'Uploading image…',
+        imageUploadFailed: 'Item was saved, but image upload failed. Please try uploading again.',
+        imageUploadError: 'An error occurred while uploading the image.',
+        imageTooLarge: 'Image file is too large. Please select an image under 5 MB.',
+        imageFormatUnsupported: 'Unsupported image format. Please use JPG, PNG, or WEBP.',
+        removeImageConfirmTitle: 'Confirm Image Removal',
+        removeImageConfirmBody: 'Are you sure you want to remove the image for this menu item?',
+        removeImageConfirmYes: 'Yes, Remove Image',
+        removeImageConfirmNo: 'Cancel',
+        noImagePlaceholder: 'No image',
+        retryUpload: 'Retry image upload',
       },
       tabs: {
         categories: 'Categories',
