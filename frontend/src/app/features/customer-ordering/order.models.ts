@@ -53,7 +53,6 @@ export interface CreatedOrder {
   readonly total: number;
   readonly paymentMethod: 'Cash';
   readonly paymentStatus: 'Pending' | 'Paid';
-  readonly trackingToken?: string;
 }
 
 export interface KitchenOrderItem {
