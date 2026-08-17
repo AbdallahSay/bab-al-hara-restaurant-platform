@@ -4,7 +4,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 
 import { StaffSessionService } from '../../features/kitchen/staff-session.service';
-import { cashierGuard, driverGuard, kitchenGuard } from './staff.guards';
+import { cashierGuard, driverGuard, kitchenGuard, managementGuard } from './staff.guards';
 
 const dummyRoute = {} as ActivatedRouteSnapshot;
 const dummyState = {} as RouterStateSnapshot;
@@ -14,6 +14,7 @@ describe('Staff Route Guards', () => {
     getKitchenSession: ReturnType<typeof vi.fn>;
     getCashierSession: ReturnType<typeof vi.fn>;
     getDriverSession: ReturnType<typeof vi.fn>;
+    getManagementSession: ReturnType<typeof vi.fn>;
   };
   let router: Router;
 
@@ -22,6 +23,7 @@ describe('Staff Route Guards', () => {
       getKitchenSession: vi.fn(),
       getCashierSession: vi.fn(),
       getDriverSession: vi.fn(),
+      getManagementSession: vi.fn(),
     };
 
     TestBed.configureTestingModule({
@@ -160,6 +162,49 @@ describe('Staff Route Guards', () => {
         result$.subscribe((result: boolean | UrlTree) => {
           expect(result instanceof UrlTree).toBe(true);
           expect(router.serializeUrl(result as UrlTree)).toBe('/driver/sign-in');
+        });
+      });
+    });
+  });
+
+  describe('managementGuard', () => {
+    it('allows navigation when management session is authenticated', () => {
+      sessionServiceSpy.getManagementSession.mockReturnValue(
+        of({ isAuthenticated: true, displayName: 'Manager' }),
+      );
+
+      TestBed.runInInjectionContext(() => {
+        const result$ = managementGuard(dummyRoute, dummyState) as Observable<boolean | UrlTree>;
+        result$.subscribe((result: boolean | UrlTree) => {
+          expect(result).toBe(true);
+        });
+      });
+    });
+
+    it('redirects to /management/sign-in when management session is not authenticated', () => {
+      sessionServiceSpy.getManagementSession.mockReturnValue(
+        of({ isAuthenticated: false, displayName: null }),
+      );
+
+      TestBed.runInInjectionContext(() => {
+        const result$ = managementGuard(dummyRoute, dummyState) as Observable<boolean | UrlTree>;
+        result$.subscribe((result: boolean | UrlTree) => {
+          expect(result instanceof UrlTree).toBe(true);
+          expect(router.serializeUrl(result as UrlTree)).toBe('/management/sign-in');
+        });
+      });
+    });
+
+    it('redirects to /management/sign-in when session check errors', () => {
+      sessionServiceSpy.getManagementSession.mockReturnValue(
+        throwError(() => new Error('Network error')),
+      );
+
+      TestBed.runInInjectionContext(() => {
+        const result$ = managementGuard(dummyRoute, dummyState) as Observable<boolean | UrlTree>;
+        result$.subscribe((result: boolean | UrlTree) => {
+          expect(result instanceof UrlTree).toBe(true);
+          expect(router.serializeUrl(result as UrlTree)).toBe('/management/sign-in');
         });
       });
     });

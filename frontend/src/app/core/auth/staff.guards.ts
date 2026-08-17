@@ -33,3 +33,15 @@ export const driverGuard: CanActivateFn = () => {
     catchError(() => of(router.createUrlTree(['/driver/sign-in']))),
   );
 };
+
+export const managementGuard: CanActivateFn = () => {
+  const sessionService = inject(StaffSessionService);
+  const router = inject(Router);
+
+  return sessionService.getManagementSession().pipe(
+    map((session) =>
+      session.isAuthenticated ? true : router.createUrlTree(['/management/sign-in']),
+    ),
+    catchError(() => of(router.createUrlTree(['/management/sign-in']))),
+  );
+};
