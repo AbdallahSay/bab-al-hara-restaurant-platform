@@ -1,0 +1,106 @@
+<main class="driver-sign-in" [attr.dir]="language.direction()">
+  <header class="driver-sign-in__header">
+    <div class="driver-sign-in__header-content">
+      <h1 class="driver-sign-in__title">{{ copy().brand.name }}</h1>
+      <div class="driver-sign-in__lang-toggle">
+        <button
+          type="button"
+          class="lang-button"
+          [class.lang-button--active]="language.current() === 'ar'"
+          (click)="setLanguage('ar')"
+          [attr.aria-pressed]="language.current() === 'ar'"
+        >
+          {{ copy().brand.arabic }}
+        </button>
+        <button
+          type="button"
+          class="lang-button"
+          [class.lang-button--active]="language.current() === 'en'"
+          (click)="setLanguage('en')"
+          [attr.aria-pressed]="language.current() === 'en'"
+        >
+          {{ copy().brand.english }}
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="driver-sign-in__container">
+    <div class="driver-sign-in__card">
+      <div class="driver-sign-in__card-header">
+        <span class="driver-sign-in__badge">🛵 {{ copy().driver.title }}</span>
+        <h2 class="driver-sign-in__card-title">{{ copy().driver.signIn }}</h2>
+      </div>
+
+      @if (failed()) {
+        <div class="driver-sign-in__error" role="alert">
+          <svg
+            class="error-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>{{ copy().staff.error }}</span>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="signIn()" novalidate class="driver-sign-in__form">
+        <div class="form-group">
+          <label for="driver-email" class="form-label">{{ copy().staff.email }}</label>
+          <input
+            id="driver-email"
+            type="email"
+            class="form-control"
+            [class.form-control--invalid]="submitted() && form.controls.email.invalid"
+            formControlName="email"
+            autocomplete="email"
+            required
+            [attr.aria-invalid]="submitted() && form.controls.email.invalid"
+          />
+          @if (submitted() && form.controls.email.invalid) {
+            <span class="form-error">{{ copy().checkout.required }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="driver-password" class="form-label">{{ copy().staff.password }}</label>
+          <input
+            id="driver-password"
+            type="password"
+            class="form-control"
+            [class.form-control--invalid]="submitted() && form.controls.password.invalid"
+            formControlName="password"
+            autocomplete="current-password"
+            required
+            [attr.aria-invalid]="submitted() && form.controls.password.invalid"
+          />
+          @if (submitted() && form.controls.password.invalid) {
+            <span class="form-error">{{ copy().checkout.required }}</span>
+          }
+        </div>
+
+        <button
+          type="submit"
+          class="button button--primary button--wide driver-sign-in__submit"
+          [disabled]="sending()"
+        >
+          @if (sending()) {
+            {{ copy().staff.signingIn }}
+          } @else {
+            {{ copy().staff.signIn }}
+          }
+        </button>
+      </form>
+
+      <div class="driver-sign-in__footer">
+        <a routerLink="/" class="driver-sign-in__back-link"> ← {{ copy().staff.customerMenu }} </a>
+      </div>
+    </div>
+  </div>
+</main>

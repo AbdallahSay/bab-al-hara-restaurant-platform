@@ -54,5 +54,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/cashier/cashier-page').then((m) => m.CashierPage),
     title: 'Cashier | Bab Al Hara',
   },
+  {
+    path: 'driver/sign-in',
+    loadComponent: () =>
+      import('./features/driver/driver-sign-in-page').then((m) => m.DriverSignInPage),
+    title: 'Driver sign in | Bab Al Hara',
+  },
+  {
+    path: 'driver',
+    loadComponent: () => import('./features/driver/driver-page').then((m) => m.DriverPage),
+    title: 'Driver | Bab Al Hara',
+  },
   { path: '**', redirectTo: '' },
 ];
