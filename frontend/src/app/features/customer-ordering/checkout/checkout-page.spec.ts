@@ -45,7 +45,16 @@ const ORDER: CreatedOrder = {
 describe('CheckoutPage', () => {
   beforeEach(() => {
     localStorage.clear();
+    localStorage.setItem('bab-al-hara.language', 'ar');
+    document.documentElement.lang = 'ar';
+    document.documentElement.dir = 'rtl';
     sessionStorage.clear();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
+    document.documentElement.lang = 'ar';
+    document.documentElement.dir = 'rtl';
   });
 
   it('shows required validation errors and rejects an invalid Egyptian phone', async () => {

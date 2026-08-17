@@ -45,7 +45,7 @@ export class ManagementSignInPage {
 
     const { email, password } = this.form.getRawValue();
     this.session
-      .signIn(email, password)
+      .signInManagement(email, password)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

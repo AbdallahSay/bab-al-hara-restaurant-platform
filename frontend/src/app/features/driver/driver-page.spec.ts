@@ -129,7 +129,9 @@ describe('DriverPage', () => {
           provide: StaffSessionService,
           useValue: {
             getSession: () => of({ isAuthenticated: true }),
+            getDriverSession: () => of({ isAuthenticated: true }),
             signOut: () => of(undefined),
+            signOutDriver: () => of(undefined),
           },
         },
         { provide: DriverApiService, useValue: apiSpy },
@@ -315,5 +317,95 @@ describe('DriverPage', () => {
       'ltr',
     );
     expect(fixture.nativeElement.textContent).toContain('Active Deliveries');
+  });
+
+  it('reconstructs active and delivered state cleanly after refresh without resurrecting delivered orders', async () => {
+    // Initial setup with ready order
+    await setup([MOCK_READY_ORDER]);
+    expect(fixture.componentInstance['activeOrders']().length).toBe(1);
+    expect(fixture.componentInstance['completedOrders']().length).toBe(0);
+
+    // Transition to Delivered
+    const deliverOrder: DriverOrderDto = {
+      ...MOCK_READY_ORDER,
+      status: 'Delivered',
+      paymentStatus: 'Paid',
+    };
+    apiSpy.getAssignedOrders.mockReturnValue(of([deliverOrder]));
+
+    // Simulate reload / refresh
+    fixture.componentInstance['loadOrders']();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance['activeOrders']().length).toBe(0);
+    expect(fixture.componentInstance['completedOrders']().length).toBe(1);
+    expect(fixture.componentInstance['completedOrders']()[0]?.id).toBe('ord-ready-1');
+  });
+
+  it('reloads authoritative orders when SignalR reconnects', async () => {
+    await setup([MOCK_READY_ORDER]);
+    expect(apiSpy.getAssignedOrders).toHaveBeenCalledTimes(1);
+
+    hubMocks.reconnected$.next();
+    fixture.detectChanges();
+
+    expect(apiSpy.getAssignedOrders).toHaveBeenCalledTimes(2);
+  });
+
+  it('deduplicates orders when duplicate SignalR events are received', async () => {
+    await setup([MOCK_READY_ORDER]);
+    expect(fixture.componentInstance['orders']().length).toBe(1);
+
+    // Emit duplicate order
+    hubMocks.orderAssigned$.next(MOCK_READY_ORDER);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance['orders']().length).toBe(1);
+  });
+
+  it('handles unauthorized 401/403 on load by setting unauthorized state and navigating to sign-in', async () => {
+    const { Router } = await import('@angular/router');
+    await setup([]);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    const { throwError } = await import('rxjs');
+    apiSpy.getAssignedOrders.mockReturnValue(throwError(() => ({ status: 401 })));
+
+    fixture.componentInstance['loadOrders']();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance['sessionExpired']()).toBe(true);
+    expect(navigateSpy).toHaveBeenCalledWith(['/driver/sign-in'], {
+      queryParams: { expired: '1' },
+    });
+    expect(fixture.nativeElement.textContent).toContain(
+      fixture.componentInstance['copy']().driver.sessionExpired,
+    );
+
+    // Switch to Arabic
+    fixture.componentInstance['setLanguage']('ar');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain(
+      'انتهت جلسة السائق. سجّل الدخول مرة أخرى للمتابعة',
+    );
+  });
+
+  it('handles unauthorized action result during action execution', async () => {
+    const { Router } = await import('@angular/router');
+    await setup([MOCK_READY_ORDER]);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    apiSpy.startDelivery.mockReturnValue(of('unauthorized'));
+
+    fixture.componentInstance['requestStartDelivery'](MOCK_READY_ORDER);
+    fixture.componentInstance['executeConfirmedAction']();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance['sessionExpired']()).toBe(true);
+    expect(navigateSpy).toHaveBeenCalledWith(['/driver/sign-in'], {
+      queryParams: { expired: '1' },
+    });
   });
 });

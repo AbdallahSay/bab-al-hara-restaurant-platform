@@ -1,4 +1,4 @@
-﻿import { inject } from '@angular/core';
+import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
 
@@ -8,7 +8,7 @@ export const managementAuthGuard: CanActivateFn = (_route, state) => {
   const staffSession = inject(StaffSessionService);
   const router = inject(Router);
 
-  return staffSession.getSession().pipe(
+  return staffSession.getManagementSession().pipe(
     map((session) => {
       if (session.isAuthenticated) {
         return true;

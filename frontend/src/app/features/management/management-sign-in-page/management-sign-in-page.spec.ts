@@ -9,12 +9,18 @@ import { ManagementSignInPage } from './management-sign-in-page';
 describe('ManagementSignInPage', () => {
   let component: ManagementSignInPage;
   let fixture: ComponentFixture<ManagementSignInPage>;
-  let sessionMock: { signIn: ReturnType<typeof vi.fn> };
+  let sessionMock: {
+    signIn: ReturnType<typeof vi.fn>;
+    signInManagement: ReturnType<typeof vi.fn>;
+  };
   let router: Router;
 
   beforeEach(async () => {
     sessionMock = {
       signIn: vi.fn().mockReturnValue(of({ isAuthenticated: true, displayName: 'Manager' })),
+      signInManagement: vi
+        .fn()
+        .mockReturnValue(of({ isAuthenticated: true, displayName: 'Manager' })),
     };
 
     await TestBed.configureTestingModule({
@@ -38,12 +44,15 @@ describe('ManagementSignInPage', () => {
 
     component.signIn();
 
-    expect(sessionMock.signIn).toHaveBeenCalledWith('manager@babalhara.com', 'Password123!');
+    expect(sessionMock.signInManagement).toHaveBeenCalledWith(
+      'manager@babalhara.com',
+      'Password123!',
+    );
     expect(router.navigateByUrl).toHaveBeenCalledWith('/management');
   });
 
   it('should handle unauthorized error (401)', () => {
-    sessionMock.signIn.mockReturnValue(throwError(() => ({ status: 401 })));
+    sessionMock.signInManagement.mockReturnValue(throwError(() => ({ status: 401 })));
 
     component['form'].setValue({
       email: 'manager@babalhara.com',

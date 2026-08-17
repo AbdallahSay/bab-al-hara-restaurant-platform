@@ -177,7 +177,7 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
         return user;
     }
 
-    public async Task<HttpClient> CreateAuthenticatedStaffClientAsync(string email, string role, string displayName)
+    public async Task<HttpClient> CreateAuthenticatedStaffClientAsync(string email, string role, string displayName, string? portal = null)
     {
         await EnsureStaffUserAsync(email, role, displayName);
 
@@ -185,7 +185,17 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
         var csrfResponse = await client.GetFromJsonAsync<AntiforgeryTokenDto>("/api/security/csrf");
         var csrfToken = csrfResponse?.RequestToken ?? string.Empty;
 
-        var signInMessage = new HttpRequestMessage(HttpMethod.Post, "/api/staff/session")
+        var targetPortal = portal ?? role.ToLowerInvariant() switch
+        {
+            "kitchen" => "kitchen",
+            "cashier" => "cashier",
+            "driver" => "driver",
+            "manager" => "management",
+            "admin" => "management",
+            _ => "kitchen"
+        };
+
+        var signInMessage = new HttpRequestMessage(HttpMethod.Post, $"/api/staff/session/{targetPortal}")
         {
             Content = JsonContent.Create(new { email, password = DefaultPassword }),
         };

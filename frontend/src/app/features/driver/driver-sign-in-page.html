@@ -30,6 +30,10 @@
       <p>{{ copy().driver.signInDescription }}</p>
     </div>
 
+    @if (isExpired()) {
+      <p class="sign-in-warning" role="alert">{{ copy().driver.sessionExpired }}</p>
+    }
+
     @if (failed()) {
       <p class="sign-in-error" role="alert">{{ copy().staff.error }}</p>
     }

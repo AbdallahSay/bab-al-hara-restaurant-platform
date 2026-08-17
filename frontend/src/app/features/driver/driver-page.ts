@@ -20,7 +20,7 @@ import { DriverHubEvent, DriverHubService } from './driver-hub.service';
 import { DriverOrderDto, DriverOrderItemDto, DriverOrderStatus } from './driver.models';
 import { StaffSessionService } from '../kitchen/staff-session.service';
 
-export type PageState = 'loading' | 'ready' | 'error';
+export type PageState = 'loading' | 'ready' | 'error' | 'unauthorized';
 
 export interface ConfirmationState {
   readonly orderId: string;
@@ -44,6 +44,7 @@ export class DriverPage implements OnInit, OnDestroy {
   protected readonly copy = this.language.copy;
   protected readonly realtime = inject(DriverHubService);
   protected readonly state = signal<PageState>('loading');
+  protected readonly sessionExpired = signal(false);
   protected readonly orders = signal<readonly DriverOrderDto[]>([]);
   protected readonly now = signal(Date.now());
 
@@ -75,17 +76,17 @@ export class DriverPage implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.sessions
-      .getSession()
+      .getDriverSession()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (session) => {
           if (!session.isAuthenticated) {
-            void this.router.navigate(['/driver/sign-in']);
+            this.handleUnauthorizedSession();
             return;
           }
           this.startSync();
         },
-        error: () => void this.router.navigate(['/driver/sign-in']),
+        error: () => this.handleUnauthorizedSession(),
       });
 
     interval(30_000)
@@ -108,7 +109,7 @@ export class DriverPage implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (orders) => {
-          this.orders.set(orders);
+          this.orders.set(this.deduplicateOrders(orders));
           this.state.set('ready');
           this.confirmingAction.set(null);
           this.inFlightOrders.set(new Set());
@@ -117,7 +118,7 @@ export class DriverPage implements OnInit, OnDestroy {
         },
         error: (error: { readonly status?: number }) => {
           if (error.status === 401 || error.status === 403) {
-            void this.router.navigate(['/driver/sign-in']);
+            this.handleUnauthorizedSession();
           } else {
             this.state.set('error');
           }
@@ -127,9 +128,13 @@ export class DriverPage implements OnInit, OnDestroy {
 
   protected signOut(): void {
     this.sessions
-      .signOut()
+      .signOutDriver()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: () => void this.router.navigate(['/driver/sign-in']) });
+  }
+
+  protected goToSignIn(): void {
+    void this.router.navigate(['/driver/sign-in']);
   }
 
   protected areaName(order: DriverOrderDto): string {
@@ -244,6 +249,8 @@ export class DriverPage implements OnInit, OnDestroy {
         this.orders.update((list) =>
           list.map((o) => (o.id === order.id ? { ...o, status: nextStatus } : o)),
         );
+      } else if (result === 'unauthorized') {
+        this.handleUnauthorizedSession();
       } else if (result === 'stale') {
         const currentStale = new Set(this.staleOrders());
         currentStale.add(order.id);
@@ -259,14 +266,41 @@ export class DriverPage implements OnInit, OnDestroy {
     });
   }
 
+  private handleUnauthorizedSession(): void {
+    this.sessionExpired.set(true);
+    this.state.set('unauthorized');
+    void this.router.navigate(['/driver/sign-in'], { queryParams: { expired: '1' } });
+  }
+
+  private deduplicateOrders(orders: readonly DriverOrderDto[]): readonly DriverOrderDto[] {
+    const seen = new Set<string>();
+    const result: DriverOrderDto[] = [];
+    for (const order of orders) {
+      if (!seen.has(order.id)) {
+        seen.add(order.id);
+        result.push(order);
+      }
+    }
+    return result;
+  }
+
   private startSync(): void {
     this.loadOrders();
 
     this.realtime.orderAssigned$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((payload) => {
       if (this.isFullDriverOrder(payload)) {
         this.orders.update((list) => {
-          const exists = list.some((o) => o.id === payload.id);
-          return exists ? list.map((o) => (o.id === payload.id ? payload : o)) : [payload, ...list];
+          const exists = list.some(
+            (o) => o.id === payload.id || o.publicCode === payload.publicCode,
+          );
+          return exists
+            ? list.map((o) =>
+                o.id === payload.id || o.publicCode === payload.publicCode ? payload : o,
+              )
+            : [
+                payload,
+                ...list.filter((o) => o.id !== payload.id && o.publicCode !== payload.publicCode),
+              ];
         });
       } else {
         this.loadOrders();
@@ -281,9 +315,11 @@ export class DriverPage implements OnInit, OnDestroy {
           const matchCode = payload.publicCode;
           const newStatus = payload.newStatus ?? payload.status;
 
+          let found = false;
           this.orders.update((list) =>
             list.map((o) => {
               if ((matchId && o.id === matchId) || (matchCode && o.publicCode === matchCode)) {
+                found = true;
                 return {
                   ...o,
                   status: (newStatus ?? o.status) as DriverOrderStatus,
@@ -293,16 +329,26 @@ export class DriverPage implements OnInit, OnDestroy {
               return o;
             }),
           );
+
+          if (!found) {
+            this.loadOrders();
+          }
         } else {
           this.loadOrders();
         }
       });
 
-    this.realtime.orderCompleted$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((orderId) => {
-      this.orders.update((list) =>
-        list.map((o) => (o.id === orderId ? { ...o, status: 'Delivered' as const } : o)),
-      );
-    });
+    this.realtime.orderCompleted$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((orderIdOrCode) => {
+        this.orders.update((list) =>
+          list.map((o) =>
+            o.id === orderIdOrCode || o.publicCode === orderIdOrCode
+              ? { ...o, status: 'Delivered' as const }
+              : o,
+          ),
+        );
+      });
 
     this.realtime.reconnected$
       .pipe(takeUntilDestroyed(this.destroyRef))

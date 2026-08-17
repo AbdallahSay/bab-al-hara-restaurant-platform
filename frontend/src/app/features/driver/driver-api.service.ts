@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { DriverOrderDto } from './driver.models';
 
-export type DriverActionResult = 'success' | 'stale' | 'error';
+export type DriverActionResult = 'success' | 'stale' | 'unauthorized' | 'error';
 
 @Injectable({ providedIn: 'root' })
 export class DriverApiService {
@@ -29,8 +29,13 @@ export class DriverApiService {
       .pipe(
         map(() => 'success' as DriverActionResult),
         catchError((error: unknown) => {
-          if (error instanceof HttpErrorResponse && error.status === 409) {
-            return of('stale' as DriverActionResult);
+          if (error instanceof HttpErrorResponse) {
+            if (error.status === 409) {
+              return of('stale' as DriverActionResult);
+            }
+            if (error.status === 401 || error.status === 403) {
+              return of('unauthorized' as DriverActionResult);
+            }
           }
           return of('error' as DriverActionResult);
         }),
@@ -47,8 +52,13 @@ export class DriverApiService {
       .pipe(
         map(() => 'success' as DriverActionResult),
         catchError((error: unknown) => {
-          if (error instanceof HttpErrorResponse && error.status === 409) {
-            return of('stale' as DriverActionResult);
+          if (error instanceof HttpErrorResponse) {
+            if (error.status === 409) {
+              return of('stale' as DriverActionResult);
+            }
+            if (error.status === 401 || error.status === 403) {
+              return of('unauthorized' as DriverActionResult);
+            }
           }
           return of('error' as DriverActionResult);
         }),

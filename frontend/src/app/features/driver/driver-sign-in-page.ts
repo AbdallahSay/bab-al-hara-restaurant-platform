@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { LanguageService } from '../../core/i18n/language.service';
 import { Language } from '../../core/i18n/translations';
@@ -17,6 +17,7 @@ import { StaffSessionService } from '../kitchen/staff-session.service';
 export class DriverSignInPage {
   private readonly sessions = inject(StaffSessionService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly language = inject(LanguageService);
@@ -24,6 +25,10 @@ export class DriverSignInPage {
   protected readonly submitted = signal(false);
   protected readonly sending = signal(false);
   protected readonly failed = signal(false);
+  protected readonly isExpired = signal(
+    this.route.snapshot.queryParams['expired'] === '1' ||
+      this.route.snapshot.queryParams['expired'] === 'true',
+  );
   protected readonly form = new FormGroup({
     email: new FormControl('', {
       nonNullable: true,
@@ -46,7 +51,7 @@ export class DriverSignInPage {
 
     this.sending.set(true);
     this.sessions
-      .signIn(this.form.controls.email.value.trim(), this.form.controls.password.value)
+      .signInDriver(this.form.controls.email.value.trim(), this.form.controls.password.value)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => void this.router.navigate(['/driver']),

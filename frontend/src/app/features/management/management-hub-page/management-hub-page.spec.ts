@@ -16,7 +16,10 @@ describe('ManagementHubPage', () => {
     getMenuItems: ReturnType<typeof vi.fn>;
     getRestaurantControlStatus: ReturnType<typeof vi.fn>;
   };
-  let sessionMock: { signOut: ReturnType<typeof vi.fn> };
+  let sessionMock: {
+    signOut: ReturnType<typeof vi.fn>;
+    signOutManagement: ReturnType<typeof vi.fn>;
+  };
 
   const MOCK_CATEGORIES: CategoryManagementDto[] = [
     {
@@ -110,6 +113,7 @@ describe('ManagementHubPage', () => {
     };
     sessionMock = {
       signOut: vi.fn().mockReturnValue(of(undefined)),
+      signOutManagement: vi.fn().mockReturnValue(of(undefined)),
     };
 
     await TestBed.configureTestingModule({

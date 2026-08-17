@@ -438,7 +438,9 @@ describe('CashierPage', () => {
           provide: StaffSessionService,
           useValue: {
             getSession: () => of({ isAuthenticated: true }),
+            getCashierSession: () => of({ isAuthenticated: true }),
             signOut: () => of(undefined),
+            signOutCashier: () => of(undefined),
           },
         },
         {

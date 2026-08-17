@@ -95,6 +95,16 @@ describe('DriverApiService', () => {
       expect(result).toBe('stale');
     });
 
+    it('should return unauthorized when 401 occurs', () => {
+      let result: string | undefined;
+      service.startDelivery('ord-1', 'row-v1').subscribe((res) => (result = res));
+
+      const req = httpTesting.expectOne('http://test.api/orders/ord-1/start-delivery');
+      req.flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });
+
+      expect(result).toBe('unauthorized');
+    });
+
     it('should return error on other http errors', () => {
       let result: string | undefined;
       service.startDelivery('ord-1', 'row-v1').subscribe((res) => (result = res));
@@ -127,6 +137,16 @@ describe('DriverApiService', () => {
       req.flush('Conflict', { status: 409, statusText: 'Conflict' });
 
       expect(result).toBe('stale');
+    });
+
+    it('should return unauthorized when 403 occurs', () => {
+      let result: string | undefined;
+      service.markDelivered('ord-1', 'row-v1').subscribe((res) => (result = res));
+
+      const req = httpTesting.expectOne('http://test.api/orders/ord-1/mark-delivered');
+      req.flush('Forbidden', { status: 403, statusText: 'Forbidden' });
+
+      expect(result).toBe('unauthorized');
     });
 
     it('should return error on generic failure', () => {

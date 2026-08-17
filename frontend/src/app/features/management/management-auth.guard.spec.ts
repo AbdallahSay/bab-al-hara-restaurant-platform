@@ -7,12 +7,16 @@ import { StaffSessionService } from '../kitchen/staff-session.service';
 import { managementAuthGuard } from './management-auth.guard';
 
 describe('managementAuthGuard', () => {
-  let sessionMock: { getSession: ReturnType<typeof vi.fn> };
+  let sessionMock: {
+    getSession: ReturnType<typeof vi.fn>;
+    getManagementSession: ReturnType<typeof vi.fn>;
+  };
   let routerMock: { createUrlTree: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     sessionMock = {
       getSession: vi.fn(),
+      getManagementSession: vi.fn(),
     };
     routerMock = {
       createUrlTree: vi.fn((commands: unknown[], extras?: unknown) => ({
@@ -31,13 +35,13 @@ describe('managementAuthGuard', () => {
   });
 
   it('allows access for authenticated staff', async () => {
-    sessionMock.getSession.mockReturnValue(
-      of({
-        isAuthenticated: true,
-        displayName: 'Manager',
-        roles: ['Manager'],
-      }),
-    );
+    const sessionVal = {
+      isAuthenticated: true,
+      displayName: 'Manager',
+      roles: ['Manager'],
+    };
+    sessionMock.getSession.mockReturnValue(of(sessionVal));
+    sessionMock.getManagementSession.mockReturnValue(of(sessionVal));
 
     const guardResult = TestBed.runInInjectionContext(() =>
       managementAuthGuard(
@@ -51,13 +55,13 @@ describe('managementAuthGuard', () => {
   });
 
   it('redirects unauthenticated users to sign-in with returnUrl', async () => {
-    sessionMock.getSession.mockReturnValue(
-      of({
-        isAuthenticated: false,
-        displayName: '',
-        roles: [],
-      }),
-    );
+    const sessionVal = {
+      isAuthenticated: false,
+      displayName: '',
+      roles: [],
+    };
+    sessionMock.getSession.mockReturnValue(of(sessionVal));
+    sessionMock.getManagementSession.mockReturnValue(of(sessionVal));
 
     const guardResult = TestBed.runInInjectionContext(() =>
       managementAuthGuard(
@@ -74,7 +78,9 @@ describe('managementAuthGuard', () => {
   });
 
   it('redirects to sign-in when getSession errors', async () => {
-    sessionMock.getSession.mockReturnValue(throwError(() => new Error('Network error')));
+    const err = throwError(() => new Error('Network error'));
+    sessionMock.getSession.mockReturnValue(err);
+    sessionMock.getManagementSession.mockReturnValue(err);
 
     const guardResult = TestBed.runInInjectionContext(() =>
       managementAuthGuard(

@@ -347,6 +347,7 @@ export interface UiCopy {
     readonly minute: string;
     readonly minutes: string;
     readonly searchOrders: string;
+    readonly sessionExpired: string;
     readonly statusReady: string;
     readonly statusOnTheWay: string;
     readonly statusDelivered: string;
@@ -873,6 +874,7 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       minute: 'دقيقة',
       minutes: 'دقائق',
       searchOrders: 'بحث برقم الطلب أو الاسم أو العنوان…',
+      sessionExpired: 'انتهت جلسة السائق. سجّل الدخول مرة أخرى للمتابعة',
       statusReady: 'جاهز للاستلام بالمطعم',
       statusOnTheWay: 'في الطريق للعميل',
       statusDelivered: 'تم التسليم',
@@ -1412,6 +1414,7 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       minute: 'min',
       minutes: 'mins',
       searchOrders: 'Search by order number, name, or address…',
+      sessionExpired: 'Driver session expired. Please sign in again.',
       statusReady: 'Ready for Pickup',
       statusOnTheWay: 'On the Way',
       statusDelivered: 'Delivered',

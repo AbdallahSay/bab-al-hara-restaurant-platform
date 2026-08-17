@@ -288,7 +288,11 @@ describe('KitchenPage', () => {
         provideRouter([]),
         {
           provide: StaffSessionService,
-          useValue: { getSession: () => of({ isAuthenticated: true, displayName: 'Chef Ali' }) },
+          useValue: {
+            getSession: () => of({ isAuthenticated: true, displayName: 'Chef Ali' }),
+            getKitchenSession: () => of({ isAuthenticated: true, displayName: 'Chef Ali' }),
+            signOutKitchen: () => of(undefined),
+          },
         },
         {
           provide: KitchenApiService,
@@ -355,7 +359,11 @@ describe('KitchenPage', () => {
         provideRouter([]),
         {
           provide: StaffSessionService,
-          useValue: { getSession: () => of({ isAuthenticated: true, displayName: 'Chef' }) },
+          useValue: {
+            getSession: () => of({ isAuthenticated: true, displayName: 'Chef' }),
+            getKitchenSession: () => of({ isAuthenticated: true, displayName: 'Chef' }),
+            signOutKitchen: () => of(undefined),
+          },
         },
         { provide: KitchenApiService, useValue: defaultApi },
         {

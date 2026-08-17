@@ -466,7 +466,7 @@ export class ManagementMenuPage implements OnInit {
 
   signOut(): void {
     this.session
-      .signOut()
+      .signOutManagement()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => void this.router.navigate(['/management/sign-in']),

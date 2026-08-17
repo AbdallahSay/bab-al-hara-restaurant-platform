@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { cashierGuard, driverGuard, kitchenGuard } from './core/auth/staff.guards';
+
 export const routes: Routes = [
   {
     path: '',
@@ -45,6 +47,7 @@ export const routes: Routes = [
   },
   {
     path: 'kitchen',
+    canActivate: [kitchenGuard],
     loadComponent: () =>
       import('./features/kitchen/kitchen-page').then((component) => component.KitchenPage),
     title: 'Kitchen | Bab Al Hara',
@@ -57,6 +60,7 @@ export const routes: Routes = [
   },
   {
     path: 'cashier',
+    canActivate: [cashierGuard],
     loadComponent: () => import('./features/cashier/cashier-page').then((m) => m.CashierPage),
     title: 'Cashier | Bab Al Hara',
   },
@@ -70,6 +74,7 @@ export const routes: Routes = [
   },
   {
     path: 'driver',
+    canActivate: [driverGuard],
     loadComponent: () =>
       import('./features/driver/driver-page').then((component) => component.DriverPage),
     title: 'Driver | Bab Al Hara',

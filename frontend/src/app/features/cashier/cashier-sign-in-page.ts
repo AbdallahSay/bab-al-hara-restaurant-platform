@@ -46,7 +46,7 @@ export class CashierSignInPage {
 
     this.sending.set(true);
     this.sessions
-      .signIn(this.form.controls.email.value.trim(), this.form.controls.password.value)
+      .signInCashier(this.form.controls.email.value.trim(), this.form.controls.password.value)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => void this.router.navigate(['/cashier']),
