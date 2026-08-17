@@ -10,6 +10,12 @@ describe('LanguageService', () => {
     TestBed.configureTestingModule({});
   });
 
+  afterEach(() => {
+    localStorage.clear();
+    document.documentElement.lang = 'ar';
+    document.documentElement.dir = 'rtl';
+  });
+
   it('defaults to Arabic and RTL', () => {
     const service = TestBed.inject(LanguageService);
     TestBed.flushEffects();

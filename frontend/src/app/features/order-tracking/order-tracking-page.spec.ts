@@ -3,12 +3,22 @@ import { ActivatedRoute, provideRouter } from '@angular/router';
 import { BehaviorSubject, Observable, of, Subject, throwError } from 'rxjs';
 import { HubConnectionState } from '@microsoft/signalr';
 
+import { LanguageService } from '../../core/i18n/language.service';
 import { CustomerOrderTracking } from './order-tracking.models';
 import { OrderTrackingPage } from './order-tracking-page';
 import { TrackingApiService } from './tracking-api.service';
 import { TrackingHubService } from './tracking-hub.service';
 
 describe('OrderTrackingPage', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    localStorage.setItem('bab-al-hara.language', 'ar');
+  });
+
+  afterEach(() => {
+    localStorage.clear();
+  });
+
   const mockDeliveryTracking: CustomerOrderTracking = {
     publicCode: 'BH-DELIV-99',
     status: 'Preparing',
@@ -97,7 +107,10 @@ describe('OrderTrackingPage', () => {
     publicCode: string,
     apiService: MockTrackingApiService,
     hubService: MockTrackingHubService,
+    language: 'ar' | 'en' = 'ar',
   ): Promise<ComponentFixture<OrderTrackingPage>> {
+    localStorage.setItem('bab-al-hara.language', language);
+
     await TestBed.configureTestingModule({
       imports: [OrderTrackingPage],
       providers: [
@@ -120,6 +133,9 @@ describe('OrderTrackingPage', () => {
       })
       .compileComponents();
 
+    const langService = TestBed.inject(LanguageService);
+    langService.setLanguage(language);
+
     return TestBed.createComponent(OrderTrackingPage);
   }
 
@@ -128,7 +144,7 @@ describe('OrderTrackingPage', () => {
     const hub = new MockTrackingHubService();
     api.getTrackingHandler = () => of(mockDeliveryTracking);
 
-    const fixture = await createTestFixture('BH-DELIV-99', api, hub);
+    const fixture = await createTestFixture('BH-DELIV-99', api, hub, 'ar');
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
@@ -146,7 +162,7 @@ describe('OrderTrackingPage', () => {
     const hub = new MockTrackingHubService();
     api.getTrackingHandler = () => of(mockTakeawayTracking);
 
-    const fixture = await createTestFixture('BH-TAKE-88', api, hub);
+    const fixture = await createTestFixture('BH-TAKE-88', api, hub, 'ar');
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
@@ -164,7 +180,7 @@ describe('OrderTrackingPage', () => {
     const hub = new MockTrackingHubService();
     api.getTrackingHandler = () => throwError(() => new Error('401 Unauthorized'));
 
-    const fixture = await createTestFixture('BH-DELIV-99', api, hub);
+    const fixture = await createTestFixture('BH-DELIV-99', api, hub, 'ar');
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
@@ -181,7 +197,7 @@ describe('OrderTrackingPage', () => {
       return of(mockDeliveryTracking);
     };
 
-    const fixture = await createTestFixture('BH-DELIV-99', api, hub);
+    const fixture = await createTestFixture('BH-DELIV-99', api, hub, 'ar');
     fixture.detectChanges();
     await Promise.resolve();
     expect(callCount).toBe(1);
@@ -197,7 +213,7 @@ describe('OrderTrackingPage', () => {
     const hub = new MockTrackingHubService();
     api.getTrackingHandler = () => of(mockDeliveryTracking);
 
-    const fixture = await createTestFixture('BH-DELIV-99', api, hub);
+    const fixture = await createTestFixture('BH-DELIV-99', api, hub, 'ar');
     fixture.detectChanges();
     await Promise.resolve();
 
@@ -215,5 +231,19 @@ describe('OrderTrackingPage', () => {
 
     const element = fixture.nativeElement as HTMLElement;
     expect(element.textContent).toContain('طلبك في الطريق');
+  });
+
+  it('renders English tracking details when English language is chosen', async () => {
+    TestBed.resetTestingModule();
+    const api = new MockTrackingApiService();
+    const hub = new MockTrackingHubService();
+    api.getTrackingHandler = () => of(mockDeliveryTracking);
+
+    const fixture = await createTestFixture('BH-DELIV-99', api, hub, 'en');
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.textContent).toContain('BH-DELIV-99');
+    expect(element.textContent).toContain('The kitchen is preparing your order');
   });
 });
