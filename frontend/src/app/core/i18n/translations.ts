@@ -214,6 +214,31 @@ export interface UiCopy {
     readonly note: string;
     readonly address: string;
     readonly area: string;
+    readonly all: string;
+    readonly takeawayQueue: string;
+    readonly deliveryQueue: string;
+    readonly filterAll: string;
+    readonly searchPlaceholder: string;
+    readonly noFilteredOrders: string;
+    readonly clearSearch: string;
+    readonly totalToCollect: string;
+    readonly collect: string;
+    readonly paid: string;
+    readonly showDetails: string;
+    readonly hideDetails: string;
+    readonly expandAll: string;
+    readonly collapseAll: string;
+    readonly refresh: string;
+    readonly soundEnable: string;
+    readonly soundEnabled: string;
+    readonly newOrder: string;
+    readonly agingNormal: string;
+    readonly agingAttention: string;
+    readonly agingOverdue: string;
+    readonly subtotal: string;
+    readonly deliveryFee: string;
+    readonly completing: string;
+    readonly deliveryWaitingNotice: string;
     readonly signOut: string;
   };
 }
@@ -424,9 +449,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       minute: 'دقيقة',
       minutes: 'دقائق',
       handoff: 'تسليم وإنهاء الطلب',
-      handoffConfirmTitle: 'تأكيد التسليم',
+      handoffConfirmTitle: 'تأكيد تسليم الطلب',
       handoffConfirmBody: 'هل تم استلام المبلغ وتسليم الطلب للعميل؟',
-      handoffConfirmYes: 'نعم، تسليم الطلب',
+      handoffConfirmYes: 'تأكيد وإنهاء',
       handoffConfirmNo: 'إلغاء',
       handoffSuccess: 'تم تسليم الطلب بنجاح',
       handoffStaleError: 'تم تحديث البيانات، يرجى المحاولة مرة أخرى',
@@ -440,6 +465,31 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       note: 'ملاحظة',
       address: 'العنوان',
       area: 'المنطقة',
+      all: 'الكل',
+      takeawayQueue: 'جاهز للاستلام',
+      deliveryQueue: 'بانتظار سائق',
+      filterAll: 'الكل',
+      searchPlaceholder: 'بحث برقم الطلب أو اسم العميل...',
+      noFilteredOrders: 'لا توجد طلبات تطابق التصفية أو البحث المحدد حالياً.',
+      clearSearch: 'مسح البحث',
+      totalToCollect: 'إجمالي المطلوب تحصيله',
+      collect: 'تحصيل',
+      paid: 'مدفوع',
+      showDetails: 'عرض الأصناف',
+      hideDetails: 'إخفاء الأصناف',
+      expandAll: 'توسيع الكل',
+      collapseAll: 'طي الكل',
+      refresh: 'تحديث',
+      soundEnable: 'تشغيل الصوت',
+      soundEnabled: 'الصوت يعمل',
+      newOrder: 'طلب جاهز جديد!',
+      agingNormal: 'عادي',
+      agingAttention: 'انتباه',
+      agingOverdue: 'متأخر',
+      subtotal: 'المجموع الفرعي',
+      deliveryFee: 'رسوم التوصيل',
+      completing: 'جاري الإنهاء...',
+      deliveryWaitingNotice: 'الطلب جاهز بالمطعم بانتظار استلام السائق للتوصيل',
       signOut: 'تسجيل الخروج',
     },
   },
@@ -649,9 +699,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       minute: 'minute',
       minutes: 'minutes',
       handoff: 'Complete & Hand Off',
-      handoffConfirmTitle: 'Confirm Handoff',
+      handoffConfirmTitle: 'Confirm Order Handoff',
       handoffConfirmBody: 'Has payment been collected and the order handed off to the customer?',
-      handoffConfirmYes: 'Yes, hand off order',
+      handoffConfirmYes: 'Confirm & Hand Off',
       handoffConfirmNo: 'Cancel',
       handoffSuccess: 'Order handed off successfully',
       handoffStaleError: 'Order data was updated, please try again',
@@ -665,6 +715,32 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       note: 'Note',
       address: 'Address',
       area: 'Area',
+      all: 'All',
+      takeawayQueue: 'Ready for Pickup',
+      deliveryQueue: 'Waiting for Driver',
+      filterAll: 'All',
+      searchPlaceholder: 'Search by order # or customer name...',
+      noFilteredOrders: 'There are no orders matching the selected filter or search right now.',
+      clearSearch: 'Clear search',
+      totalToCollect: 'Total to collect',
+      collect: 'Collect',
+      paid: 'Paid',
+      showDetails: 'Show items',
+      hideDetails: 'Hide items',
+      expandAll: 'Expand all',
+      collapseAll: 'Collapse all',
+      refresh: 'Refresh',
+      soundEnable: 'Enable sound',
+      soundEnabled: 'Sound enabled',
+      newOrder: 'New ready order!',
+      agingNormal: 'Normal',
+      agingAttention: 'Attention',
+      agingOverdue: 'Overdue',
+      subtotal: 'Subtotal',
+      deliveryFee: 'Delivery fee',
+      completing: 'Completing...',
+      deliveryWaitingNotice:
+        'Order is ready at the restaurant, awaiting driver pickup for delivery',
       signOut: 'Sign out',
     },
   },
