@@ -8,20 +8,34 @@ import {
 import { Subject } from 'rxjs';
 
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
-import { OrderStatusChangedEvent } from '../customer-ordering/order.models';
-import { RealtimeStatus } from '../kitchen/kitchen-realtime.service';
 import { DriverOrderDto } from './driver.models';
+
+export type RealtimeStatus = 'disconnected' | 'connecting' | 'connected' | 'reconnecting';
+
+export interface DriverHubEvent {
+  readonly id?: string;
+  readonly orderId?: string;
+  readonly publicCode?: string;
+  readonly newStatus?: string;
+  readonly status?: string;
+  readonly rowVersion?: string;
+  readonly driverId?: string;
+  readonly driverName?: string;
+  readonly driverAssignedAtUtc?: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class DriverHubService {
-  private readonly orderAssigned = new Subject<DriverOrderDto>();
-  private readonly orderStatusChanged = new Subject<OrderStatusChangedEvent>();
+  private readonly orderAssigned = new Subject<DriverOrderDto | DriverHubEvent>();
+  private readonly orderStatusChanged = new Subject<DriverHubEvent>();
+  private readonly orderCompleted = new Subject<string>();
   private readonly reconnected = new Subject<void>();
   private readonly connection: HubConnection;
 
   readonly status = signal<RealtimeStatus>('disconnected');
   readonly orderAssigned$ = this.orderAssigned.asObservable();
   readonly orderStatusChanged$ = this.orderStatusChanged.asObservable();
+  readonly orderCompleted$ = this.orderCompleted.asObservable();
   readonly reconnected$ = this.reconnected.asObservable();
 
   constructor() {
@@ -32,10 +46,12 @@ export class DriverHubService {
       .configureLogging(LogLevel.Warning)
       .build();
 
-    this.connection.on('OrderAssigned', (order: DriverOrderDto) => this.orderAssigned.next(order));
-    this.connection.on('OrderStatusChanged', (event: OrderStatusChangedEvent) =>
-      this.orderStatusChanged.next(event),
+    this.connection.on('DriverAssigned', (evt: DriverHubEvent) => this.orderAssigned.next(evt));
+    this.connection.on('OrderAssigned', (evt: DriverOrderDto) => this.orderAssigned.next(evt));
+    this.connection.on('OrderStatusChanged', (evt: DriverHubEvent) =>
+      this.orderStatusChanged.next(evt),
     );
+    this.connection.on('OrderCompleted', (orderId: string) => this.orderCompleted.next(orderId));
     this.connection.onreconnecting(() => this.status.set('reconnecting'));
     this.connection.onreconnected(() => {
       this.status.set('connected');

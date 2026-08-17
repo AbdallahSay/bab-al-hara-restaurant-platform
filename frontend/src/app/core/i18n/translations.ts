@@ -233,14 +233,45 @@ export interface UiCopy {
     readonly statusReady: string;
     readonly statusOnTheWay: string;
     readonly statusDelivered: string;
+    readonly all: string;
+    readonly takeawayQueue: string;
+    readonly deliveryQueue: string;
+    readonly filterAll: string;
+    readonly searchPlaceholder: string;
+    readonly noFilteredOrders: string;
+    readonly clearSearch: string;
+    readonly totalToCollect: string;
+    readonly collect: string;
+    readonly paid: string;
+    readonly showDetails: string;
+    readonly hideDetails: string;
+    readonly expandAll: string;
+    readonly collapseAll: string;
+    readonly refresh: string;
+    readonly soundEnable: string;
+    readonly soundEnabled: string;
+    readonly newOrder: string;
+    readonly subtotal: string;
+    readonly deliveryFee: string;
+    readonly completing: string;
+    readonly deliveryWaitingNotice: string;
   };
   readonly driver: {
     readonly title: string;
+    readonly signIn: string;
+    readonly signInTitle: string;
+    readonly signInDescription: string;
     readonly assignedOrders: string;
+    readonly activeDeliveries: string;
+    readonly completedDeliveries: string;
+    readonly noActiveOrders: string;
+    readonly noActiveOrdersSub: string;
+    readonly noCompletedOrders: string;
     readonly connectionLabel: string;
     readonly ordersLabel: string;
     readonly signOut: string;
     readonly loading: string;
+    readonly loadError: string;
     readonly emptyTitle: string;
     readonly emptyBody: string;
     readonly emptyFilterTitle: string;
@@ -255,16 +286,25 @@ export interface UiCopy {
     readonly customer: string;
     readonly phone: string;
     readonly callCustomer: string;
+    readonly deliveryDestination: string;
+    readonly area: string;
     readonly address: string;
     readonly deliveryArea: string;
+    readonly deliveryNote: string;
     readonly note: string;
     readonly items: string;
+    readonly showItems: string;
+    readonly hideItems: string;
+    readonly itemCount: string;
+    readonly payment: string;
+    readonly codAmount: string;
+    readonly paidOnline: string;
+    readonly cashOnDelivery: string;
     readonly subtotal: string;
     readonly deliveryFee: string;
     readonly total: string;
     readonly paymentMethod: string;
     readonly paymentStatus: string;
-    readonly cashOnDelivery: string;
     readonly paid: string;
     readonly unpaid: string;
     readonly allFilter: string;
@@ -273,26 +313,38 @@ export interface UiCopy {
     readonly deliveredFilter: string;
     readonly startDelivery: string;
     readonly markDelivered: string;
+    readonly startDeliveryAction: string;
+    readonly markDeliveredAction: string;
     readonly startingDelivery: string;
     readonly markingDelivered: string;
+    readonly startDeliveryConfirmTitle: string;
+    readonly startDeliveryConfirmBody: string;
+    readonly startDeliveryConfirmYes: string;
+    readonly markDeliveredConfirmTitle: string;
+    readonly markDeliveredConfirmBody: string;
+    readonly markDeliveredConfirmYes: string;
     readonly confirmStartDeliveryTitle: string;
     readonly confirmStartDeliveryMessage: string;
     readonly confirmMarkDeliveredTitle: string;
     readonly confirmMarkDeliveredMessage: string;
     readonly confirm: string;
     readonly cancel: string;
+    readonly actionInProgress: string;
+    readonly actionSuccess: string;
+    readonly staleError: string;
+    readonly actionError: string;
     readonly refresh: string;
     readonly orderUpdatedByOther: string;
-    readonly actionError: string;
     readonly deliveryStartedSuccess: string;
     readonly orderDeliveredSuccess: string;
     readonly receivedAt: string;
     readonly elapsed: string;
     readonly minute: string;
     readonly minutes: string;
-    readonly signInTitle: string;
-    readonly signInDescription: string;
     readonly searchOrders: string;
+    readonly statusReady: string;
+    readonly statusOnTheWay: string;
+    readonly statusDelivered: string;
     readonly status: Readonly<Record<string, string>>;
   };
   readonly orderTracking: {
@@ -534,9 +586,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       minute: 'دقيقة',
       minutes: 'دقائق',
       handoff: 'تسليم وإنهاء الطلب',
-      handoffConfirmTitle: 'تأكيد التسليم',
+      handoffConfirmTitle: 'تأكيد تسليم الطلب',
       handoffConfirmBody: 'هل تم استلام المبلغ وتسليم الطلب للعميل؟',
-      handoffConfirmYes: 'نعم، تسليم الطلب',
+      handoffConfirmYes: 'تأكيد وإنهاء',
       handoffConfirmNo: 'إلغاء',
       handoffSuccess: 'تم تسليم الطلب بنجاح',
       handoffStaleError: 'تم تحديث البيانات، يرجى المحاولة مرة أخرى',
@@ -566,14 +618,45 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       statusReady: 'جاهز للتوصيل',
       statusOnTheWay: 'في الطريق',
       statusDelivered: 'تم التسليم',
+      all: 'الكل',
+      takeawayQueue: 'جاهز للاستلام',
+      deliveryQueue: 'بانتظار سائق',
+      filterAll: 'الكل',
+      searchPlaceholder: 'بحث برقم الطلب أو اسم العميل...',
+      noFilteredOrders: 'لا توجد طلبات تطابق التصفية أو البحث المحدد حالياً.',
+      clearSearch: 'مسح البحث',
+      totalToCollect: 'إجمالي المطلوب تحصيله',
+      collect: 'تحصيل',
+      paid: 'مدفوع',
+      showDetails: 'عرض الأصناف',
+      hideDetails: 'إخفاء الأصناف',
+      expandAll: 'توسيع الكل',
+      collapseAll: 'طي الكل',
+      refresh: 'تحديث',
+      soundEnable: 'تشغيل الصوت',
+      soundEnabled: 'الصوت مفعّل',
+      newOrder: 'طلب جاهز جديد!',
+      subtotal: 'المجموع الفرعي',
+      deliveryFee: 'رسوم التوصيل',
+      completing: 'جاري الإنهاء...',
+      deliveryWaitingNotice: 'الطلب جاهز بالمطعم بانتظار استلام السائق للتوصيل',
     },
     driver: {
-      title: 'شاشة السائق',
+      title: 'توصيل الطلبات',
+      signIn: 'تسجيل دخول السائق',
+      signInTitle: 'دخول السائقين',
+      signInDescription: 'هذه الشاشة مخصصة لكباتن وسائقي التوصيل المصرح لهم.',
       assignedOrders: 'طلبات التوصيل المسندة',
+      activeDeliveries: 'الطلبات الجارية',
+      completedDeliveries: 'الطلبات المسلّمة',
+      noActiveOrders: 'لا توجد طلبات جارية للتوصيل',
+      noActiveOrdersSub: 'ستظهر الطلبات المعيّنة لك هنا فور تجهيزها بالمطعم.',
+      noCompletedOrders: 'لا توجد طلبات مسلّمة اليوم',
       connectionLabel: 'حالة اتصال شاشة التوصيل',
       ordersLabel: 'قائمة طلبات التوصيل',
       signOut: 'تسجيل الخروج',
-      loading: 'جاري تحميل الطلبات المسندة…',
+      loading: 'جاري تحميل طلبات التوصيل…',
+      loadError: 'حدث خطأ في تحميل طلبات التوصيل',
       emptyTitle: 'لا توجد طلبات توصيل مسندة',
       emptyBody: 'ستظهر الطلبات المسندة إليك هنا فور تعيينها.',
       emptyFilterTitle: 'لا توجد طلبات في هذا القسم',
@@ -585,19 +668,28 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       disconnected: 'التحديث المباشر متوقف',
       newAssignment: 'تم إسناد طلب توصيل جديد!',
       orderCode: 'طلب #',
-      customer: 'العميل',
+      customer: 'بيانات العميل',
       phone: 'رقم الهاتف',
       callCustomer: 'اتصال بالعميل',
-      address: 'عنوان التوصيل',
+      deliveryDestination: 'عنوان التوصيل',
+      area: 'المنطقة',
+      address: 'العنوان بالتفصيل',
       deliveryArea: 'منطقة التوصيل',
+      deliveryNote: 'ملاحظات التوصيل',
       note: 'ملاحظات العميل',
-      items: 'الأصناف المطلوبة',
+      items: 'محتويات الطلب',
+      showItems: 'عرض الأصناف',
+      hideItems: 'إخفاء الأصناف',
+      itemCount: 'أصناف',
+      payment: 'الدفع والتحصيل',
+      codAmount: 'المطلوب تحصيله',
+      paidOnline: 'مدفوع مسبقاً',
+      cashOnDelivery: 'الدفع عند الاستلام (كاش)',
       subtotal: 'المجموع الفرعي',
       deliveryFee: 'رسوم التوصيل',
       total: 'الإجمالي المطلوب تحصيله',
       paymentMethod: 'طريقة الدفع',
       paymentStatus: 'حالة الدفع',
-      cashOnDelivery: 'الدفع عند الاستلام (كاش)',
       paid: 'مدفوع',
       unpaid: 'غير مدفوع (مطلوب تحصيله)',
       allFilter: 'كل المسند',
@@ -606,26 +698,38 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       deliveredFilter: 'تم التسليم',
       startDelivery: 'بدء التوصيل',
       markDelivered: 'تم التسليم',
+      startDeliveryAction: 'بدء التوصيل',
+      markDeliveredAction: 'تم التسليم',
       startingDelivery: 'جاري بدء التوصيل…',
       markingDelivered: 'جاري تأكيد التسليم…',
+      startDeliveryConfirmTitle: 'تأكيد استلام الطلب وبدء التحرك',
+      startDeliveryConfirmBody: 'هل استلمت وجبة الطلب من المطبخ وبدأت التوجه لعنوان العميل؟',
+      startDeliveryConfirmYes: 'نعم، ابدأ التوصيل',
+      markDeliveredConfirmTitle: 'تأكيد تسليم الطلب والتحصيل',
+      markDeliveredConfirmBody: 'هل قمت بتسليم الطلب للعميل واستلام المبلغ المطلوب بالكامل؟',
+      markDeliveredConfirmYes: 'نعم، تم التسليم',
       confirmStartDeliveryTitle: 'تأكيد استلام وبدء التوصيل',
       confirmStartDeliveryMessage: 'هل استلمت الطلب من المطعم وجاهز للبدء بالتوصيل إلى العنوان؟',
       confirmMarkDeliveredTitle: 'تأكيد تسليم الطلب',
       confirmMarkDeliveredMessage: 'هل تم تسليم الطلب للعميل واستلام المبلغ المطلوب بالكامل؟',
       confirm: 'تأكيد',
-      cancel: 'إلغاء',
+      cancel: 'تراجع',
+      actionInProgress: 'جاري التحديث…',
+      actionSuccess: 'تم تحديث حالة الطلب بنجاح',
+      staleError: 'تم تعديل بيانات هذا الطلب من عملية أخرى. جاري تحديث الشاشة…',
+      actionError: 'حدث خطأ أثناء تحديث الطلب. يرجى المحاولة مرة أخرى.',
       refresh: 'تحديث البيانات',
       orderUpdatedByOther: 'تم تحديث حالة هذا الطلب من جهة أخرى، تم تحديث الشاشة.',
-      actionError: 'تعذر تنفيذ العملية. حاول مرة أخرى.',
       deliveryStartedSuccess: 'تم بدء التوصيل بنجاح.',
       orderDeliveredSuccess: 'تم تأكيد تسليم الطلب بنجاح.',
       receivedAt: 'وقت الطلب',
       elapsed: 'الوقت المنقضي',
       minute: 'دقيقة',
       minutes: 'دقائق',
-      signInTitle: 'دخول السائقين',
-      signInDescription: 'هذه الشاشة مخصصة لكباتن وسائقي التوصيل المصرح لهم.',
       searchOrders: 'بحث برقم الطلب أو الاسم أو العنوان…',
+      statusReady: 'جاهز للاستلام بالمطعم',
+      statusOnTheWay: 'في الطريق للعميل',
+      statusDelivered: 'تم التسليم',
       status: {
         Pending: 'قيد الانتظار',
         Confirmed: 'مؤكد',
@@ -873,9 +977,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       minute: 'minute',
       minutes: 'minutes',
       handoff: 'Complete & Hand Off',
-      handoffConfirmTitle: 'Confirm Handoff',
+      handoffConfirmTitle: 'Confirm Order Handoff',
       handoffConfirmBody: 'Has payment been collected and the order handed off to the customer?',
-      handoffConfirmYes: 'Yes, hand off order',
+      handoffConfirmYes: 'Confirm & Hand Off',
       handoffConfirmNo: 'Cancel',
       handoffSuccess: 'Order handed off successfully',
       handoffStaleError: 'Order data was updated, please try again',
@@ -905,15 +1009,47 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       statusReady: 'Ready for Delivery',
       statusOnTheWay: 'On the way',
       statusDelivered: 'Delivered',
+      all: 'All',
+      takeawayQueue: 'Ready for Pickup',
+      deliveryQueue: 'Waiting for Driver',
+      filterAll: 'All',
+      searchPlaceholder: 'Search by order # or customer name...',
+      noFilteredOrders: 'There are no orders matching the selected filter or search right now.',
+      clearSearch: 'Clear search',
+      totalToCollect: 'Total to collect',
+      collect: 'Collect',
+      paid: 'Paid',
+      showDetails: 'Show items',
+      hideDetails: 'Hide items',
+      expandAll: 'Expand all',
+      collapseAll: 'Collapse all',
+      refresh: 'Refresh',
+      soundEnable: 'Enable sound',
+      soundEnabled: 'Sound enabled',
+      newOrder: 'New ready order!',
+      subtotal: 'Subtotal',
+      deliveryFee: 'Delivery fee',
+      completing: 'Completing...',
+      deliveryWaitingNotice:
+        'Order is ready at the restaurant, awaiting driver pickup for delivery',
     },
 
     driver: {
-      title: 'Driver Screen',
+      title: 'Driver Deliveries',
+      signIn: 'Driver Sign In',
+      signInTitle: 'Driver sign in',
+      signInDescription: 'This screen is restricted to authorised delivery drivers.',
       assignedOrders: 'Assigned Deliveries',
+      activeDeliveries: 'Active Deliveries',
+      completedDeliveries: 'Delivered Orders',
+      noActiveOrders: 'No active deliveries',
+      noActiveOrdersSub: 'Assigned orders ready for pickup will appear here.',
+      noCompletedOrders: 'No delivered orders today',
       connectionLabel: 'Driver connection status',
       ordersLabel: 'Assigned deliveries list',
       signOut: 'Sign out',
-      loading: 'Loading assigned orders…',
+      loading: 'Loading delivery orders…',
+      loadError: 'Failed to load delivery orders',
       emptyTitle: 'No assigned deliveries',
       emptyBody: 'Orders assigned to you for delivery will appear here.',
       emptyFilterTitle: 'No orders in this section',
@@ -921,23 +1057,32 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       queueError: 'Failed to load assigned deliveries. Try again.',
       connected: 'Live updates connected',
       connecting: 'Connecting…',
-      reconnecting: 'Connection lost, reconnecting…',
+      reconnecting: 'Reconnecting…',
       disconnected: 'Live updates disconnected',
       newAssignment: 'New delivery assigned!',
       orderCode: 'Order #',
-      customer: 'Customer',
-      phone: 'Phone number',
-      callCustomer: 'Call customer',
-      address: 'Delivery address',
+      customer: 'Customer Info',
+      phone: 'Phone Number',
+      callCustomer: 'Call Customer',
+      deliveryDestination: 'Delivery Address',
+      area: 'Area',
+      address: 'Full Address',
       deliveryArea: 'Delivery area',
+      deliveryNote: 'Delivery Note',
       note: 'Customer note',
-      items: 'Order items',
+      items: 'Order Items',
+      showItems: 'Show items',
+      hideItems: 'Hide items',
+      itemCount: 'items',
+      payment: 'Payment & Collection',
+      codAmount: 'Amount to collect',
+      paidOnline: 'Prepaid',
+      cashOnDelivery: 'Cash on Delivery',
       subtotal: 'Subtotal',
       deliveryFee: 'Delivery fee',
       total: 'Total to collect',
       paymentMethod: 'Payment method',
       paymentStatus: 'Payment status',
-      cashOnDelivery: 'Cash on Delivery',
       paid: 'Paid',
       unpaid: 'Unpaid (Collect cash)',
       allFilter: 'All Assigned',
@@ -946,8 +1091,18 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       deliveredFilter: 'Delivered',
       startDelivery: 'Start delivery',
       markDelivered: 'Mark delivered',
+      startDeliveryAction: 'Start Delivery',
+      markDeliveredAction: 'Mark Delivered',
       startingDelivery: 'Starting delivery…',
       markingDelivered: 'Marking delivered…',
+      startDeliveryConfirmTitle: 'Start Delivery Confirmation',
+      startDeliveryConfirmBody:
+        'Have you collected the order from the kitchen and started heading to the customer?',
+      startDeliveryConfirmYes: 'Yes, start delivery',
+      markDeliveredConfirmTitle: 'Confirm Delivery & Collection',
+      markDeliveredConfirmBody:
+        'Have you handed over the order to the customer and collected the required amount?',
+      markDeliveredConfirmYes: 'Yes, mark delivered',
       confirmStartDeliveryTitle: 'Confirm Delivery Pickup',
       confirmStartDeliveryMessage:
         'Have you collected this order and are starting delivery to the customer?',
@@ -956,18 +1111,22 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         'Has this order been delivered to the customer and total cash collected?',
       confirm: 'Confirm',
       cancel: 'Cancel',
+      actionInProgress: 'Updating…',
+      actionSuccess: 'Order updated successfully',
+      staleError: 'Order data was updated by another action. Refreshing…',
+      actionError: 'An error occurred while updating the order. Please try again.',
       refresh: 'Refresh data',
       orderUpdatedByOther: 'This order was updated by another user. Display refreshed.',
-      actionError: 'Failed to update order. Try again.',
       deliveryStartedSuccess: 'Delivery started successfully.',
       orderDeliveredSuccess: 'Order marked as delivered successfully.',
       receivedAt: 'Order time',
-      elapsed: 'Elapsed',
+      elapsed: 'Waiting',
       minute: 'min',
       minutes: 'mins',
-      signInTitle: 'Driver sign in',
-      signInDescription: 'This screen is restricted to authorised delivery drivers.',
       searchOrders: 'Search by order number, name, or address…',
+      statusReady: 'Ready for Pickup',
+      statusOnTheWay: 'On the Way',
+      statusDelivered: 'Delivered',
       status: {
         Pending: 'Pending',
         Confirmed: 'Confirmed',
