@@ -4,6 +4,7 @@ using BabAlHara.Application.Delivery;
 using BabAlHara.Application.Driver;
 using BabAlHara.Application.Kitchen;
 using BabAlHara.Application.Ordering;
+using BabAlHara.Application.RestaurantControl;
 using BabAlHara.Application.Tracking;
 using BabAlHara.Infrastructure.Cashier;
 using BabAlHara.Infrastructure.Catalog;
@@ -13,6 +14,7 @@ using BabAlHara.Infrastructure.Identity;
 using BabAlHara.Infrastructure.Kitchen;
 using BabAlHara.Infrastructure.Ordering;
 using BabAlHara.Infrastructure.Persistence;
+using BabAlHara.Infrastructure.RestaurantControl;
 using BabAlHara.Infrastructure.Tracking;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -75,6 +77,7 @@ public static class DependencyInjection
         services.AddScoped<ICashierOrderService, CashierApplicationService>();
         services.AddScoped<IDriverOrderService, DriverApplicationService>();
         services.AddScoped<ICustomerOrderTrackingService, CustomerOrderTrackingService>();
+        services.AddScoped<IRestaurantControlService, RestaurantControlService>();
         services.AddScoped<DevelopmentDataSeeder>();
 
         return services;

@@ -6,6 +6,7 @@ using BabAlHara.Api.Features.Driver;
 using BabAlHara.Api.Features.Kitchen;
 using BabAlHara.Api.Features.OrderTracking;
 using BabAlHara.Api.Features.Ordering;
+using BabAlHara.Api.Features.RestaurantControl;
 using BabAlHara.Api.Platform.Errors;
 using BabAlHara.Api.Platform.Health;
 using BabAlHara.Api.Platform.Observability;
@@ -138,6 +139,14 @@ builder.Services
                 .RequireAuthenticatedUser()
                 .RequireRole(
                     DevelopmentDataSeeder.DriverRole,
+                    DevelopmentDataSeeder.ManagerRole,
+                    DevelopmentDataSeeder.AdminRole))
+    .AddPolicy(
+        AuthorizationPolicies.Management,
+        policy =>
+            policy
+                .RequireAuthenticatedUser()
+                .RequireRole(
                     DevelopmentDataSeeder.ManagerRole,
                     DevelopmentDataSeeder.AdminRole));
 
@@ -407,6 +416,7 @@ app.MapCashierEndpoints();
 app.MapDriverEndpoints();
 
 app.MapOrderTrackingEndpoints();
+app.MapRestaurantControlEndpoints();
 
 //
 // SignalR
