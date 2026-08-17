@@ -76,7 +76,7 @@ export class DriverPage implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.sessions
-      .getSession()
+      .getDriverSession()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (session) => {
@@ -128,7 +128,7 @@ export class DriverPage implements OnInit, OnDestroy {
 
   protected signOut(): void {
     this.sessions
-      .signOut()
+      .signOutDriver()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: () => void this.router.navigate(['/driver/sign-in']) });
   }

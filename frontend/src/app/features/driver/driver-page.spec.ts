@@ -129,7 +129,9 @@ describe('DriverPage', () => {
           provide: StaffSessionService,
           useValue: {
             getSession: () => of({ isAuthenticated: true }),
+            getDriverSession: () => of({ isAuthenticated: true }),
             signOut: () => of(undefined),
+            signOutDriver: () => of(undefined),
           },
         },
         { provide: DriverApiService, useValue: apiSpy },

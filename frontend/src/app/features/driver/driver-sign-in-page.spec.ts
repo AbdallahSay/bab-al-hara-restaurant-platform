@@ -10,17 +10,19 @@ describe('DriverSignInPage', () => {
   let fixture: ComponentFixture<DriverSignInPage>;
   let sessionServiceSpy: {
     signIn: ReturnType<typeof vi.fn>;
+    signInDriver: ReturnType<typeof vi.fn>;
   };
 
   async function setup(queryParams: Record<string, string> = {}) {
     sessionServiceSpy = {
       signIn: vi.fn().mockReturnValue(of({ isAuthenticated: true })),
+      signInDriver: vi.fn().mockReturnValue(of({ isAuthenticated: true })),
     };
 
     await TestBed.configureTestingModule({
       imports: [DriverSignInPage],
       providers: [
-        provideRouter([]),
+        provideRouter([{ path: 'driver', component: class {} }]),
         {
           provide: ActivatedRoute,
           useValue: {
@@ -54,7 +56,9 @@ describe('DriverSignInPage', () => {
 
   it('shows error banner when sign in fails', async () => {
     await setup();
-    sessionServiceSpy.signIn.mockReturnValue(throwError(() => new Error('Invalid credentials')));
+    const err = throwError(() => new Error('Invalid credentials'));
+    sessionServiceSpy.signInDriver.mockReturnValue(err);
+    sessionServiceSpy.signIn.mockReturnValue(err);
 
     fixture.componentInstance['form'].controls.email.setValue('driver@test.local');
     fixture.componentInstance['form'].controls.password.setValue('WrongPassword123!');
