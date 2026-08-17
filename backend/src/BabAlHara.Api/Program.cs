@@ -117,6 +117,7 @@ builder.Services
         AuthorizationPolicies.Kitchen,
         policy =>
             policy
+                .AddAuthenticationSchemes(StaffAuthSchemes.All)
                 .RequireAuthenticatedUser()
                 .RequireRole(
                     DevelopmentDataSeeder.KitchenRole,
@@ -126,6 +127,7 @@ builder.Services
         AuthorizationPolicies.Cashier,
         policy =>
             policy
+                .AddAuthenticationSchemes(StaffAuthSchemes.All)
                 .RequireAuthenticatedUser()
                 .RequireRole(
                     DevelopmentDataSeeder.CashierRole,
@@ -135,21 +137,34 @@ builder.Services
         AuthorizationPolicies.Driver,
         policy =>
             policy
+                .AddAuthenticationSchemes(StaffAuthSchemes.All)
                 .RequireAuthenticatedUser()
                 .RequireRole(
                     DevelopmentDataSeeder.DriverRole,
                     DevelopmentDataSeeder.ManagerRole,
+                    DevelopmentDataSeeder.AdminRole))
+    .AddPolicy(
+        AuthorizationPolicies.Management,
+        policy =>
+            policy
+                .AddAuthenticationSchemes(StaffAuthSchemes.All)
+                .RequireAuthenticatedUser()
+                .RequireRole(
+                    DevelopmentDataSeeder.ManagerRole,
                     DevelopmentDataSeeder.AdminRole));
 
 //
-// Staff Authentication Cookie
+// Staff Authentication Cookie Schemes
 //
 
-builder.Services.ConfigureApplicationCookie(options =>
+void ConfigureStaffCookieOptions(
+    CookieAuthenticationOptions options,
+    string devName,
+    string prodName)
 {
     options.Cookie.Name = builder.Environment.IsDevelopment()
-        ? "BabAlHara.Staff"
-        : "__Host-BabAlHara-Staff";
+        ? devName
+        : prodName;
 
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Strict;
@@ -179,6 +194,41 @@ builder.Services.ConfigureApplicationCookie(options =>
             return Task.CompletedTask;
         },
     };
+}
+
+builder.Services
+    .AddAuthentication()
+    .AddCookie(
+        StaffAuthSchemes.Kitchen,
+        options => ConfigureStaffCookieOptions(
+            options,
+            "BabAlHara.Kitchen.Auth",
+            "__Host-BabAlHara-Kitchen"))
+    .AddCookie(
+        StaffAuthSchemes.Cashier,
+        options => ConfigureStaffCookieOptions(
+            options,
+            "BabAlHara.Cashier.Auth",
+            "__Host-BabAlHara-Cashier"))
+    .AddCookie(
+        StaffAuthSchemes.Driver,
+        options => ConfigureStaffCookieOptions(
+            options,
+            "BabAlHara.Driver.Auth",
+            "__Host-BabAlHara-Driver"))
+    .AddCookie(
+        StaffAuthSchemes.Management,
+        options => ConfigureStaffCookieOptions(
+            options,
+            "BabAlHara.Management.Auth",
+            "__Host-BabAlHara-Management"));
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    ConfigureStaffCookieOptions(
+        options,
+        "BabAlHara.Staff",
+        "__Host-BabAlHara-Staff");
 });
 
 //

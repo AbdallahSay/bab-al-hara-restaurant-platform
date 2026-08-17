@@ -71,6 +71,7 @@
     }
   }
 
+  &.status--connecting,
   &.status--reconnecting {
     color: var(--color-warning);
     background: var(--color-warning-soft);

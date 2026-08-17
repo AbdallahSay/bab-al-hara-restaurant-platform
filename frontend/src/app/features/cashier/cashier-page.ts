@@ -122,7 +122,7 @@ export class CashierPage implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.sessions
-      .getSession()
+      .getCashierSession()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (session) => {
@@ -234,7 +234,7 @@ export class CashierPage implements OnInit, OnDestroy {
 
   protected signOut(): void {
     this.sessions
-      .signOut()
+      .signOutCashier()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: () => void this.router.navigate(['/cashier/sign-in']) });
   }

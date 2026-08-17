@@ -33,13 +33,26 @@ public sealed partial class DriverApplicationService(
 
     public async Task<IReadOnlyList<DriverOrderDto>> GetAssignedOrdersAsync(Guid driverId, CancellationToken cancellationToken)
     {
-        var orders = await dbContext.Orders
+        var activeOrders = await dbContext.Orders
+            .AsNoTracking()
             .Include(o => o.Items)
             .Where(o => o.DriverId == driverId && (o.Status == OrderStatus.Ready || o.Status == OrderStatus.OnTheWay))
-            .OrderByDescending(o => o.CreatedAt)
+            .OrderBy(o => o.Status == OrderStatus.OnTheWay ? 0 : 1)
+            .ThenBy(o => o.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        return orders.Select(MapDriverOrder).ToList();
+        var deliveredOrders = await dbContext.Orders
+            .AsNoTracking()
+            .Include(o => o.Items)
+            .Where(o => o.DriverId == driverId && o.Status == OrderStatus.Delivered)
+            .OrderByDescending(o => o.CreatedAt)
+            .Take(20)
+            .ToListAsync(cancellationToken);
+
+        return activeOrders
+            .Concat(deliveredOrders)
+            .Select(MapDriverOrder)
+            .ToList();
     }
 
     public async Task<AssignDriverResult> AssignDriverAsync(

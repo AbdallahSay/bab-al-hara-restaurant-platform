@@ -171,7 +171,7 @@ public sealed class DriverApiTests(OrderingApiFactory factory) : IClassFixture<O
     }
 
     [Fact]
-    public async Task GetAssignedDriverOrdersReturnsOnlyReadyAndOnTheWayOrdersForCaller()
+    public async Task GetAssignedDriverOrdersReturnsReadyOnTheWayAndRecentDeliveredOrdersForCallerWithDriverIsolation()
     {
         await factory.ResetAsync();
         var driver1 = await factory.EnsureStaffUserAsync("driver.active1@bab-al-hara.local", "Driver", "Driver 1");
@@ -192,9 +192,10 @@ public sealed class DriverApiTests(OrderingApiFactory factory) : IClassFixture<O
 
         var orders = await response.Content.ReadFromJsonAsync<List<DriverOrderDto>>(JsonOptions);
         Assert.NotNull(orders);
-        Assert.Contains(orders, o => o.PublicCode == "BH-D-READY-001");
-        Assert.Contains(orders, o => o.PublicCode == "BH-D-ONWAY-001");
-        Assert.DoesNotContain(orders, o => o.PublicCode == "BH-D-DELIV-001");
+        Assert.Equal(3, orders.Count);
+        Assert.Equal("BH-D-ONWAY-001", orders[0].PublicCode);
+        Assert.Equal("BH-D-READY-001", orders[1].PublicCode);
+        Assert.Equal("BH-D-DELIV-001", orders[2].PublicCode);
         Assert.DoesNotContain(orders, o => o.PublicCode == "BH-D-OTHER-001");
     }
 

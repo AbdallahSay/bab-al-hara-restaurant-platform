@@ -6,6 +6,7 @@
       <div
         class="realtime-status"
         [class.status--connected]="realtime.status() === 'connected'"
+        [class.status--connecting]="realtime.status() === 'connecting'"
         [class.status--reconnecting]="realtime.status() === 'reconnecting'"
         [class.status--disconnected]="realtime.status() === 'disconnected'"
         role="status"
@@ -49,7 +50,15 @@
 
   <!-- Main Operational Container -->
   <div class="driver-content">
-    @if (state() === 'loading') {
+    @if (state() === 'unauthorized' || sessionExpired()) {
+      <div class="state-container state-container--error" role="alert">
+        <span class="error-icon" aria-hidden="true">🔒</span>
+        <h2 class="state-title">{{ copy().driver.sessionExpired }}</h2>
+        <button type="button" class="btn-retry" (click)="goToSignIn()">
+          {{ copy().driver.signIn }}
+        </button>
+      </div>
+    } @else if (state() === 'loading') {
       <div class="state-container state-container--loading" role="status">
         <div class="spinner" aria-hidden="true"></div>
         <p class="state-text">{{ copy().driver.loading }}</p>

@@ -1,4 +1,4 @@
-﻿import {
+import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -125,7 +125,7 @@ export class KitchenPage implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.sessions
-      .getSession()
+      .getKitchenSession()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (session) => {
@@ -301,7 +301,7 @@ export class KitchenPage implements OnInit, OnDestroy {
 
   protected signOut(): void {
     this.sessions
-      .signOut()
+      .signOutKitchen()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: () => void this.router.navigate(['/kitchen/sign-in']) });
   }

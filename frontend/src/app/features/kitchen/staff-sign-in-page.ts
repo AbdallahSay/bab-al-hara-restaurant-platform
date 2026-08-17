@@ -46,7 +46,7 @@ export class StaffSignInPage {
 
     this.sending.set(true);
     this.sessions
-      .signIn(this.form.controls.email.value.trim(), this.form.controls.password.value)
+      .signInKitchen(this.form.controls.email.value.trim(), this.form.controls.password.value)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => void this.router.navigate(['/kitchen']),
