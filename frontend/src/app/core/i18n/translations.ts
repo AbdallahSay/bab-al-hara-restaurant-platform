@@ -215,6 +215,7 @@ export interface UiCopy {
     readonly address: string;
     readonly area: string;
     readonly signOut: string;
+  };
   readonly driver: {
     readonly title: string;
     readonly assignedOrders: string;
@@ -501,6 +502,8 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       address: 'العنوان',
       area: 'المنطقة',
       signOut: 'تسجيل الخروج',
+    },
+
     driver: {
       title: 'شاشة السائق',
       assignedOrders: 'طلبات التوصيل المسندة',
@@ -570,7 +573,6 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       },
     },
   },
-
   en: {
     brand: {
       name: 'Bab Al Hara',
@@ -794,6 +796,8 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       address: 'Address',
       area: 'Area',
       signOut: 'Sign out',
+    },
+
     driver: {
       title: 'Driver Screen',
       assignedOrders: 'Assigned Deliveries',
