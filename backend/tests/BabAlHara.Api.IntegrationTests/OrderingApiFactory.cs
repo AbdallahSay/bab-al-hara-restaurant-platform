@@ -69,6 +69,15 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
         await dbContext.MenuItems.ExecuteDeleteAsync();
         await dbContext.Categories.ExecuteDeleteAsync();
         await dbContext.DeliveryAreas.ExecuteDeleteAsync();
+        await dbContext.RestaurantControls.ExecuteDeleteAsync();
+
+        dbContext.RestaurantControls.Add(new BabAlHara.Domain.Ordering.RestaurantControl(
+            BabAlHara.Domain.Ordering.RestaurantControl.SingletonId,
+            acceptingOrders: true,
+            pauseMessageAr: null,
+            pauseMessageEn: null,
+            updatedAtUtc: DateTimeOffset.UtcNow,
+            updatedByStaffDisplayName: "System"));
 
         dbContext.Categories.AddRange(
             new Category(ActiveCategoryId, "السندوتشات", "Sandwiches", 1),

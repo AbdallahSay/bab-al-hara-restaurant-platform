@@ -1,4 +1,4 @@
-import { EnvironmentProviders, Provider } from '@angular/core';
+﻿import { EnvironmentProviders, Provider } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -75,6 +75,36 @@ describe('MenuPage', () => {
     expect(fixture.nativeElement.querySelector('h1').textContent).toContain('Choose your meal');
     expect(fixture.nativeElement.textContent).toContain('Kofta sandwich');
     expect(document.documentElement.dir).toBe('ltr');
+  });
+
+  it('renders paused banner when acceptingOrders is false but still allows adding items to cart', async () => {
+    await configure({
+      getCategories: () => of([CATEGORY]),
+      getMenuItems: () => of(ITEMS),
+      getRestaurantStatus: () =>
+        of({
+          acceptingOrders: false,
+          messageAr: 'نعتذر عن استقبال طلبات جديدة مؤقتًا لضغط الطلبات',
+          messageEn: 'Temporarily paused for new orders due to high demand',
+        }),
+    });
+    const fixture = TestBed.createComponent(MenuPage);
+    fixture.detectChanges();
+
+    // Check banner is rendered
+    const banner = fixture.nativeElement.querySelector('.restaurant-paused-banner');
+    expect(banner).toBeTruthy();
+    expect(banner.textContent).toContain('نعتذر عن استقبال طلبات جديدة مؤقتًا لضغط الطلبات');
+
+    // Customer can still add available item to cart
+    const addBtn: HTMLButtonElement = fixture.nativeElement.querySelector(
+      '.menu-item:not(.menu-item--unavailable) .button--primary',
+    );
+    expect(addBtn.disabled).toBe(false);
+    addBtn.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.mobile-cart')).toBeTruthy();
   });
 
   it('blocks the unavailable item and exposes a text status', async () => {
@@ -164,9 +194,13 @@ describe('MenuPage', () => {
     api: Partial<CustomerApiService>,
     cartToastMock?: Partial<CartToastService>,
   ): Promise<void> {
+    const fullApi: Partial<CustomerApiService> = {
+      getRestaurantStatus: () => of({ acceptingOrders: true, messageAr: null, messageEn: null }),
+      ...api,
+    };
     const providers: (Provider | EnvironmentProviders)[] = [
       provideRouter([]),
-      { provide: CustomerApiService, useValue: api },
+      { provide: CustomerApiService, useValue: fullApi },
     ];
     if (cartToastMock) {
       providers.push({ provide: CartToastService, useValue: cartToastMock });

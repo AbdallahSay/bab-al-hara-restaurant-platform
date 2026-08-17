@@ -28,6 +28,7 @@ public sealed class MenuQueryService(AppDbContext dbContext) : IMenuQueryService
             .Where(item => item.IsActive && item.Category.IsActive)
             .Where(item => !categoryId.HasValue || item.CategoryId == categoryId)
             .OrderBy(item => item.Category.DisplayOrder)
+            .ThenBy(item => item.DisplayOrder)
             .ThenBy(item => item.NameEn)
             .Select(item => Map(item))
             .ToListAsync(cancellationToken);

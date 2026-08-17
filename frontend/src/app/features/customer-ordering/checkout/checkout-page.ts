@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+﻿import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -15,17 +15,19 @@ import { Router, RouterLink } from '@angular/router';
 import { formatMoney, localizedText } from '../../../core/i18n/formatters';
 import { LanguageService } from '../../../core/i18n/language.service';
 import { CustomerHeader } from '../../../shared/customer-header/customer-header';
+import { RestaurantPausedBanner } from '../../../shared/restaurant-paused-banner/restaurant-paused-banner';
 import { CartService } from '../cart/cart.service';
 import { CustomerApiService } from '../customer-api.service';
 import { CustomerContactProfileService } from '../customer-contact-profile.service';
 import { CreateOrderRequest, DeliveryArea, OrderType, ProblemDetails } from '../order.models';
+import { RestaurantStatusService } from '../restaurant-status.service';
 import { OrderReceiptService } from '../success/order-receipt.service';
 
 type AreaState = 'loading' | 'ready' | 'error';
 
 @Component({
   selector: 'app-checkout-page',
-  imports: [CustomerHeader, ReactiveFormsModule, RouterLink],
+  imports: [CustomerHeader, ReactiveFormsModule, RestaurantPausedBanner, RouterLink],
   templateUrl: './checkout-page.html',
   styleUrl: './checkout-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,6 +42,7 @@ export class CheckoutPage implements OnInit {
   protected readonly language = inject(LanguageService);
   protected readonly copy = this.language.copy;
   protected readonly cart = inject(CartService);
+  protected readonly statusService = inject(RestaurantStatusService);
   protected readonly areaState = signal<AreaState>('loading');
   protected readonly deliveryAreas = signal<readonly DeliveryArea[]>([]);
   protected readonly submitted = signal(false);
@@ -128,6 +131,7 @@ export class CheckoutPage implements OnInit {
       this.form.controls.customerPhone.setValue(savedContact.phone);
       this.hasPrefilledContact.set(true);
     }
+    this.statusService.loadStatus().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
     this.loadDeliveryAreas();
   }
 
@@ -158,6 +162,10 @@ export class CheckoutPage implements OnInit {
   }
 
   protected submit(): void {
+    if (this.statusService.isPaused()) {
+      return;
+    }
+
     this.submitted.set(true);
     this.errorMessage.set('');
     this.form.markAllAsTouched();
@@ -210,7 +218,12 @@ export class CheckoutPage implements OnInit {
         error: (error: HttpErrorResponse) => {
           this.sending.set(false);
           const problem = error.error as ProblemDetails | undefined;
-          this.errorMessage.set(this.problemMessage(problem?.code));
+          const code =
+            problem?.code ?? (error.status === 409 ? 'restaurant_not_accepting_orders' : undefined);
+          if (code === 'restaurant_not_accepting_orders' || error.status === 409) {
+            this.statusService.setPausedManually(problem?.detail, null);
+          }
+          this.errorMessage.set(this.problemMessage(code, problem?.detail));
         },
       });
   }
@@ -233,13 +246,16 @@ export class CheckoutPage implements OnInit {
     return formatMoney(value, this.language.current());
   }
 
-  private problemMessage(code?: string): string {
+  private problemMessage(code?: string, detail?: string): string {
+    if (code === 'restaurant_not_accepting_orders') {
+      return this.copy().checkout.restaurantNotAcceptingOrdersError;
+    }
     if (code === 'unavailable_menu_item' || code === 'inactive_menu_item') {
       return this.copy().checkout.unavailableError;
     }
     if (code === 'inactive_delivery_area' || code === 'invalid_delivery_area') {
       return this.copy().checkout.areaError;
     }
-    return this.copy().checkout.orderError;
+    return detail || this.copy().checkout.orderError;
   }
 }

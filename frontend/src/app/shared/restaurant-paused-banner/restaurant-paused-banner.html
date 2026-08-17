@@ -1,0 +1,27 @@
+﻿@if (statusService.isPaused()) {
+  <aside
+    class="restaurant-paused-banner"
+    role="status"
+    aria-live="polite"
+    aria-label="Restaurant status notice"
+  >
+    <div class="banner-icon-box" aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="10" y1="15" x2="10" y2="9" />
+        <line x1="14" y1="15" x2="14" y2="9" />
+      </svg>
+    </div>
+    <div class="banner-body">
+      <strong class="banner-title">{{ statusService.pauseMessage() }}</strong>
+      <p class="banner-subtext">{{ copy().common.restaurantPausedBrowsingNotice }}</p>
+    </div>
+  </aside>
+}

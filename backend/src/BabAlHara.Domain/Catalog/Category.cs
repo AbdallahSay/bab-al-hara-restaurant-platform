@@ -10,6 +10,8 @@ public sealed class Category
 
     public Category(Guid id, string nameAr, string nameEn, int displayOrder, bool isActive = true)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(displayOrder);
+
         Id = id;
         NameAr = RequireText(nameAr, nameof(nameAr));
         NameEn = RequireText(nameEn, nameof(nameEn));
@@ -27,7 +29,24 @@ public sealed class Category
 
     public bool IsActive { get; private set; }
 
+    public byte[]? RowVersion { get; private set; }
+
     public IReadOnlyCollection<MenuItem> MenuItems => menuItems;
+
+    public void Update(string nameAr, string nameEn, int displayOrder, bool isActive)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(displayOrder);
+
+        NameAr = RequireText(nameAr, nameof(nameAr));
+        NameEn = RequireText(nameEn, nameof(nameEn));
+        DisplayOrder = displayOrder;
+        IsActive = isActive;
+    }
+
+    public void SetActive(bool isActive)
+    {
+        IsActive = isActive;
+    }
 
     private static string RequireText(string value, string parameterName) =>
         string.IsNullOrWhiteSpace(value)

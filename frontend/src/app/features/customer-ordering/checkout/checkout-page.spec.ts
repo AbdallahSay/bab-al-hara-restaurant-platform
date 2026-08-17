@@ -296,6 +296,61 @@ describe('CheckoutPage', () => {
     });
   });
 
+  it('disables the submit button and shows pause notice when restaurant is not accepting orders', async () => {
+    const fixture = await createFixture({
+      getRestaurantStatus: () =>
+        of({
+          acceptingOrders: false,
+          messageAr: '?????? ????? ?????? ?? ??????? ??????? ???????',
+          messageEn: 'The restaurant is temporarily paused for maintenance',
+        }),
+    });
+    fillContact(fixture);
+
+    const submitBtn: HTMLButtonElement = fixture.nativeElement.querySelector('.desktop-submit-btn');
+    expect(submitBtn.disabled).toBe(true);
+    expect(submitBtn.getAttribute('title')).toBe('?????? ????? ?????? ?? ??????? ??????? ???????');
+    expect(fixture.nativeElement.textContent).toContain(
+      '?????? ????? ?????? ?? ??????? ??????? ???????',
+    );
+  });
+
+  it('handles 409 restaurant_not_accepting_orders during order creation without clearing cart and disables submit button', async () => {
+    const fixture = await createFixture({
+      createOrder: () =>
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 409,
+              error: {
+                code: 'restaurant_not_accepting_orders',
+                detail: '?????? ?? ?????? ????? ????? ??????',
+              },
+            }),
+        ),
+    });
+
+    const cart = TestBed.inject(CartService);
+    expect(cart.items().length).toBe(1);
+
+    fillContact(fixture);
+    fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    // Check error message displayed
+    expect(fixture.nativeElement.querySelector('.error-banner')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.error-banner').textContent).toContain(
+      'المطعم متوقف مؤقتًا عن استقبال طلبات جديدة',
+    );
+
+    // Cart items MUST remain intact!
+    expect(cart.items().length).toBe(1);
+
+    // Submit button should now be disabled
+    const submitBtn: HTMLButtonElement = fixture.nativeElement.querySelector('.desktop-submit-btn');
+    expect(submitBtn.disabled).toBe(true);
+  });
+
   it('does NOT save contact details if order creation fails', async () => {
     const fixture = await createFixture({
       createOrder: () =>
@@ -326,6 +381,12 @@ describe('CheckoutPage', () => {
         {
           provide: CustomerApiService,
           useValue: {
+            getRestaurantStatus: () =>
+              of({
+                acceptingOrders: true,
+                messageAr: null,
+                messageEn: null,
+              }),
             getDeliveryAreas: () =>
               of([
                 {
