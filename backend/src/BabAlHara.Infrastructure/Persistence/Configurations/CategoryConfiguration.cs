@@ -18,6 +18,7 @@ public sealed class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.Property(category => category.NameEn).HasMaxLength(120).IsRequired();
         builder.Property(category => category.DisplayOrder).IsRequired();
         builder.Property(category => category.IsActive).IsRequired();
+        builder.Property(category => category.RowVersion).IsRowVersion();
         builder.HasIndex(category => new { category.IsActive, category.DisplayOrder });
 
         builder.HasData(

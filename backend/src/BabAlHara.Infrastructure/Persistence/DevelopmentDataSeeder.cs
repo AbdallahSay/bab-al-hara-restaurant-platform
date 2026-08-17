@@ -105,7 +105,8 @@ public sealed class DevelopmentDataSeeder(
             "Kofta, kebab, and shish tawook with grilled vegetables.",
             295m,
             "/images/menu/mixed-grill.webp",
-            28),
+            28,
+            displayOrder: 10),
         new(
             SeedIds.ChickenGrillId,
             SeedIds.GrillsCategoryId,
@@ -115,7 +116,8 @@ public sealed class DevelopmentDataSeeder(
             "Charcoal-grilled marinated chicken with garlic sauce and pickles.",
             180m,
             "/images/menu/grilled-chicken.webp",
-            25),
+            25,
+            displayOrder: 20),
         new(
             SeedIds.KoftaSandwichId,
             SeedIds.SandwichesCategoryId,
@@ -125,7 +127,8 @@ public sealed class DevelopmentDataSeeder(
             "Grilled kofta in baladi bread with tahini and salad.",
             85m,
             "/images/menu/kofta-sandwich.webp",
-            14),
+            14,
+            displayOrder: 10),
         new(
             SeedIds.ShishTawookSandwichId,
             SeedIds.SandwichesCategoryId,
@@ -135,7 +138,8 @@ public sealed class DevelopmentDataSeeder(
             "Grilled shish tawook with garlic sauce and pickled cucumber.",
             78m,
             "/images/menu/shish-sandwich.webp",
-            14),
+            14,
+            displayOrder: 20),
         new(
             SeedIds.HummusId,
             SeedIds.SidesCategoryId,
@@ -145,7 +149,8 @@ public sealed class DevelopmentDataSeeder(
             "Creamy hummus finished with olive oil and paprika.",
             48m,
             "/images/menu/hummus.webp",
-            6),
+            6,
+            displayOrder: 10),
         new(
             SeedIds.FattoushId,
             SeedIds.SidesCategoryId,
@@ -155,7 +160,8 @@ public sealed class DevelopmentDataSeeder(
             "Fresh vegetables and toasted bread with pomegranate molasses.",
             55m,
             "/images/menu/fattoush.webp",
-            8),
+            8,
+            displayOrder: 20),
         new(
             SeedIds.MintLemonadeId,
             SeedIds.DrinksCategoryId,
@@ -165,7 +171,8 @@ public sealed class DevelopmentDataSeeder(
             "Fresh lemon and mint, blended to order.",
             42m,
             "/images/menu/mint-lemonade.webp",
-            5),
+            5,
+            displayOrder: 10),
         new(
             SeedIds.TamarindId,
             SeedIds.DrinksCategoryId,
@@ -176,6 +183,7 @@ public sealed class DevelopmentDataSeeder(
             35m,
             "/images/menu/tamarind.webp",
             3,
+            displayOrder: 20,
             isAvailable: false),
     ];
 

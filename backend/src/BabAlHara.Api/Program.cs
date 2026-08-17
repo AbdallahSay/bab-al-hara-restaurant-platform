@@ -139,6 +139,14 @@ builder.Services
                 .RequireRole(
                     DevelopmentDataSeeder.DriverRole,
                     DevelopmentDataSeeder.ManagerRole,
+                    DevelopmentDataSeeder.AdminRole))
+    .AddPolicy(
+        AuthorizationPolicies.Management,
+        policy =>
+            policy
+                .RequireAuthenticatedUser()
+                .RequireRole(
+                    DevelopmentDataSeeder.ManagerRole,
                     DevelopmentDataSeeder.AdminRole));
 
 //
@@ -398,6 +406,8 @@ app.MapHealthChecks(
 app.MapSecurityEndpoints();
 
 app.MapCatalogEndpoints();
+
+app.MapManagementCatalogEndpoints();
 
 app.MapOrderEndpoints();
 
