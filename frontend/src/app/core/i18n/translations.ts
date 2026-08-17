@@ -107,6 +107,7 @@ export interface UiCopy {
     readonly priceUpdated: string;
     readonly newOrder: string;
     readonly missing: string;
+    readonly trackOrder: string;
   };
   readonly staff: {
     readonly title: string;
@@ -292,6 +293,34 @@ export interface UiCopy {
     readonly searchOrders: string;
     readonly status: Readonly<Record<string, string>>;
   };
+  readonly orderTracking: {
+    readonly title: string;
+    readonly orderCode: string;
+    readonly status: string;
+    readonly lastUpdated: string;
+    readonly orderSummary: string;
+    readonly orderItems: string;
+    readonly deliveryAddress: string;
+    readonly payment: string;
+    readonly orderTotal: string;
+    readonly showDetails: string;
+    readonly hideDetails: string;
+    readonly loading: string;
+    readonly error: string;
+    readonly retry: string;
+    readonly reconnecting: string;
+    readonly connected: string;
+    readonly noCredential: string;
+    readonly steps: {
+      readonly pending: string;
+      readonly confirmed: string;
+      readonly preparing: string;
+      readonly readyDelivery: string;
+      readonly readyTakeaway: string;
+      readonly onTheWay: string;
+      readonly delivered: string;
+    };
+  };
 }
 
 export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
@@ -402,6 +431,7 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       priceUpdated: 'تم تحديث السعر إلى القيمة الحالية قبل تأكيد الطلب.',
       newOrder: 'اطلب مرة أخرى',
       missing: 'لا يوجد طلب مؤكد لعرضه.',
+      trackOrder: 'تتبع طلبك',
     },
     staff: {
       title: 'دخول المطبخ',
@@ -533,7 +563,6 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       statusOnTheWay: 'في الطريق',
       statusDelivered: 'تم التسليم',
     },
-
     driver: {
       title: 'شاشة السائق',
       assignedOrders: 'طلبات التوصيل المسندة',
@@ -600,6 +629,34 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         Ready: 'جاهز للاستلام',
         OnTheWay: 'في الطريق للتوصيل',
         Delivered: 'تم التسليم',
+      },
+    },
+    orderTracking: {
+      title: 'تتبع طلبك',
+      orderCode: 'رقم الطلب',
+      status: 'الحالة',
+      lastUpdated: 'آخر تحديث',
+      orderSummary: 'ملخص الطلب',
+      orderItems: 'عناصر الطلب',
+      deliveryAddress: 'عنوان التوصيل',
+      payment: 'الدفع',
+      orderTotal: 'إجمالي الطلب',
+      showDetails: 'عرض التفاصيل',
+      hideDetails: 'إخفاء التفاصيل',
+      loading: 'جاري التحميل…',
+      error: 'تعذر تحميل بيانات التتبع. يرجى المحاولة مرة أخرى.',
+      retry: 'إعادة المحاولة',
+      reconnecting: 'جاري إعادة الاتصال…',
+      connected: 'متصل',
+      noCredential: 'التتبع متاح فقط من الجهاز والمتصفح الذي تم إجراء الطلب منه.',
+      steps: {
+        pending: 'استلمنا طلبك',
+        confirmed: 'تم تأكيد طلبك',
+        preparing: 'المطبخ بيجهز طلبك',
+        readyDelivery: 'طلبك جاهز وينتظر بدء التوصيل',
+        readyTakeaway: 'طلبك جاهز للاستلام',
+        onTheWay: 'طلبك في الطريق',
+        delivered: 'تم تسليم طلبك',
       },
     },
   },
@@ -711,6 +768,7 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       priceUpdated: 'The total was updated to current prices before confirmation.',
       newOrder: 'Start another order',
       missing: 'There is no confirmed order to display.',
+      trackOrder: 'Track your order',
     },
     staff: {
       title: 'Kitchen sign in',
@@ -911,6 +969,35 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         Ready: 'Ready for pickup',
         OnTheWay: 'On the way',
         Delivered: 'Delivered',
+      },
+    },
+    orderTracking: {
+      title: 'Track Your Order',
+      orderCode: 'Order Code',
+      status: 'Status',
+      lastUpdated: 'Last updated',
+      orderSummary: 'Order Summary',
+      orderItems: 'Order Items',
+      deliveryAddress: 'Delivery Address',
+      payment: 'Payment',
+      orderTotal: 'Order Total',
+      showDetails: 'Show Details',
+      hideDetails: 'Hide Details',
+      loading: 'Loading...',
+      error: 'Failed to load order details',
+      retry: 'Retry',
+      reconnecting: 'Reconnecting...',
+      connected: 'Connected',
+      noCredential:
+        'Tracking is only available from the device and browser that placed this order.',
+      steps: {
+        pending: 'We received your order',
+        confirmed: 'Your order is confirmed',
+        preparing: 'The kitchen is preparing your order',
+        readyDelivery: 'Your order is ready, awaiting delivery',
+        readyTakeaway: 'Your order is ready for pickup',
+        onTheWay: 'Your order is on the way',
+        delivered: 'Your order has been delivered',
       },
     },
   },

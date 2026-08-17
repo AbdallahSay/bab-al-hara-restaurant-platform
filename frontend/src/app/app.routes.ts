@@ -30,6 +30,12 @@ export const routes: Routes = [
     title: 'Order confirmed | Bab Al Hara',
   },
   {
+    path: 'order/:publicCode/track',
+    loadComponent: () =>
+      import('./features/order-tracking/order-tracking-page').then((m) => m.OrderTrackingPage),
+    title: 'Track your order | Bab Al Hara',
+  },
+  {
     path: 'kitchen/sign-in',
     loadComponent: () =>
       import('./features/kitchen/staff-sign-in-page').then(

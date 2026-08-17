@@ -1,0 +1,154 @@
+<app-customer-header />
+
+<main class="tracking-shell">
+  @if (state() === 'loading') {
+    <div class="tracking-card tracking-card--centered" role="status" aria-live="polite">
+      <span class="spinner" aria-hidden="true"></span>
+      <p>{{ copy().orderTracking.loading }}</p>
+    </div>
+  }
+
+  @if (state() === 'no-credential') {
+    <div class="tracking-card tracking-card--centered" role="alert">
+      <span class="state-icon" aria-hidden="true">🔒</span>
+      <p class="state-message">{{ copy().orderTracking.noCredential }}</p>
+      <a class="button button--primary" routerLink="/">{{ copy().common.backToMenu }}</a>
+    </div>
+  }
+
+  @if (state() === 'error') {
+    <div class="tracking-card tracking-card--centered" role="alert">
+      <span class="state-icon" aria-hidden="true">⚠️</span>
+      <p class="state-message">{{ copy().orderTracking.error }}</p>
+      <button class="button button--primary" (click)="loadTracking()">
+        {{ copy().orderTracking.retry }}
+      </button>
+    </div>
+  }
+
+  @if (state() === 'loaded') {
+    @let t = tracking()!;
+
+    <!-- Connectivity Banner -->
+    @if (isReconnecting()) {
+      <div class="connectivity-banner" role="status" aria-live="polite">
+        <span class="connectivity-banner__dot" aria-hidden="true"></span>
+        {{ copy().orderTracking.reconnecting }}
+      </div>
+    }
+
+    <!-- Status Panel -->
+    <section class="tracking-card status-panel" aria-labelledby="status-heading" aria-live="polite">
+      <p class="order-code-label">{{ copy().orderTracking.orderCode }}</p>
+      <p class="order-code" dir="ltr">{{ t.publicCode }}</p>
+      <div class="status-badge" [attr.data-status]="t.status">
+        <span class="status-icon" aria-hidden="true">
+          @if (t.status === 'Delivered') {
+            ✓
+          } @else if (t.status === 'OnTheWay') {
+            🚗
+          } @else if (t.status === 'Ready') {
+            🍽️
+          } @else if (t.status === 'Preparing') {
+            👨‍🍳
+          } @else {
+            ⏳
+          }
+        </span>
+        <h1 id="status-heading" class="status-wording">{{ statusWording() }}</h1>
+      </div>
+      <p class="last-updated">
+        <span class="last-updated__label">{{ copy().orderTracking.lastUpdated }}: </span>
+        <time [dateTime]="t.lastUpdatedAt">{{ formatDate(t.lastUpdatedAt) }}</time>
+      </p>
+    </section>
+
+    <!-- Status Stepper -->
+    <section class="tracking-card stepper-card" aria-label="Order progress">
+      <ol class="stepper" role="list">
+        @for (step of currentSteps(); track step.key) {
+          @let sc = getStepClass(step.key, t.status, t.statusTimeline);
+          <li
+            class="stepper__step stepper__step--{{ sc }}"
+            [attr.aria-current]="sc === 'current' ? 'step' : null"
+          >
+            <span class="stepper__icon" aria-hidden="true">
+              @if (sc === 'completed') {
+                ✓
+              } @else if (sc === 'current') {
+                ●
+              } @else {
+                ○
+              }
+            </span>
+            <span class="stepper__label">{{ step.label() }}</span>
+          </li>
+        }
+      </ol>
+    </section>
+
+    <!-- Order Summary -->
+    <section class="tracking-card summary-card">
+      <button
+        class="summary-toggle"
+        [attr.aria-expanded]="summaryOpen()"
+        (click)="toggleSummary()"
+        type="button"
+      >
+        <span>{{ copy().orderTracking.orderSummary }}</span>
+        <span
+          class="summary-toggle__chevron"
+          [class.summary-toggle__chevron--open]="summaryOpen()"
+          aria-hidden="true"
+          >▼</span
+        >
+      </button>
+
+      @if (summaryOpen()) {
+        <div class="summary-body">
+          <ul class="item-list" aria-label="{{ copy().orderTracking.orderSummary }}">
+            @for (item of t.items; track item.productNameAr) {
+              <li class="item-row">
+                <span class="item-name">
+                  {{ localizedText(item.productNameAr, item.productNameEn) }}
+                </span>
+                <span class="item-qty">{{ item.quantity }}×</span>
+                <span class="item-price" dir="ltr">{{ formatMoney(item.lineTotal) }}</span>
+              </li>
+            }
+          </ul>
+
+          <dl class="summary-totals">
+            <div>
+              <dt>{{ copy().common.subtotal }}</dt>
+              <dd dir="ltr">{{ formatMoney(t.subtotal) }}</dd>
+            </div>
+            @if (t.orderType === 'Delivery') {
+              <div>
+                <dt>{{ copy().common.deliveryFee }}</dt>
+                <dd dir="ltr">{{ formatMoney(t.deliveryFee) }}</dd>
+              </div>
+            }
+            <div class="summary-totals__total">
+              <dt>{{ copy().common.total }}</dt>
+              <dd dir="ltr">{{ formatMoney(t.total) }}</dd>
+            </div>
+          </dl>
+
+          @if (t.orderType === 'Delivery' && t.address) {
+            <dl class="summary-meta">
+              <div>
+                <dt>{{ copy().orderTracking.orderSummary }}</dt>
+                <dd>{{ localizedText(t.deliveryAreaNameAr, t.deliveryAreaNameEn) }}</dd>
+              </div>
+              <div>
+                <dt>{{ copy().common.delivery }}</dt>
+                <dd>{{ t.address }}</dd>
+              </div>
+            </dl>
+          }
+        </div>
+      }
+    </section>
+  }
+</main>

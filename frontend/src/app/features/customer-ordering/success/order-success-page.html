@@ -53,7 +53,13 @@
             : copy().success.deliveryMessage
         }}
       </p>
-      <a class="button button--primary button--wide" routerLink="/">
+      <a
+        class="button button--primary button--wide"
+        [routerLink]="['/order', confirmed.order.publicCode, 'track']"
+      >
+        {{ copy().success.trackOrder }}
+      </a>
+      <a class="button button--secondary button--wide" routerLink="/">
         {{ copy().success.newOrder }}
       </a>
     </section>
