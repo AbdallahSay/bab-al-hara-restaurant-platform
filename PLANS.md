@@ -103,21 +103,33 @@ Customer sees server-authoritative status progression.
 
 ## Phase 5 — Cashier
 
-- ready/current queues
-- cash confirmation
-- takeaway verification/handoff
-- driver availability
-- driver assignment
-- tests and permission enforcement
+Status: COMPLETE — 2026-08-17
+
+Delivered:
+- Compact operational queues with fast scan time (<2s)
+- Live operational metrics strip (Ready count, Takeaway queue, Delivery queue, Cash to collect)
+- Immediate search & 1-tap queue filters (All, Ready for Pickup, Waiting for Driver)
+- Progressive details disclosure (collapsible item drawers, global expand/collapse)
+- 3-tier aging alerts (normal, attention 10m+, overdue 20m+)
+- Takeaway handover action with confirmation modal and payment collection verification
+- Driver assignment workflows with concurrency/409 handling
+- Real-time SignalR live order updates and Web Audio alert chime
+- Bilingual Arabic RTL and English LTR support
 
 ## Phase 6 — Driver
 
-- assigned orders mobile UI
-- call/map actions
-- start delivery
-- mark delivered
-- customer status update
-- tests
+Status: COMPLETE — 2026-08-17
+
+Delivered:
+- Mobile-first driver operational portal (360-430px) and centered desktop workspace
+- Current active order visual dominance with grouped customer contact & delivery address
+- One-tap phone call integration with large touch targets (>= 48px)
+- High-contrast COD banner ("Cash on Delivery: XX.XX EGP" vs "Prepaid Online")
+- Single dominant primary action (`Start Delivery` -> `Mark Delivered`)
+- Confirmation dialog with explicit cash collection reminder
+- SignalR real-time updates and reconnection handling
+- Stale state / 409 conflict recovery
+- Bilingual Arabic RTL and English LTR support
 
 ## Phase 7 — Management/Admin
 
