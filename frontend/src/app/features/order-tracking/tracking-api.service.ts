@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -8,8 +8,10 @@ import { CustomerOrderTracking } from './order-tracking.models';
 export class TrackingApiService {
   private readonly http = inject(HttpClient);
 
-  getTracking(publicCode: string, token: string): Observable<CustomerOrderTracking> {
-    const headers = new HttpHeaders({ 'X-Tracking-Token': token });
-    return this.http.get<CustomerOrderTracking>(`/api/orders/track/${publicCode}`, { headers });
+  getTracking(publicCode: string): Observable<CustomerOrderTracking> {
+    return this.http.get<CustomerOrderTracking>(
+      `/api/orders/track/${encodeURIComponent(publicCode)}`,
+      { withCredentials: true },
+    );
   }
 }

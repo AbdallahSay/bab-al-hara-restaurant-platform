@@ -13,17 +13,21 @@ export class TrackingHubService implements OnDestroy {
   readonly trackingUpdate$ = new Subject<CustomerOrderTracking>();
   readonly reconnected$ = new Subject<void>();
 
-  async startConnection(token: string): Promise<void> {
-    this.connection = new HubConnectionBuilder()
-      .withUrl('/hubs/order-tracking', { accessTokenFactory: () => token })
-      .withAutomaticReconnect()
-      .build();
+  async startConnection(publicCode: string): Promise<void> {
+    if (this.connection) {
+      await this.stopConnection();
+    }
+
+    const hubUrl = `/hubs/order-tracking?publicCode=${encodeURIComponent(publicCode)}`;
+
+    this.connection = new HubConnectionBuilder().withUrl(hubUrl).withAutomaticReconnect().build();
 
     this.connection.on('OrderTrackingUpdated', (data: CustomerOrderTracking) => {
       this.trackingUpdate$.next(data);
     });
 
     this.connection.onreconnected(() => {
+      this.connectionState$.next(HubConnectionState.Connected);
       this.reconnected$.next();
     });
 
@@ -35,13 +39,24 @@ export class TrackingHubService implements OnDestroy {
       this.connectionState$.next(HubConnectionState.Reconnecting);
     });
 
-    await this.connection.start();
-    this.connectionState$.next(HubConnectionState.Connected);
+    try {
+      await this.connection.start();
+      this.connectionState$.next(HubConnectionState.Connected);
+    } catch {
+      this.connectionState$.next(HubConnectionState.Disconnected);
+    }
   }
 
   async stopConnection(): Promise<void> {
-    await this.connection?.stop();
-    this.connection = null;
+    if (this.connection) {
+      try {
+        await this.connection.stop();
+      } catch {
+        // Safe cleanup
+      }
+      this.connection = null;
+      this.connectionState$.next(HubConnectionState.Disconnected);
+    }
   }
 
   ngOnDestroy(): void {

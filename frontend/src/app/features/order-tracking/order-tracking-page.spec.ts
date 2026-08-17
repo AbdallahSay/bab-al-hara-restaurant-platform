@@ -6,12 +6,9 @@ import { HubConnectionState } from '@microsoft/signalr';
 import { CustomerOrderTracking } from './order-tracking.models';
 import { OrderTrackingPage } from './order-tracking-page';
 import { TrackingApiService } from './tracking-api.service';
-import { TrackingCredentialService } from './tracking-credential.service';
 import { TrackingHubService } from './tracking-hub.service';
 
 describe('OrderTrackingPage', () => {
-  let credentialService: TrackingCredentialService;
-
   const mockDeliveryTracking: CustomerOrderTracking = {
     publicCode: 'BH-DELIV-99',
     status: 'Preparing',
@@ -72,11 +69,11 @@ describe('OrderTrackingPage', () => {
   };
 
   class MockTrackingApiService {
-    getTrackingHandler: (code: string, token: string) => Observable<CustomerOrderTracking> = () =>
+    getTrackingHandler: (code: string) => Observable<CustomerOrderTracking> = () =>
       of(mockDeliveryTracking);
 
-    getTracking(code: string, token: string): Observable<CustomerOrderTracking> {
-      return this.getTrackingHandler(code, token);
+    getTracking(code: string): Observable<CustomerOrderTracking> {
+      return this.getTrackingHandler(code);
     }
   }
 
@@ -96,10 +93,6 @@ describe('OrderTrackingPage', () => {
     }
   }
 
-  afterEach(() => {
-    sessionStorage.clear();
-  });
-
   async function createTestFixture(
     publicCode: string,
     apiService: MockTrackingApiService,
@@ -118,53 +111,33 @@ describe('OrderTrackingPage', () => {
           },
         },
         { provide: TrackingApiService, useValue: apiService },
-        { provide: TrackingHubService, useValue: hubService },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(OrderTrackingPage, {
+        set: {
+          providers: [{ provide: TrackingHubService, useValue: hubService }],
+        },
+      })
+      .compileComponents();
 
-    credentialService = TestBed.inject(TrackingCredentialService);
     return TestBed.createComponent(OrderTrackingPage);
   }
 
-  it('shows no-credential state when token is not in sessionStorage', async () => {
-    const api = new MockTrackingApiService();
-    const hub = new MockTrackingHubService();
-    let apiCalled = false;
-    api.getTrackingHandler = () => {
-      apiCalled = true;
-      return of(mockDeliveryTracking);
-    };
-
-    const fixture = await createTestFixture('BH-DELIV-99', api, hub);
-    fixture.detectChanges();
-
-    const element = fixture.nativeElement as HTMLElement;
-    expect(element.textContent).toContain('التتبع متاح فقط من الجهاز');
-    expect(apiCalled).toBe(false);
-  });
-
-  it('loads and renders delivery tracking details when credential exists', async () => {
+  it('loads and renders delivery tracking details automatically using cookie capability', async () => {
     const api = new MockTrackingApiService();
     const hub = new MockTrackingHubService();
     api.getTrackingHandler = () => of(mockDeliveryTracking);
 
     const fixture = await createTestFixture('BH-DELIV-99', api, hub);
-    credentialService.store('BH-DELIV-99', 'valid-token-abc');
-
-    // Re-init with credential present
-    fixture.componentInstance.ngOnInit();
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
     expect(element.textContent).toContain('BH-DELIV-99');
     expect(element.textContent).toContain('المطبخ بيجهز طلبك');
 
-    // Stepper checks: Delivery has OnTheWay step
+    // Stepper checks: Delivery has 6 steps including OnTheWay
     const steps = element.querySelectorAll('.stepper__step');
-    expect(steps.length).toBe(6); // Pending, Confirmed, Preparing, Ready, OnTheWay, Delivered
-
-    // Token security: raw token must NOT be in DOM
-    expect(element.innerHTML).not.toContain('valid-token-abc');
+    expect(steps.length).toBe(6);
   });
 
   it('renders takeaway stepper without OnTheWay step', async () => {
@@ -174,9 +147,6 @@ describe('OrderTrackingPage', () => {
     api.getTrackingHandler = () => of(mockTakeawayTracking);
 
     const fixture = await createTestFixture('BH-TAKE-88', api, hub);
-    credentialService.store('BH-TAKE-88', 'valid-takeaway-token');
-
-    fixture.componentInstance.ngOnInit();
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
@@ -188,19 +158,62 @@ describe('OrderTrackingPage', () => {
     expect(element.textContent).not.toContain('في الطريق');
   });
 
-  it('shows error state when API fails', async () => {
+  it('shows error state when API fails or unauthorized', async () => {
     TestBed.resetTestingModule();
     const api = new MockTrackingApiService();
     const hub = new MockTrackingHubService();
-    api.getTrackingHandler = () => throwError(() => new Error('Network error'));
+    api.getTrackingHandler = () => throwError(() => new Error('401 Unauthorized'));
 
     const fixture = await createTestFixture('BH-DELIV-99', api, hub);
-    credentialService.store('BH-DELIV-99', 'valid-token-abc');
-
-    fixture.componentInstance.ngOnInit();
     fixture.detectChanges();
 
     const element = fixture.nativeElement as HTMLElement;
     expect(element.textContent).toContain('تعذر تحميل بيانات التتبع');
+  });
+
+  it('refetches tracking data on realtime reconnect', async () => {
+    TestBed.resetTestingModule();
+    const api = new MockTrackingApiService();
+    const hub = new MockTrackingHubService();
+    let callCount = 0;
+    api.getTrackingHandler = () => {
+      callCount++;
+      return of(mockDeliveryTracking);
+    };
+
+    const fixture = await createTestFixture('BH-DELIV-99', api, hub);
+    fixture.detectChanges();
+    await Promise.resolve();
+    expect(callCount).toBe(1);
+
+    hub.reconnected$.next();
+    await Promise.resolve();
+    expect(callCount).toBe(2);
+  });
+
+  it('updates tracking data dynamically when hub emits update', async () => {
+    TestBed.resetTestingModule();
+    const api = new MockTrackingApiService();
+    const hub = new MockTrackingHubService();
+    api.getTrackingHandler = () => of(mockDeliveryTracking);
+
+    const fixture = await createTestFixture('BH-DELIV-99', api, hub);
+    fixture.detectChanges();
+    await Promise.resolve();
+
+    const updatedTracking: CustomerOrderTracking = {
+      ...mockDeliveryTracking,
+      status: 'OnTheWay',
+      statusTimeline: [
+        ...mockDeliveryTracking.statusTimeline,
+        { status: 'OnTheWay', changedAt: '2026-08-17T10:15:00Z' },
+      ],
+    };
+
+    hub.trackingUpdate$.next(updatedTracking);
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.textContent).toContain('طلبك في الطريق');
   });
 });

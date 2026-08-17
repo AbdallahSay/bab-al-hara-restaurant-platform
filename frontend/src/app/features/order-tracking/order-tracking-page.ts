@@ -16,9 +16,7 @@ import { formatMoney, localizedText } from '../../core/i18n/formatters';
 import { LanguageService } from '../../core/i18n/language.service';
 import { CustomerHeader } from '../../shared/customer-header/customer-header';
 import { CustomerOrderTracking, OrderStatus, OrderType } from './order-tracking.models';
-
 import { TrackingApiService } from './tracking-api.service';
-import { TrackingCredentialService } from './tracking-credential.service';
 import { TrackingHubService } from './tracking-hub.service';
 
 type PageState = 'loading' | 'no-credential' | 'error' | 'loaded';
@@ -38,13 +36,11 @@ interface StepDef {
 })
 export class OrderTrackingPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
-  private readonly credentials = inject(TrackingCredentialService);
   private readonly api = inject(TrackingApiService);
   protected readonly hub = inject(TrackingHubService);
   protected readonly HubConnectionState = HubConnectionState;
   private readonly destroyRef = inject(DestroyRef);
   private publicCode = '';
-  private token = '';
 
   protected readonly language = inject(LanguageService);
   protected readonly copy = this.language.copy;
@@ -104,10 +100,9 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.publicCode = this.route.snapshot.params['publicCode'] as string;
-    this.token = this.credentials.getToken(this.publicCode) ?? '';
+    this.publicCode = (this.route.snapshot.params['publicCode'] as string | undefined) ?? '';
 
-    if (!this.token) {
+    if (!this.publicCode) {
       this.state.set('no-credential');
       return;
     }
@@ -122,7 +117,7 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
   protected loadTracking(): void {
     this.state.set('loading');
     this.api
-      .getTracking(this.publicCode, this.token)
+      .getTracking(this.publicCode)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
@@ -184,10 +179,9 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
 
   private async connectHub(): Promise<void> {
     try {
-      await this.hub.startConnection(this.token);
+      await this.hub.startConnection(this.publicCode);
     } catch {
-      // Hub failure is non-fatal — REST polling would be the fallback.
-      // The connectivity banner covers transient disconnects.
+      // Hub failure is non-fatal — REST polling or reload provides fallback.
       return;
     }
 
@@ -197,7 +191,7 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
 
     this.hub.reconnected$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.api
-        .getTracking(this.publicCode, this.token)
+        .getTracking(this.publicCode)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (data) => this.tracking.set(data),
