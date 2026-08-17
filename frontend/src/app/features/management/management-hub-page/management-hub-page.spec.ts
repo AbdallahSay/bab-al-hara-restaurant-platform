@@ -16,7 +16,10 @@ describe('ManagementHubPage', () => {
     getMenuItems: ReturnType<typeof vi.fn>;
     getRestaurantControlStatus: ReturnType<typeof vi.fn>;
   };
-  let sessionMock: { signOut: ReturnType<typeof vi.fn> };
+  let sessionMock: {
+    signOut: ReturnType<typeof vi.fn>;
+    signOutManagement: ReturnType<typeof vi.fn>;
+  };
 
   const MOCK_CATEGORIES: CategoryManagementDto[] = [
     {
