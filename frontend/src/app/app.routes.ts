@@ -74,5 +74,37 @@ export const routes: Routes = [
       import('./features/driver/driver-page').then((component) => component.DriverPage),
     title: 'Driver | Bab Al Hara',
   },
+  {
+    path: 'management/sign-in',
+    loadComponent: () =>
+      import('./features/management/management-sign-in-page/management-sign-in-page').then(
+        (m) => m.ManagementSignInPage,
+      ),
+    title: 'Management Sign In | Bab Al Hara',
+  },
+  {
+    path: 'management',
+    canActivate: [
+      () =>
+        import('./features/management/management-auth.guard').then((m) => m.managementAuthGuard),
+    ],
+    loadComponent: () =>
+      import('./features/management/management-hub-page/management-hub-page').then(
+        (m) => m.ManagementHubPage,
+      ),
+    title: 'Management Hub | Bab Al Hara',
+  },
+  {
+    path: 'management/menu',
+    canActivate: [
+      () =>
+        import('./features/management/management-auth.guard').then((m) => m.managementAuthGuard),
+    ],
+    loadComponent: () =>
+      import('./features/management/management-menu-page/management-menu-page').then(
+        (m) => m.ManagementMenuPage,
+      ),
+    title: 'Menu Management | Bab Al Hara',
+  },
   { path: '**', redirectTo: '' },
 ];

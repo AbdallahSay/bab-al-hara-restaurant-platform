@@ -1,0 +1,136 @@
+<div class="status-card" [class.is-paused]="!form.controls.acceptingOrders.value">
+  <div class="card-header">
+    <div class="header-titles">
+      <h2 class="card-title">{{ copy().management.restaurantControl.title }}</h2>
+      <p class="card-subtitle">{{ copy().management.restaurantControl.subtitle }}</p>
+    </div>
+    @if (!loading()) {
+      <div
+        class="live-badge"
+        [class.is-open]="form.controls.acceptingOrders.value"
+        [class.is-paused]="!form.controls.acceptingOrders.value"
+      >
+        <span class="badge-dot" aria-hidden="true"></span>
+        <span>
+          {{
+            form.controls.acceptingOrders.value
+              ? copy().management.restaurantControl.openBadge
+              : copy().management.restaurantControl.pausedBadge
+          }}
+        </span>
+      </div>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="card-loading" role="status">
+      <div class="skeleton-toggle"></div>
+      <div class="skeleton-field"></div>
+      <div class="skeleton-field"></div>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="save()" class="status-form">
+      @if (error()) {
+        <div class="alert alert-error" role="alert">
+          <span class="alert-icon" aria-hidden="true">⚠️</span>
+          <div class="alert-content">
+            <p>{{ error() }}</p>
+            @if (error() === copy().management.restaurantControl.staleError) {
+              <button type="button" class="btn-link" (click)="loadStatus()">
+                {{ copy().management.restaurantControl.refreshPrompt }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="alert alert-success" role="status">
+          <span class="alert-icon" aria-hidden="true">✓</span>
+          <p>{{ successMessage() }}</p>
+        </div>
+      }
+
+      <div class="toggle-container">
+        <label class="switch-label" for="accepting-orders-toggle">
+          <span class="switch-title">{{
+            copy().management.restaurantControl.acceptingOrders
+          }}</span>
+          <span class="switch-help">
+            {{
+              form.controls.acceptingOrders.value
+                ? copy().management.restaurantControl.openBadge
+                : copy().management.restaurantControl.pausedBadge
+            }}
+          </span>
+        </label>
+        <label class="toggle-switch">
+          <input
+            id="accepting-orders-toggle"
+            type="checkbox"
+            formControlName="acceptingOrders"
+            role="switch"
+            [attr.aria-checked]="form.controls.acceptingOrders.value"
+          />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="messages-section" [class.is-collapsed]="form.controls.acceptingOrders.value">
+        <div class="form-group">
+          <div class="label-row">
+            <label for="pause-msg-ar">{{
+              copy().management.restaurantControl.pauseMessageAr
+            }}</label>
+            <span class="char-counter"> {{ form.controls.pauseMessageAr.value.length }}/300 </span>
+          </div>
+          <textarea
+            id="pause-msg-ar"
+            formControlName="pauseMessageAr"
+            rows="2"
+            dir="rtl"
+            [placeholder]="copy().management.restaurantControl.pauseMessageArPlaceholder"
+            maxlength="300"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="pause-msg-en">{{
+              copy().management.restaurantControl.pauseMessageEn
+            }}</label>
+            <span class="char-counter"> {{ form.controls.pauseMessageEn.value.length }}/300 </span>
+          </div>
+          <textarea
+            id="pause-msg-en"
+            formControlName="pauseMessageEn"
+            rows="2"
+            dir="ltr"
+            [placeholder]="copy().management.restaurantControl.pauseMessageEnPlaceholder"
+            maxlength="300"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        @if (currentStatus()?.updatedAtUtc) {
+          <div class="metadata-info">
+            <span class="meta-label">{{ copy().management.restaurantControl.lastUpdated }}:</span>
+            <span class="meta-value">{{ currentStatus()?.updatedAtUtc }}</span>
+            @if (currentStatus()?.updatedByStaffDisplayName) {
+              <span class="meta-updater">({{ currentStatus()?.updatedByStaffDisplayName }})</span>
+            }
+          </div>
+        }
+        <button type="submit" class="btn btn-primary" [disabled]="saving() || form.invalid">
+          @if (saving()) {
+            <span class="btn-spinner" aria-hidden="true"></span>
+            <span>{{ copy().management.restaurantControl.saving }}</span>
+          } @else {
+            <span>{{ copy().management.restaurantControl.saveButton }}</span>
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>
