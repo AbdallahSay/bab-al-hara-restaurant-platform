@@ -9,106 +9,69 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { interval } from 'rxjs';
 
 import { localizedText } from '../../core/i18n/formatters';
 import { LanguageService } from '../../core/i18n/language.service';
 import { Language } from '../../core/i18n/translations';
-import { OrderStatus } from '../customer-ordering/order.models';
-import { StaffSessionService } from '../kitchen/staff-session.service';
 import { DriverApiService } from './driver-api.service';
-import { DriverHubService } from './driver-hub.service';
-import { DriverOrderDto, DriverOrderItem } from './driver.models';
+import { DriverHubEvent, DriverHubService } from './driver-hub.service';
+import { DriverOrderDto, DriverOrderItemDto, DriverOrderStatus } from './driver.models';
+import { StaffSessionService } from '../kitchen/staff-session.service';
 
-type QueueState = 'loading' | 'ready' | 'error';
-type FilterStatus = 'ALL' | 'Ready' | 'OnTheWay' | 'Delivered';
+export type PageState = 'loading' | 'ready' | 'error';
 
-interface PendingAction {
+export interface ConfirmationState {
+  readonly orderId: string;
+  readonly type: 'start-delivery' | 'mark-delivered';
   readonly order: DriverOrderDto;
-  readonly actionType: 'startDelivery' | 'markDelivered';
 }
 
 @Component({
   selector: 'app-driver-page',
-  imports: [FormsModule],
   templateUrl: './driver-page.html',
   styleUrl: './driver-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DriverPage implements OnInit, OnDestroy {
   private readonly api = inject(DriverApiService);
-  private readonly hub = inject(DriverHubService);
   private readonly sessions = inject(StaffSessionService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
-  private toastTimer?: ReturnType<typeof setTimeout>;
 
-  protected readonly localizedText = localizedText;
   protected readonly language = inject(LanguageService);
   protected readonly copy = this.language.copy;
-  protected readonly realtime = this.hub;
-  protected readonly state = signal<QueueState>('loading');
+  protected readonly realtime = inject(DriverHubService);
+  protected readonly state = signal<PageState>('loading');
   protected readonly orders = signal<readonly DriverOrderDto[]>([]);
-  protected readonly activeFilter = signal<FilterStatus>('ALL');
-  protected readonly searchQuery = signal('');
-  protected readonly submittingCodes = signal<readonly string[]>([]);
-  protected readonly toastMessage = signal<string | null>(null);
-  protected readonly toastType = signal<'success' | 'warning' | 'error'>('success');
-  protected readonly newAssignmentCode = signal<string | null>(null);
   protected readonly now = signal(Date.now());
-  protected readonly pendingConfirmation = signal<PendingAction | null>(null);
 
-  // Status counts
-  protected readonly allCount = computed(() => this.orders().length);
-  protected readonly readyCount = computed(
-    () => this.orders().filter((o) => o.status === 'Ready').length,
-  );
-  protected readonly onTheWayCount = computed(
-    () => this.orders().filter((o) => o.status === 'OnTheWay').length,
-  );
-  protected readonly deliveredCount = computed(
-    () => this.orders().filter((o) => o.status === 'Delivered').length,
-  );
+  protected readonly inFlightOrders = signal<Set<string>>(new Set());
+  protected readonly staleOrders = signal<Set<string>>(new Set());
+  protected readonly errorOrders = signal<Set<string>>(new Set());
+  protected readonly expandedItems = signal<Set<string>>(new Set());
 
-  protected readonly sortedOrders = computed(() =>
-    [...this.orders()].sort((left, right) => {
-      // Prioritize active orders (Ready, OnTheWay) before Delivered
-      const statusWeight: Record<OrderStatus, number> = {
-        Ready: 1,
-        OnTheWay: 2,
-        Pending: 3,
-        Confirmed: 4,
-        Preparing: 5,
-        Delivered: 6,
-      };
-      const leftWeight = statusWeight[left.status] ?? 99;
-      const rightWeight = statusWeight[right.status] ?? 99;
-      if (leftWeight !== rightWeight) {
-        return leftWeight - rightWeight;
-      }
-      return new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
-    }),
-  );
+  // Modal / prompt confirmation state
+  protected readonly confirmingAction = signal<ConfirmationState | null>(null);
 
-  protected readonly filteredOrders = computed(() => {
-    const filter = this.activeFilter();
-    const query = this.searchQuery().trim().toLowerCase();
-    return this.sortedOrders().filter((order) => {
-      const matchesFilter = filter === 'ALL' || order.status === filter;
-      if (!matchesFilter) return false;
-      if (!query) return true;
-      return (
-        order.publicCode.toLowerCase().includes(query) ||
-        order.customerName.toLowerCase().includes(query) ||
-        order.customerPhone.toLowerCase().includes(query) ||
-        (order.address && order.address.toLowerCase().includes(query)) ||
-        (order.deliveryAreaNameAr && order.deliveryAreaNameAr.toLowerCase().includes(query)) ||
-        (order.deliveryAreaNameEn && order.deliveryAreaNameEn.toLowerCase().includes(query))
-      );
+  protected readonly activeOrders = computed(() => {
+    const list = this.orders().filter((o) => o.status === 'Ready' || o.status === 'OnTheWay');
+    return list.sort((a, b) => {
+      // Prioritize OnTheWay (currently in transit) first, then oldest Ready
+      if (a.status === 'OnTheWay' && b.status !== 'OnTheWay') return -1;
+      if (b.status === 'OnTheWay' && a.status !== 'OnTheWay') return 1;
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     });
   });
+
+  protected readonly completedOrders = computed(() => {
+    const list = this.orders().filter((o) => o.status === 'Delivered');
+    return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  });
+
+  protected readonly activeCount = computed(() => this.activeOrders().length);
+  protected readonly completedCount = computed(() => this.completedOrders().length);
 
   ngOnInit(): void {
     this.sessions
@@ -120,7 +83,7 @@ export class DriverPage implements OnInit, OnDestroy {
             void this.router.navigate(['/driver/sign-in']);
             return;
           }
-          this.initDriverOperations();
+          this.startSync();
         },
         error: () => void this.router.navigate(['/driver/sign-in']),
       });
@@ -131,24 +94,15 @@ export class DriverPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    void this.hub.stop();
-    if (this.toastTimer) {
-      clearTimeout(this.toastTimer);
-    }
+    void this.realtime.stop();
   }
 
   protected setLanguage(language: Language): void {
     this.language.setLanguage(language);
   }
 
-  protected setFilter(filter: FilterStatus): void {
-    this.activeFilter.set(filter);
-  }
-
-  protected loadAssignedOrders(): void {
-    if (this.orders().length === 0) {
-      this.state.set('loading');
-    }
+  protected loadOrders(): void {
+    this.state.set('loading');
     this.api
       .getAssignedOrders()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -156,120 +110,16 @@ export class DriverPage implements OnInit, OnDestroy {
         next: (orders) => {
           this.orders.set(orders);
           this.state.set('ready');
+          this.confirmingAction.set(null);
+          this.inFlightOrders.set(new Set());
+          this.staleOrders.set(new Set());
+          this.errorOrders.set(new Set());
         },
         error: (error: { readonly status?: number }) => {
           if (error.status === 401 || error.status === 403) {
             void this.router.navigate(['/driver/sign-in']);
           } else {
             this.state.set('error');
-          }
-        },
-      });
-  }
-
-  protected isSubmitting(publicCode: string): boolean {
-    return this.submittingCodes().includes(publicCode);
-  }
-
-  protected requestStartDelivery(order: DriverOrderDto): void {
-    if (this.isSubmitting(order.publicCode)) {
-      return;
-    }
-    this.pendingConfirmation.set({ order, actionType: 'startDelivery' });
-  }
-
-  protected requestMarkDelivered(order: DriverOrderDto): void {
-    if (this.isSubmitting(order.publicCode)) {
-      return;
-    }
-    this.pendingConfirmation.set({ order, actionType: 'markDelivered' });
-  }
-
-  protected cancelPendingAction(): void {
-    this.pendingConfirmation.set(null);
-  }
-
-  protected confirmPendingAction(): void {
-    const pending = this.pendingConfirmation();
-    if (!pending) return;
-
-    this.pendingConfirmation.set(null);
-    const { order, actionType } = pending;
-
-    if (actionType === 'startDelivery') {
-      this.executeStartDelivery(order);
-    } else if (actionType === 'markDelivered') {
-      this.executeMarkDelivered(order);
-    }
-  }
-
-  protected executeStartDelivery(order: DriverOrderDto): void {
-    if (this.isSubmitting(order.publicCode)) {
-      return;
-    }
-
-    this.submittingCodes.update((codes) => [...codes, order.publicCode]);
-    const id = order.id ?? order.publicCode;
-    const rowVersion = order.rowVersion ?? '';
-
-    this.api
-      .startDelivery(id, rowVersion)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (result) => {
-          this.clearSubmitting(order.publicCode);
-          if (result && result.order) {
-            this.updateOrderInList(result.order);
-          } else {
-            this.updateOrderStatus(order.publicCode, 'OnTheWay');
-          }
-          this.showToast(this.copy().driver.deliveryStartedSuccess, 'success');
-        },
-        error: (error: { readonly status?: number }) => {
-          this.clearSubmitting(order.publicCode);
-          if (error.status === 409) {
-            this.showToast(this.copy().driver.orderUpdatedByOther, 'warning');
-            this.loadAssignedOrders();
-          } else if (error.status === 401 || error.status === 403) {
-            void this.router.navigate(['/driver/sign-in']);
-          } else {
-            this.showToast(this.copy().driver.actionError, 'error');
-          }
-        },
-      });
-  }
-
-  protected executeMarkDelivered(order: DriverOrderDto): void {
-    if (this.isSubmitting(order.publicCode)) {
-      return;
-    }
-
-    this.submittingCodes.update((codes) => [...codes, order.publicCode]);
-    const id = order.id ?? order.publicCode;
-    const rowVersion = order.rowVersion ?? '';
-
-    this.api
-      .markDelivered(id, rowVersion)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (result) => {
-          this.clearSubmitting(order.publicCode);
-          if (result && result.order) {
-            this.updateOrderInList(result.order);
-          } else {
-            this.updateOrderStatus(order.publicCode, 'Delivered');
-          }
-          this.showToast(this.copy().driver.orderDeliveredSuccess, 'success');
-        },
-        error: (error: { readonly status?: number }) => {
-          this.clearSubmitting(order.publicCode);
-          if (error.status === 409) {
-            this.showToast(this.copy().driver.orderUpdatedByOther, 'warning');
-            this.loadAssignedOrders();
-          } else if (error.status === 401 || error.status === 403) {
-            void this.router.navigate(['/driver/sign-in']);
-          } else {
-            this.showToast(this.copy().driver.actionError, 'error');
           }
         },
       });
@@ -290,15 +140,8 @@ export class DriverPage implements OnInit, OnDestroy {
     );
   }
 
-  protected itemName(item: DriverOrderItem): string {
+  protected itemName(item: DriverOrderItemDto): string {
     return localizedText(this.language.current(), item.productNameAr, item.productNameEn);
-  }
-
-  protected receivedAt(value: string): string {
-    return new Intl.DateTimeFormat(this.language.current() === 'ar' ? 'ar-EG' : 'en-EG', {
-      hour: 'numeric',
-      minute: '2-digit',
-    }).format(new Date(value));
   }
 
   protected elapsedMinutes(value: string): number {
@@ -310,88 +153,170 @@ export class DriverPage implements OnInit, OnDestroy {
     return `${minutes} ${minutes === 1 ? this.copy().driver.minute : this.copy().driver.minutes}`;
   }
 
+  protected statusLabel(status: DriverOrderStatus): string {
+    switch (status) {
+      case 'Ready':
+        return this.copy().driver.statusReady;
+      case 'OnTheWay':
+        return this.copy().driver.statusOnTheWay;
+      case 'Delivered':
+        return this.copy().driver.statusDelivered;
+      default:
+        return status;
+    }
+  }
+
   protected realtimeLabel(): string {
     return this.copy().driver[this.realtime.status()];
   }
 
-  protected formatCurrency(amount: number): string {
-    return `${amount.toFixed(2)} ${this.copy().common.currency}`;
+  protected isCOD(order: DriverOrderDto): boolean {
+    return order.paymentMethod === 'Cash' && order.paymentStatus === 'Pending';
   }
 
-  private clearSubmitting(publicCode: string): void {
-    this.submittingCodes.update((codes) => codes.filter((c) => c !== publicCode));
+  protected isItemsExpanded(orderId: string): boolean {
+    return this.expandedItems().has(orderId);
   }
 
-  private updateOrderInList(updatedOrder: DriverOrderDto): void {
-    this.orders.update((orders) => {
-      const exists = orders.some((o) => o.publicCode === updatedOrder.publicCode);
-      if (exists) {
-        return orders.map((o) => (o.publicCode === updatedOrder.publicCode ? updatedOrder : o));
-      }
-      return [updatedOrder, ...orders];
-    });
-  }
-
-  private updateOrderStatus(publicCode: string, status: OrderStatus): void {
-    this.orders.update((orders) =>
-      orders.map((o) => (o.publicCode === publicCode ? { ...o, status } : o)),
-    );
-  }
-
-  private showToast(message: string, type: 'success' | 'warning' | 'error' = 'success'): void {
-    this.toastMessage.set(message);
-    this.toastType.set(type);
-    if (this.toastTimer) {
-      clearTimeout(this.toastTimer);
+  protected toggleItems(orderId: string): void {
+    const set = new Set(this.expandedItems());
+    if (set.has(orderId)) {
+      set.delete(orderId);
+    } else {
+      set.add(orderId);
     }
-    this.toastTimer = setTimeout(() => {
-      this.toastMessage.set(null);
-    }, 4000);
+    this.expandedItems.set(set);
   }
 
-  private initDriverOperations(): void {
-    this.loadAssignedOrders();
-
-    this.hub.orderAssigned$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((order) => {
-      this.receiveAssignedOrder(order);
+  protected requestStartDelivery(order: DriverOrderDto): void {
+    this.confirmingAction.set({
+      orderId: order.id,
+      type: 'start-delivery',
+      order,
     });
-
-    this.hub.orderStatusChanged$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
-      this.orders.update((orders) =>
-        orders.map((o) =>
-          o.publicCode === event.publicCode
-            ? {
-                ...o,
-                status: event.status ?? o.status,
-                rowVersion: event.rowVersion ?? o.rowVersion,
-              }
-            : o,
-        ),
-      );
-    });
-
-    this.hub.reconnected$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.loadAssignedOrders();
-    });
-
-    void this.hub.start().catch(() => undefined);
   }
 
-  private receiveAssignedOrder(order: DriverOrderDto): void {
-    this.orders.update((orders) => {
-      const withoutExisting = orders.filter(
-        (candidate) => candidate.publicCode !== order.publicCode,
-      );
-      return [order, ...withoutExisting];
+  protected requestMarkDelivered(order: DriverOrderDto): void {
+    this.confirmingAction.set({
+      orderId: order.id,
+      type: 'mark-delivered',
+      order,
     });
-    this.state.set('ready');
-    this.newAssignmentCode.set(order.publicCode);
-    this.showToast(`${this.copy().driver.newAssignment} (#${order.publicCode})`, 'success');
+  }
 
-    globalThis.setTimeout(() => {
-      if (this.newAssignmentCode() === order.publicCode) {
-        this.newAssignmentCode.set(null);
+  protected cancelConfirmation(): void {
+    this.confirmingAction.set(null);
+  }
+
+  protected executeConfirmedAction(): void {
+    const action = this.confirmingAction();
+    if (!action) return;
+
+    const { order, type } = action;
+    if (this.inFlightOrders().has(order.id)) return;
+
+    const inFlight = new Set(this.inFlightOrders());
+    inFlight.add(order.id);
+    this.inFlightOrders.set(inFlight);
+    this.confirmingAction.set(null);
+
+    // Clear previous errors for this order
+    const stales = new Set(this.staleOrders());
+    stales.delete(order.id);
+    this.staleOrders.set(stales);
+
+    const errors = new Set(this.errorOrders());
+    errors.delete(order.id);
+    this.errorOrders.set(errors);
+
+    const apiCall =
+      type === 'start-delivery'
+        ? this.api.startDelivery(order.id, order.rowVersion)
+        : this.api.markDelivered(order.id, order.rowVersion);
+
+    apiCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => {
+      const currentInFlight = new Set(this.inFlightOrders());
+      currentInFlight.delete(order.id);
+      this.inFlightOrders.set(currentInFlight);
+
+      if (result === 'success') {
+        const nextStatus: DriverOrderStatus = type === 'start-delivery' ? 'OnTheWay' : 'Delivered';
+        this.orders.update((list) =>
+          list.map((o) => (o.id === order.id ? { ...o, status: nextStatus } : o)),
+        );
+      } else if (result === 'stale') {
+        const currentStale = new Set(this.staleOrders());
+        currentStale.add(order.id);
+        this.staleOrders.set(currentStale);
+
+        // Auto refresh after delay
+        setTimeout(() => this.loadOrders(), 2500);
+      } else {
+        const currentErrors = new Set(this.errorOrders());
+        currentErrors.add(order.id);
+        this.errorOrders.set(currentErrors);
       }
-    }, 10_000);
+    });
+  }
+
+  private startSync(): void {
+    this.loadOrders();
+
+    this.realtime.orderAssigned$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((payload) => {
+      if (this.isFullDriverOrder(payload)) {
+        this.orders.update((list) => {
+          const exists = list.some((o) => o.id === payload.id);
+          return exists ? list.map((o) => (o.id === payload.id ? payload : o)) : [payload, ...list];
+        });
+      } else {
+        this.loadOrders();
+      }
+    });
+
+    this.realtime.orderStatusChanged$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((payload) => {
+        if (payload && (payload.id || payload.orderId || payload.publicCode)) {
+          const matchId = payload.id ?? payload.orderId;
+          const matchCode = payload.publicCode;
+          const newStatus = payload.newStatus ?? payload.status;
+
+          this.orders.update((list) =>
+            list.map((o) => {
+              if ((matchId && o.id === matchId) || (matchCode && o.publicCode === matchCode)) {
+                return {
+                  ...o,
+                  status: (newStatus ?? o.status) as DriverOrderStatus,
+                  rowVersion: payload.rowVersion ?? o.rowVersion,
+                };
+              }
+              return o;
+            }),
+          );
+        } else {
+          this.loadOrders();
+        }
+      });
+
+    this.realtime.orderCompleted$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((orderId) => {
+      this.orders.update((list) =>
+        list.map((o) => (o.id === orderId ? { ...o, status: 'Delivered' as const } : o)),
+      );
+    });
+
+    this.realtime.reconnected$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadOrders());
+
+    void this.realtime.start().catch(() => undefined);
+  }
+
+  private isFullDriverOrder(order: DriverOrderDto | DriverHubEvent): order is DriverOrderDto {
+    return (
+      typeof (order as DriverOrderDto).id === 'string' &&
+      typeof (order as DriverOrderDto).publicCode === 'string' &&
+      typeof (order as DriverOrderDto).customerName === 'string' &&
+      typeof (order as DriverOrderDto).total === 'number'
+    );
   }
 }

@@ -21,31 +21,53 @@ const MOCK_DRIVERS: DriverSummaryDto[] = [
 const INITIAL_ORDER_TAKEAWAY: CashierOrderDto = {
   id: '1',
   publicCode: 'TAKE1',
-  createdAt: '2026-08-13T18:00:00Z',
+  createdAt: new Date(Date.now() - 5 * 60_000).toISOString(),
   orderType: 'Takeaway',
   status: 'Ready',
-  customerName: 'Ahmed',
+  customerName: 'Ahmed Mahmoud',
   deliveryAreaNameAr: null,
   deliveryAreaNameEn: null,
   address: null,
-  customerNote: null,
-  subtotal: 100,
+  customerNote: 'بدون شطة',
+  subtotal: 150,
   deliveryFee: 0,
-  total: 100,
+  total: 150,
   paymentMethod: 'Cash',
   paymentStatus: 'Pending',
   rowVersion: 'v1',
-  items: [],
+  items: [
+    {
+      productNameAr: 'مشاوي مشكل',
+      productNameEn: 'Mixed Grill',
+      quantity: 2,
+    },
+  ],
 };
 
 const INITIAL_ORDER_DELIVERY_UNASSIGNED: CashierOrderDto = {
-  ...INITIAL_ORDER_TAKEAWAY,
   id: '2',
   publicCode: 'DEL2',
+  createdAt: new Date(Date.now() - 25 * 60_000).toISOString(),
   orderType: 'Delivery',
-  deliveryAreaNameEn: 'Maadi',
+  status: 'Ready',
+  customerName: 'Sara Ali',
   deliveryAreaNameAr: 'المعادي',
-  address: '123 St',
+  deliveryAreaNameEn: 'Maadi',
+  address: 'شارع 9 المعادي',
+  customerNote: null,
+  subtotal: 200,
+  deliveryFee: 25,
+  total: 225,
+  paymentMethod: 'Cash',
+  paymentStatus: 'Paid',
+  rowVersion: 'v2',
+  items: [
+    {
+      productNameAr: 'شاورما دجاج',
+      productNameEn: 'Chicken Shawarma',
+      quantity: 1,
+    },
+  ],
   driverId: null,
   driverName: null,
 };
@@ -56,7 +78,7 @@ const INITIAL_ORDER_DELIVERY_ASSIGNED: CashierOrderDto = {
   publicCode: 'DEL3',
   driverId: 'd1',
   driverName: 'أحمد السائق',
-  driverAssignedAtUtc: '2026-08-13T18:05:00Z',
+  driverAssignedAtUtc: new Date(Date.now() - 10 * 60_000).toISOString(),
 };
 
 describe('CashierPage', () => {
@@ -114,17 +136,16 @@ describe('CashierPage', () => {
 
     // Click confirm
     const confirmYesBtn = fixture.nativeElement.querySelector(
-      '.assignment-confirm .button--primary',
+      '.assignment-confirm .btn-confirm',
     ) as HTMLButtonElement;
     confirmYesBtn.click();
     fixture.detectChanges();
 
-    expect(assignedArgs).toEqual({ orderId: '2', driverId: 'd1', rowVersion: 'v1' });
+    expect(assignedArgs).toEqual({ orderId: '2', driverId: 'd1', rowVersion: 'v2' });
 
     // Order now prominently displays assigned driver and status
     expect(fixture.nativeElement.querySelector('.assigned-driver-card')).toBeTruthy();
     expect(fixture.nativeElement.textContent).toContain('أحمد السائق');
-    // Cashier cannot mark OnTheWay or Delivered (no transition buttons)
     expect(fixture.nativeElement.querySelector('.handoff-button')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.driver-select')).toBeFalsy();
   });
@@ -146,13 +167,12 @@ describe('CashierPage', () => {
     fixture.detectChanges();
 
     const confirmYesBtn = fixture.nativeElement.querySelector(
-      '.assignment-confirm .button--primary',
+      '.assignment-confirm .btn-confirm',
     ) as HTMLButtonElement;
     confirmYesBtn.click();
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.error-text')).toBeTruthy();
-    expect(fixture.nativeElement.textContent).toContain('تم تعديل الطلب من قبل مستخدم آخر');
+    expect(fixture.nativeElement.querySelector('.error-badge--stale')).toBeTruthy();
   });
 
   it('prominently displays assigned driver on already assigned delivery order without driver actions', async () => {
@@ -163,6 +183,164 @@ describe('CashierPage', () => {
     expect(driverCard.textContent).toContain('السائق');
     expect(fixture.nativeElement.querySelector('.handoff-button')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.driver-select')).toBeFalsy();
+  });
+
+  it('filters queue by filter pills', async () => {
+    const { fixture } = await createFixture([
+      INITIAL_ORDER_TAKEAWAY,
+      INITIAL_ORDER_DELIVERY_UNASSIGNED,
+    ]);
+    const filterPills = fixture.nativeElement.querySelectorAll(
+      '.filter-pill',
+    ) as NodeListOf<HTMLButtonElement>;
+
+    // Click Takeaway filter
+    filterPills[1]?.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('TAKE1');
+    expect(fixture.nativeElement.textContent).not.toContain('DEL2');
+
+    // Click Delivery filter
+    filterPills[2]?.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('TAKE1');
+    expect(fixture.nativeElement.textContent).toContain('DEL2');
+
+    // Click All filter
+    filterPills[0]?.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('TAKE1');
+    expect(fixture.nativeElement.textContent).toContain('DEL2');
+  });
+
+  it('filters queue by search query (code, customer name, area)', async () => {
+    const { fixture } = await createFixture([
+      INITIAL_ORDER_TAKEAWAY,
+      INITIAL_ORDER_DELIVERY_UNASSIGNED,
+    ]);
+    const searchInput = fixture.nativeElement.querySelector('.search-input') as HTMLInputElement;
+
+    searchInput.value = 'Sara';
+    searchInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Sara Ali');
+    expect(fixture.nativeElement.textContent).not.toContain('Ahmed Mahmoud');
+
+    const clearButton = fixture.nativeElement.querySelector(
+      '.clear-search-btn',
+    ) as HTMLButtonElement;
+    expect(clearButton).toBeTruthy();
+    clearButton.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Ahmed Mahmoud');
+    expect(fixture.nativeElement.textContent).toContain('Sara Ali');
+  });
+
+  it('toggles item details via progressive disclosure', async () => {
+    const { fixture } = await createFixture([INITIAL_ORDER_TAKEAWAY]);
+    expect(fixture.nativeElement.querySelector('.order-ticket__details')).toBeFalsy();
+
+    const toggleBtn = fixture.nativeElement.querySelector(
+      '.details-toggle-btn',
+    ) as HTMLButtonElement;
+    toggleBtn.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.order-ticket__details')).toBeTruthy();
+    expect(fixture.nativeElement.textContent).toContain('مشاوي مشكل');
+    expect(fixture.nativeElement.textContent).toContain('بدون شطة');
+
+    toggleBtn.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.order-ticket__details')).toBeFalsy();
+  });
+
+  it('toggles all items details via expand/collapse all toolbar button', async () => {
+    const { fixture } = await createFixture([
+      INITIAL_ORDER_TAKEAWAY,
+      INITIAL_ORDER_DELIVERY_UNASSIGNED,
+    ]);
+    expect(fixture.nativeElement.querySelectorAll('.order-ticket__details').length).toBe(0);
+
+    const toggleAllBtn = fixture.nativeElement.querySelector(
+      '.action-toggle-btn',
+    ) as HTMLButtonElement;
+    toggleAllBtn.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('.order-ticket__details').length).toBe(2);
+
+    toggleAllBtn.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.order-ticket__details').length).toBe(0);
+  });
+
+  it('displays aging badges with appropriate urgency styling', async () => {
+    const { fixture } = await createFixture([
+      INITIAL_ORDER_TAKEAWAY,
+      INITIAL_ORDER_DELIVERY_UNASSIGNED,
+    ]);
+    const agingBadges = fixture.nativeElement.querySelectorAll('.aging-badge');
+
+    // Index 0: INITIAL_ORDER_DELIVERY_UNASSIGNED (25m -> overdue)
+    // Index 1: INITIAL_ORDER_TAKEAWAY (5m -> normal)
+    expect(agingBadges[0]?.classList.contains('aging-badge--overdue')).toBe(true);
+    expect(agingBadges[1]?.classList.contains('aging-badge--normal')).toBe(true);
+  });
+
+  it('initiates takeaway handoff, confirms successfully, and removes order', async () => {
+    let completedArgs: { id: string; rowVersion: string } | undefined;
+    const { fixture } = await createFixture([INITIAL_ORDER_TAKEAWAY], MOCK_DRIVERS, {
+      completeCashTakeaway: (id, rowVersion) => {
+        completedArgs = { id, rowVersion };
+        return of('success');
+      },
+    });
+
+    const handoffBtn = fixture.nativeElement.querySelector('.handoff-button') as HTMLButtonElement;
+    handoffBtn.click();
+    fixture.detectChanges();
+
+    const confirmBox = fixture.nativeElement.querySelector('.handoff-confirm');
+    expect(confirmBox).toBeTruthy();
+
+    const confirmBtn = confirmBox.querySelector('.btn-confirm') as HTMLButtonElement;
+    confirmBtn.click();
+    fixture.detectChanges();
+
+    expect(completedArgs).toEqual({ id: '1', rowVersion: 'v1' });
+    expect(fixture.nativeElement.textContent).not.toContain('TAKE1');
+  });
+
+  it('allows canceling takeaway handoff without calling API', async () => {
+    const { fixture } = await createFixture([INITIAL_ORDER_TAKEAWAY]);
+    const handoffBtn = fixture.nativeElement.querySelector('.handoff-button') as HTMLButtonElement;
+    handoffBtn.click();
+    fixture.detectChanges();
+
+    const cancelBtn = fixture.nativeElement.querySelector('.btn-cancel') as HTMLButtonElement;
+    cancelBtn.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.handoff-confirm')).toBeFalsy();
+    expect(fixture.nativeElement.textContent).toContain('TAKE1');
+  });
+
+  it('handles 409 stale data error gracefully with warning message', async () => {
+    const { fixture } = await createFixture([INITIAL_ORDER_TAKEAWAY], MOCK_DRIVERS, {
+      completeCashTakeaway: () => of('stale'),
+    });
+    const handoffBtn = fixture.nativeElement.querySelector('.handoff-button') as HTMLButtonElement;
+    handoffBtn.click();
+    fixture.detectChanges();
+
+    const confirmBtn = fixture.nativeElement.querySelector('.btn-confirm') as HTMLButtonElement;
+    confirmBtn.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.error-badge--stale')).toBeTruthy();
   });
 
   it('SignalR OrderDriverAssigned live updates driver info', async () => {
@@ -222,6 +400,24 @@ describe('CashierPage', () => {
     expect(fixture.nativeElement.textContent).toContain('DEL3');
   });
 
+  it('switches language and reflects translated copy', async () => {
+    const { fixture } = await createFixture([INITIAL_ORDER_TAKEAWAY]);
+    const langBtns = fixture.nativeElement.querySelectorAll(
+      '.language-switcher button',
+    ) as NodeListOf<HTMLButtonElement>;
+
+    // Click English
+    langBtns[1]?.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Cashier');
+    expect(fixture.nativeElement.textContent).toContain('Ready for Pickup');
+
+    // Switch back to Arabic
+    langBtns[0]?.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('الكاشير');
+  });
+
   async function createFixture(
     orders: readonly CashierOrderDto[],
     drivers: readonly DriverSummaryDto[] = MOCK_DRIVERS,
@@ -238,7 +434,10 @@ describe('CashierPage', () => {
         provideRouter([]),
         {
           provide: StaffSessionService,
-          useValue: { getSession: () => of({ isAuthenticated: true }) },
+          useValue: {
+            getSession: () => of({ isAuthenticated: true }),
+            signOut: () => of(undefined),
+          },
         },
         {
           provide: CashierApiService,

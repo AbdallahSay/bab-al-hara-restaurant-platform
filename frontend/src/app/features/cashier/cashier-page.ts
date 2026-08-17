@@ -20,7 +20,9 @@ import { CashierHubService } from './cashier-hub.service';
 import { CashierOrderDto, CashierOrderItemDto, DriverSummaryDto } from './cashier.models';
 import { StaffSessionService } from '../kitchen/staff-session.service';
 
-type PageState = 'loading' | 'ready' | 'error';
+export type PageState = 'loading' | 'ready' | 'error';
+export type QueueFilter = 'all' | 'takeaway' | 'delivery' | 'unpaid' | 'urgent';
+export type AgingCategory = 'normal' | 'attention' | 'overdue';
 
 @Component({
   selector: 'app-cashier-page',
@@ -33,6 +35,7 @@ export class CashierPage implements OnInit, OnDestroy {
   private readonly sessions = inject(StaffSessionService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private audioContext?: AudioContext;
 
   protected readonly language = inject(LanguageService);
   protected readonly copy = this.language.copy;
@@ -40,13 +43,17 @@ export class CashierPage implements OnInit, OnDestroy {
   protected readonly state = signal<PageState>('loading');
   protected readonly orders = signal<readonly CashierOrderDto[]>([]);
   protected readonly drivers = signal<readonly DriverSummaryDto[]>([]);
+  protected readonly selectedFilter = signal<QueueFilter>('all');
+  protected readonly searchQuery = signal('');
+  protected readonly expandedOrderIds = signal<Set<string>>(new Set());
+  protected readonly soundEnabled = signal(false);
+  protected readonly newOrderBanner = signal<string | null>(null);
   protected readonly now = signal(Date.now());
 
+  // Handoff confirmation state (Takeaway)
   protected readonly inFlightHandoffs = signal<Set<string>>(new Set());
   protected readonly staleOrders = signal<Set<string>>(new Set());
   protected readonly errorOrders = signal<Set<string>>(new Set());
-
-  // Handoff confirmation state (Takeaway)
   protected readonly confirmingOrders = signal<Set<string>>(new Set());
 
   // Driver assignment state (Delivery)
@@ -61,6 +68,62 @@ export class CashierPage implements OnInit, OnDestroy {
       (left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime(),
     ),
   );
+
+  protected readonly filteredOrders = computed(() => {
+    const list = this.sortedOrders();
+    const filter = this.selectedFilter();
+    const query = this.searchQuery().trim().toLowerCase();
+
+    return list.filter((order) => {
+      // Status/Type filter
+      if (filter === 'takeaway' && order.orderType !== 'Takeaway') return false;
+      if (filter === 'delivery' && order.orderType !== 'Delivery') return false;
+      if (filter === 'unpaid' && order.paymentStatus !== 'Pending') return false;
+      if (filter === 'urgent' && this.elapsedMinutes(order.createdAt) < 15) return false;
+
+      // Text search filter
+      if (query) {
+        const publicCode = order.publicCode.toLowerCase();
+        const customerName = order.customerName.toLowerCase();
+        const areaAr = (order.deliveryAreaNameAr ?? '').toLowerCase();
+        const areaEn = (order.deliveryAreaNameEn ?? '').toLowerCase();
+        const address = (order.address ?? '').toLowerCase();
+        const driverName = (order.driverName ?? '').toLowerCase();
+
+        return (
+          publicCode.includes(query) ||
+          customerName.includes(query) ||
+          areaAr.includes(query) ||
+          areaEn.includes(query) ||
+          address.includes(query) ||
+          driverName.includes(query)
+        );
+      }
+
+      return true;
+    });
+  });
+
+  protected readonly totalCount = computed(() => this.orders().length);
+  protected readonly takeawayCount = computed(
+    () => this.orders().filter((o) => o.orderType === 'Takeaway').length,
+  );
+  protected readonly deliveryCount = computed(
+    () => this.orders().filter((o) => o.orderType === 'Delivery').length,
+  );
+  protected readonly unpaidCount = computed(
+    () => this.orders().filter((o) => o.paymentStatus === 'Pending').length,
+  );
+  protected readonly urgentCount = computed(
+    () => this.orders().filter((o) => this.elapsedMinutes(o.createdAt) >= 15).length,
+  );
+
+  protected readonly allExpanded = computed(() => {
+    const visible = this.filteredOrders();
+    if (visible.length === 0) return false;
+    const expanded = this.expandedOrderIds();
+    return visible.every((o) => expanded.has(o.id));
+  });
 
   ngOnInit(): void {
     this.sessions
@@ -84,6 +147,7 @@ export class CashierPage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     void this.realtime.stop();
+    void this.audioContext?.close();
   }
 
   protected setLanguage(language: Language): void {
@@ -98,6 +162,7 @@ export class CashierPage implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (orders) => {
+          const prevCount = this.orders().length;
           this.orders.set(orders);
           this.state.set('ready');
           this.confirmingOrders.set(new Set());
@@ -108,6 +173,10 @@ export class CashierPage implements OnInit, OnDestroy {
           this.inFlightAssignments.set(new Set());
           this.staleAssignmentOrders.set(new Set());
           this.errorAssignmentOrders.set(new Set());
+
+          if (prevCount > 0 && orders.length > prevCount) {
+            this.triggerNewOrderAlert();
+          }
         },
         error: (error: { readonly status?: number }) => {
           if (error.status === 401 || error.status === 403) {
@@ -127,6 +196,45 @@ export class CashierPage implements OnInit, OnDestroy {
         next: (drivers) => this.drivers.set(drivers),
         error: () => this.drivers.set([]),
       });
+  }
+
+  protected setFilter(filter: QueueFilter): void {
+    this.selectedFilter.set(filter);
+  }
+
+  protected setSearch(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery.set(input.value);
+  }
+
+  protected clearSearch(): void {
+    this.searchQuery.set('');
+  }
+
+  protected toggleDetails(orderId: string): void {
+    const current = new Set(this.expandedOrderIds());
+    if (current.has(orderId)) {
+      current.delete(orderId);
+    } else {
+      current.add(orderId);
+    }
+    this.expandedOrderIds.set(current);
+  }
+
+  protected toggleAllDetails(): void {
+    const visible = this.filteredOrders();
+    if (this.allExpanded()) {
+      this.expandedOrderIds.set(new Set());
+    } else {
+      const allIds = new Set(visible.map((o) => o.id));
+      this.expandedOrderIds.set(allIds);
+    }
+  }
+
+  protected enableSound(): void {
+    this.audioContext ??= new AudioContext();
+    void this.audioContext.resume();
+    this.soundEnabled.set(true);
   }
 
   protected signOut(): void {
@@ -161,6 +269,19 @@ export class CashierPage implements OnInit, OnDestroy {
   protected elapsedLabel(value: string): string {
     const minutes = this.elapsedMinutes(value);
     return `${minutes} ${minutes === 1 ? this.copy().cashier.minute : this.copy().cashier.minutes}`;
+  }
+
+  protected getAgingCategory(value: string): AgingCategory {
+    const minutes = this.elapsedMinutes(value);
+    if (minutes >= 20) return 'overdue';
+    if (minutes >= 10) return 'attention';
+    return 'normal';
+  }
+
+  protected agingCategoryLabel(category: AgingCategory): string {
+    if (category === 'overdue') return this.copy().cashier.agingOverdue;
+    if (category === 'attention') return this.copy().cashier.agingAttention;
+    return this.copy().cashier.agingNormal;
   }
 
   protected realtimeLabel(): string {
@@ -220,7 +341,7 @@ export class CashierPage implements OnInit, OnDestroy {
           confirming.delete(order.id);
           this.confirmingOrders.set(confirming);
 
-          setTimeout(() => this.loadOrders(), 3000);
+          setTimeout(() => this.loadOrders(), 2500);
         } else {
           const errors = new Set(this.errorOrders());
           errors.add(order.id);
@@ -311,7 +432,7 @@ export class CashierPage implements OnInit, OnDestroy {
           const stale = new Set(this.staleAssignmentOrders());
           stale.add(order.id);
           this.staleAssignmentOrders.set(stale);
-          setTimeout(() => this.loadOrders(), 3000);
+          setTimeout(() => this.loadOrders(), 2500);
         } else {
           const error = new Set(this.errorAssignmentOrders());
           error.add(order.id);
@@ -386,5 +507,48 @@ export class CashierPage implements OnInit, OnDestroy {
 
   private removeOrder(orderId: string): void {
     this.orders.update((orders) => orders.filter((o) => o.id !== orderId));
+    this.expandedOrderIds.update((set) => {
+      const next = new Set(set);
+      next.delete(orderId);
+      return next;
+    });
+    this.confirmingOrders.update((set) => {
+      const next = new Set(set);
+      next.delete(orderId);
+      return next;
+    });
+    this.confirmingAssignments.update((set) => {
+      const next = new Set(set);
+      next.delete(orderId);
+      return next;
+    });
+  }
+
+  private triggerNewOrderAlert(): void {
+    this.newOrderBanner.set(this.copy().cashier.newOrder);
+    setTimeout(() => this.newOrderBanner.set(null), 4000);
+    this.playNotificationChime();
+  }
+
+  private playNotificationChime(): void {
+    if (!this.soundEnabled() || !this.audioContext) {
+      return;
+    }
+
+    try {
+      const oscillator = this.audioContext.createOscillator();
+      const gain = this.audioContext.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, this.audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(1320, this.audioContext.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.4);
+      oscillator.connect(gain);
+      gain.connect(this.audioContext.destination);
+      oscillator.start();
+      oscillator.stop(this.audioContext.currentTime + 0.4);
+    } catch {
+      // Audio context may not be ready or allowed
+    }
   }
 }

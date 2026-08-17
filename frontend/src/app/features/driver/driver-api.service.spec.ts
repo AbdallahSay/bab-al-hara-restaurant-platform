@@ -1,36 +1,14 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
 
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
-import { CustomerApiService } from '../customer-ordering/customer-api.service';
 import { DriverApiService } from './driver-api.service';
 import { DriverOrderDto } from './driver.models';
 
-const SAMPLE_ORDER: DriverOrderDto = {
-  publicCode: 'BH-101',
-  createdAt: '2026-08-17T01:00:00Z',
-  orderType: 'Delivery',
-  status: 'Ready',
-  customerName: 'Ahmed Aly',
-  customerPhone: '01012345678',
-  deliveryAreaNameAr: 'مدينة نصر',
-  deliveryAreaNameEn: 'Nasr City',
-  address: '15 Abbas El Akkad St',
-  customerNote: 'Please ring bell',
-  subtotal: 250,
-  deliveryFee: 25,
-  total: 275,
-  paymentMethod: 'Cash',
-  paymentStatus: 'Pending',
-  rowVersion: 'AAAAAAAAB+E=',
-  items: [{ productNameAr: 'مشاوي مشكل', productNameEn: 'Mixed Grill', quantity: 1 }],
-};
-
 describe('DriverApiService', () => {
   let service: DriverApiService;
-  let http: HttpTestingController;
+  let httpTesting: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -41,65 +19,124 @@ describe('DriverApiService', () => {
           provide: APP_ENVIRONMENT,
           useValue: {
             production: false,
-            apiBaseUrl: '/api',
-            kitchenHubUrl: '/hubs/kitchen',
-            driverHubUrl: '/hubs/driver',
-          },
-        },
-        {
-          provide: CustomerApiService,
-          useValue: {
-            antiforgeryToken: () => of('mock-xsrf-token'),
+            apiBaseUrl: 'http://test.api',
+            kitchenHubUrl: 'http://test.hub/kitchen',
+            cashierHubUrl: 'http://test.hub/cashier',
+            driverHubUrl: 'http://test.hub/driver',
           },
         },
       ],
     });
     service = TestBed.inject(DriverApiService);
-    http = TestBed.inject(HttpTestingController);
+    httpTesting = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
-    http.verify();
+    httpTesting.verify();
   });
 
-  it('retrieves assigned driver orders with credentials', () => {
-    let orders: DriverOrderDto[] = [];
-    service.getAssignedOrders().subscribe((result) => (orders = result));
+  describe('getAssignedOrders', () => {
+    it('should fetch assigned orders via GET /api/driver/orders/assigned', () => {
+      const mockOrders: DriverOrderDto[] = [
+        {
+          id: 'ord-1',
+          publicCode: 'BH-1001',
+          createdAt: '2026-08-17T12:00:00Z',
+          orderType: 'Delivery',
+          status: 'Ready',
+          customerName: 'Kareem',
+          customerPhone: '01012345678',
+          deliveryAreaNameAr: 'الدقي',
+          deliveryAreaNameEn: 'Dokki',
+          address: 'شارع التحرير مبنى 15 الدور 3',
+          customerNote: 'رن الجرس',
+          subtotal: 250,
+          deliveryFee: 20,
+          total: 270,
+          paymentMethod: 'Cash',
+          paymentStatus: 'Pending',
+          rowVersion: 'row-v1',
+          items: [{ productNameAr: 'كباب مشوي', productNameEn: 'Grilled Kebab', quantity: 2 }],
+        },
+      ];
 
-    const request = http.expectOne('/api/driver/orders/assigned');
-    expect(request.request.method).toBe('GET');
-    expect(request.request.withCredentials).toBe(true);
-    request.flush([SAMPLE_ORDER]);
+      let result: readonly DriverOrderDto[] | undefined;
+      service.getAssignedOrders().subscribe((data) => (result = data));
 
-    expect(orders.length).toBe(1);
-    expect(orders[0]?.publicCode).toBe('BH-101');
+      const req = httpTesting.expectOne('http://test.api/driver/orders/assigned');
+      expect(req.request.method).toBe('GET');
+      expect(req.request.withCredentials).toBe(true);
+      req.flush(mockOrders);
+
+      expect(result).toEqual(mockOrders);
+    });
   });
 
-  it('posts start-delivery with antiforgery token and rowVersion', () => {
-    let called = false;
-    service.startDelivery('BH-101', 'AAAAAAAAB+E=').subscribe(() => (called = true));
+  describe('startDelivery', () => {
+    it('should send POST /api/orders/{id}/start-delivery with rowVersion', () => {
+      let result: string | undefined;
+      service.startDelivery('ord-1', 'row-v1').subscribe((res) => (result = res));
 
-    const request = http.expectOne('/api/orders/BH-101/start-delivery');
-    expect(request.request.method).toBe('POST');
-    expect(request.request.body).toEqual({ rowVersion: 'AAAAAAAAB+E=' });
-    expect(request.request.headers.get('X-XSRF-TOKEN')).toBe('mock-xsrf-token');
-    expect(request.request.withCredentials).toBe(true);
-    request.flush({ isSuccess: true });
+      const req = httpTesting.expectOne('http://test.api/orders/ord-1/start-delivery');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ rowVersion: 'row-v1' });
+      req.flush({});
 
-    expect(called).toBe(true);
+      expect(result).toBe('success');
+    });
+
+    it('should return stale when 409 conflict occurs', () => {
+      let result: string | undefined;
+      service.startDelivery('ord-1', 'row-v1').subscribe((res) => (result = res));
+
+      const req = httpTesting.expectOne('http://test.api/orders/ord-1/start-delivery');
+      req.flush('Conflict', { status: 409, statusText: 'Conflict' });
+
+      expect(result).toBe('stale');
+    });
+
+    it('should return error on other http errors', () => {
+      let result: string | undefined;
+      service.startDelivery('ord-1', 'row-v1').subscribe((res) => (result = res));
+
+      const req = httpTesting.expectOne('http://test.api/orders/ord-1/start-delivery');
+      req.flush('Server Error', { status: 500, statusText: 'Server Error' });
+
+      expect(result).toBe('error');
+    });
   });
 
-  it('posts mark-delivered with antiforgery token and rowVersion', () => {
-    let called = false;
-    service.markDelivered('BH-101', 'AAAAAAAAB+E=').subscribe(() => (called = true));
+  describe('markDelivered', () => {
+    it('should send POST /api/orders/{id}/mark-delivered with rowVersion', () => {
+      let result: string | undefined;
+      service.markDelivered('ord-1', 'row-v1').subscribe((res) => (result = res));
 
-    const request = http.expectOne('/api/orders/BH-101/mark-delivered');
-    expect(request.request.method).toBe('POST');
-    expect(request.request.body).toEqual({ rowVersion: 'AAAAAAAAB+E=' });
-    expect(request.request.headers.get('X-XSRF-TOKEN')).toBe('mock-xsrf-token');
-    expect(request.request.withCredentials).toBe(true);
-    request.flush({ isSuccess: true });
+      const req = httpTesting.expectOne('http://test.api/orders/ord-1/mark-delivered');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ rowVersion: 'row-v1' });
+      req.flush({});
 
-    expect(called).toBe(true);
+      expect(result).toBe('success');
+    });
+
+    it('should return stale on 409 conflict', () => {
+      let result: string | undefined;
+      service.markDelivered('ord-1', 'row-v1').subscribe((res) => (result = res));
+
+      const req = httpTesting.expectOne('http://test.api/orders/ord-1/mark-delivered');
+      req.flush('Conflict', { status: 409, statusText: 'Conflict' });
+
+      expect(result).toBe('stale');
+    });
+
+    it('should return error on generic failure', () => {
+      let result: string | undefined;
+      service.markDelivered('ord-1', 'row-v1').subscribe((res) => (result = res));
+
+      const req = httpTesting.expectOne('http://test.api/orders/ord-1/mark-delivered');
+      req.flush('Bad Request', { status: 400, statusText: 'Bad Request' });
+
+      expect(result).toBe('error');
+    });
   });
 });
