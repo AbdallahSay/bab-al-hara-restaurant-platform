@@ -96,6 +96,8 @@ export interface UiCopy {
     readonly items: string;
     readonly orderTypeTakeaway: string;
     readonly orderTypeDelivery: string;
+    readonly savedContactNotice: string;
+    readonly clearSavedContact: string;
   };
   readonly success: {
     readonly eyebrow: string;
@@ -391,6 +393,8 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       items: 'أصناف',
       orderTypeTakeaway: 'استلام من الفرع',
       orderTypeDelivery: 'توصيل للمنزل',
+      savedContactNotice: 'استخدمنا بياناتك المحفوظة على هذا الجهاز',
+      clearSavedContact: 'مسح البيانات المحفوظة',
     },
     success: {
       eyebrow: 'تم استلام الطلب',
@@ -700,6 +704,8 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       items: 'items',
       orderTypeTakeaway: 'Pick up from restaurant',
       orderTypeDelivery: 'Delivery to address',
+      savedContactNotice: 'We filled in your saved details on this device',
+      clearSavedContact: 'Clear saved details',
     },
     success: {
       eyebrow: 'Order received',
