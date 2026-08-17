@@ -68,6 +68,7 @@ public static class DependencyInjection
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<IOrderCodeGenerator, PublicOrderCodeGenerator>();
         services.AddScoped<IMenuQueryService, MenuQueryService>();
+        services.AddScoped<IManagementCatalogService, ManagementCatalogService>();
         services.AddScoped<IDeliveryAreaQueryService, DeliveryAreaQueryService>();
         services.AddScoped<IOrderApplicationService, OrderApplicationService>();
         services.AddScoped<IKitchenOrderQueryService, KitchenOrderQueryService>();
