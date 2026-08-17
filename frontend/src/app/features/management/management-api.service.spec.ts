@@ -282,4 +282,67 @@ describe('ManagementApiService', () => {
     expect(req.request.headers.get('X-XSRF-TOKEN')).toBe('mock-token-xyz');
     req.flush(updatedItem);
   });
+
+  it('should upload menu item image using multipart FormData with CSRF token', () => {
+    const updatedItem: MenuItemManagementDto = {
+      id: 'item-1',
+      categoryId: 'cat-1',
+      categoryNameAr: 'مشاوي',
+      categoryNameEn: 'Grills',
+      nameAr: 'مشاوي مشكلة',
+      nameEn: 'Mixed Grill',
+      descriptionAr: 'طبق مشكل',
+      descriptionEn: 'Mixed platter',
+      price: 250,
+      imageReference: '/api/menu-images/11111111-2222-3333-4444-555555555555',
+      preparationMinutes: 25,
+      displayOrder: 1,
+      isActive: true,
+      isAvailable: true,
+      rowVersion: 'ITEM1D==',
+    };
+
+    const mockFile = new File(['fake-image-data'], 'grill.jpg', { type: 'image/jpeg' });
+
+    service.uploadMenuItemImage('item-1', mockFile).subscribe((res) => {
+      expect(res.imageReference).toBe('/api/menu-images/11111111-2222-3333-4444-555555555555');
+    });
+
+    const req = httpMock.expectOne(`${baseUrl}/management/menu-items/item-1/image`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.headers.get('X-XSRF-TOKEN')).toBe('mock-token-xyz');
+    expect(req.request.body instanceof FormData).toBe(true);
+    expect(req.request.withCredentials).toBe(true);
+    req.flush(updatedItem);
+  });
+
+  it('should delete menu item image with CSRF token', () => {
+    const updatedItem: MenuItemManagementDto = {
+      id: 'item-1',
+      categoryId: 'cat-1',
+      categoryNameAr: 'مشاوي',
+      categoryNameEn: 'Grills',
+      nameAr: 'مشاوي مشكلة',
+      nameEn: 'Mixed Grill',
+      descriptionAr: 'طبق مشكل',
+      descriptionEn: 'Mixed platter',
+      price: 250,
+      imageReference: '/images/menu/default.webp',
+      preparationMinutes: 25,
+      displayOrder: 1,
+      isActive: true,
+      isAvailable: true,
+      rowVersion: 'ITEM1E==',
+    };
+
+    service.deleteMenuItemImage('item-1').subscribe((res) => {
+      expect(res.imageReference).toBe('/images/menu/default.webp');
+    });
+
+    const req = httpMock.expectOne(`${baseUrl}/management/menu-items/item-1/image`);
+    expect(req.request.method).toBe('DELETE');
+    expect(req.request.headers.get('X-XSRF-TOKEN')).toBe('mock-token-xyz');
+    expect(req.request.withCredentials).toBe(true);
+    req.flush(updatedItem);
+  });
 });

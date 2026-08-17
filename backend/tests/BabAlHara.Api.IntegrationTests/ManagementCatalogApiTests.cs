@@ -566,6 +566,185 @@ public sealed class ManagementCatalogApiTests(OrderingApiFactory factory) : ICla
         Assert.Equal("unavailable_menu_item", unavailProblem?.Extensions["code"]?.ToString());
     }
 
+    [Fact]
+    public async Task MenuItemImageUploadAndPublicDeliveryLifecycle()
+    {
+        await factory.ResetAsync();
+
+        var managerClient = await factory.CreateAuthenticatedStaffClientAsync(
+            "manager@bab-al-hara-restaurant.local",
+            "Manager",
+            "Manager Zaid");
+
+        var itemId = OrderingApiFactory.ActiveItemId;
+
+        // 1. Upload valid JPEG image
+        byte[] jpegBytes = [0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00];
+        using var jpegContent = new MultipartFormDataContent();
+        var jpegFileContent = new ByteArrayContent(jpegBytes);
+        jpegFileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+        jpegContent.Add(jpegFileContent, "file", "grill.jpg");
+
+        var uploadResp = await managerClient.PostAsync($"/api/management/menu-items/{itemId}/image", jpegContent);
+        Assert.Equal(HttpStatusCode.OK, uploadResp.StatusCode);
+
+        var updatedItem = await uploadResp.Content.ReadFromJsonAsync<MenuItemManagementDto>(JsonOptions);
+        Assert.NotNull(updatedItem);
+        Assert.StartsWith("/api/menu-images/", updatedItem.ImageReference, StringComparison.Ordinal);
+
+        var imageIdStr = updatedItem.ImageReference["/api/menu-images/".Length..];
+        Assert.True(Guid.TryParse(imageIdStr, out var imageId));
+
+        // 2. Public anonymous client reads image
+        var publicClient = factory.CreateClient();
+        var imageResp = await publicClient.GetAsync($"/api/menu-images/{imageId}");
+        Assert.Equal(HttpStatusCode.OK, imageResp.StatusCode);
+        Assert.Equal("image/jpeg", imageResp.Content.Headers.ContentType?.MediaType);
+        Assert.NotNull(imageResp.Headers.CacheControl);
+        Assert.True(imageResp.Headers.CacheControl.Public);
+        Assert.NotNull(imageResp.Headers.ETag);
+
+        var imageBytes = await imageResp.Content.ReadAsByteArrayAsync();
+        Assert.Equal(jpegBytes, imageBytes);
+
+        // 3. ETag 304 Not Modified
+        var cachedRequest = new HttpRequestMessage(HttpMethod.Get, $"/api/menu-images/{imageId}");
+        cachedRequest.Headers.IfNoneMatch.Add(imageResp.Headers.ETag);
+        var cachedResp = await publicClient.SendAsync(cachedRequest);
+        Assert.Equal(HttpStatusCode.NotModified, cachedResp.StatusCode);
+
+        // 4. Replace with PNG image
+        byte[] pngBytes = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52];
+        using var pngContent = new MultipartFormDataContent();
+        var pngFileContent = new ByteArrayContent(pngBytes);
+        pngFileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+        pngContent.Add(pngFileContent, "file", "grill_new.png");
+
+        var replaceResp = await managerClient.PostAsync($"/api/management/menu-items/{itemId}/image", pngContent);
+        Assert.Equal(HttpStatusCode.OK, replaceResp.StatusCode);
+        var replacedItem = await replaceResp.Content.ReadFromJsonAsync<MenuItemManagementDto>(JsonOptions);
+        Assert.NotNull(replacedItem);
+        Assert.StartsWith("/api/menu-images/", replacedItem.ImageReference, StringComparison.Ordinal);
+        Assert.NotEqual(updatedItem.ImageReference, replacedItem.ImageReference);
+
+        var newImageIdStr = replacedItem.ImageReference["/api/menu-images/".Length..];
+        var newImageResp = await publicClient.GetAsync($"/api/menu-images/{newImageIdStr}");
+        Assert.Equal(HttpStatusCode.OK, newImageResp.StatusCode);
+        Assert.Equal("image/png", newImageResp.Content.Headers.ContentType?.MediaType);
+
+        // 5. Remove image
+        var removeResp = await managerClient.DeleteAsync($"/api/management/menu-items/{itemId}/image");
+        Assert.Equal(HttpStatusCode.OK, removeResp.StatusCode);
+        var removedItem = await removeResp.Content.ReadFromJsonAsync<MenuItemManagementDto>(JsonOptions);
+        Assert.NotNull(removedItem);
+        Assert.Equal("/images/menu/default.webp", removedItem.ImageReference);
+
+        // Verify in management get
+        var getResp = await managerClient.GetAsync($"/api/management/menu-items/{itemId}");
+        var finalItem = await getResp.Content.ReadFromJsonAsync<MenuItemManagementDto>(JsonOptions);
+        Assert.Equal("/images/menu/default.webp", finalItem!.ImageReference);
+    }
+
+    [Fact]
+    public async Task MenuItemImageUploadValidationAndSecurity()
+    {
+        await factory.ResetAsync();
+
+        var managerClient = await factory.CreateAuthenticatedStaffClientAsync(
+            "manager@bab-al-hara-restaurant.local",
+            "Manager",
+            "Manager Zaid");
+
+        var itemId = OrderingApiFactory.ActiveItemId;
+
+        // 1. Oversized image (> 5MB)
+        byte[] oversizedBytes = new byte[5 * 1024 * 1024 + 1];
+        oversizedBytes[0] = 0xFF;
+        oversizedBytes[1] = 0xD8;
+        oversizedBytes[2] = 0xFF;
+        using var overContent = new MultipartFormDataContent();
+        var overFile = new ByteArrayContent(oversizedBytes);
+        overFile.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+        overContent.Add(overFile, "file", "giant.jpg");
+
+        var overResp = await managerClient.PostAsync($"/api/management/menu-items/{itemId}/image", overContent);
+        Assert.Equal(HttpStatusCode.BadRequest, overResp.StatusCode);
+
+        // 2. Spoofed/invalid magic bytes
+        byte[] fakeBytes = System.Text.Encoding.UTF8.GetBytes("<html><script>alert('evil')</script></html>");
+        using var fakeContent = new MultipartFormDataContent();
+        var fakeFile = new ByteArrayContent(fakeBytes);
+        fakeFile.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+        fakeContent.Add(fakeFile, "file", "spoofed.jpg");
+
+        var fakeResp = await managerClient.PostAsync($"/api/management/menu-items/{itemId}/image", fakeContent);
+        Assert.Equal(HttpStatusCode.BadRequest, fakeResp.StatusCode);
+
+        // 3. Valid WEBP image
+        byte[] webpBytes = [0x52, 0x49, 0x46, 0x46, 0x20, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50, 0x38, 0x20];
+        using var webpContent = new MultipartFormDataContent();
+        var webpFile = new ByteArrayContent(webpBytes);
+        webpFile.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/webp");
+        webpContent.Add(webpFile, "file", "salad.webp");
+
+        var webpResp = await managerClient.PostAsync($"/api/management/menu-items/{itemId}/image", webpContent);
+        Assert.Equal(HttpStatusCode.OK, webpResp.StatusCode);
+        var webpItem = await webpResp.Content.ReadFromJsonAsync<MenuItemManagementDto>(JsonOptions);
+        Assert.NotNull(webpItem);
+
+        // 4. Non-existent menu item
+        var randomId = Guid.NewGuid();
+        using var missingItemContent = new MultipartFormDataContent();
+        var missingFile = new ByteArrayContent(webpBytes);
+        missingFile.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/webp");
+        missingItemContent.Add(missingFile, "file", "salad.webp");
+
+        var missingItemResp = await managerClient.PostAsync($"/api/management/menu-items/{randomId}/image", missingItemContent);
+        Assert.Equal(HttpStatusCode.NotFound, missingItemResp.StatusCode);
+
+        var missingDeleteResp = await managerClient.DeleteAsync($"/api/management/menu-items/{randomId}/image");
+        Assert.Equal(HttpStatusCode.NotFound, missingDeleteResp.StatusCode);
+
+        // 5. Public non-existent image asset
+        var publicClient = factory.CreateClient();
+        var missingAssetResp = await publicClient.GetAsync($"/api/menu-images/{Guid.NewGuid()}");
+        Assert.Equal(HttpStatusCode.NotFound, missingAssetResp.StatusCode);
+
+        // 6. Role Authorization: Unauthenticated, Kitchen, Cashier, Driver cannot mutate
+        var unauthClient = factory.CreateClient();
+        using var unauthContent = new MultipartFormDataContent();
+        unauthContent.Add(new ByteArrayContent(webpBytes), "file", "test.webp");
+        var unauthPost = await unauthClient.PostAsync($"/api/management/menu-items/{itemId}/image", unauthContent);
+        Assert.Equal(HttpStatusCode.Unauthorized, unauthPost.StatusCode);
+
+        var unauthDelete = await unauthClient.DeleteAsync($"/api/management/menu-items/{itemId}/image");
+        Assert.Equal(HttpStatusCode.Unauthorized, unauthDelete.StatusCode);
+
+        var kitchenClient = await factory.CreateAuthenticatedStaffClientAsync("kitchen@bab-al-hara.local", "Kitchen", "Kitchen Staff");
+        using var kitchenContent = new MultipartFormDataContent();
+        kitchenContent.Add(new ByteArrayContent(webpBytes), "file", "test.webp");
+        var kitchenPost = await kitchenClient.PostAsync($"/api/management/menu-items/{itemId}/image", kitchenContent);
+        Assert.Equal(HttpStatusCode.Forbidden, kitchenPost.StatusCode);
+        var kitchenDelete = await kitchenClient.DeleteAsync($"/api/management/menu-items/{itemId}/image");
+        Assert.Equal(HttpStatusCode.Forbidden, kitchenDelete.StatusCode);
+
+        var cashierClient = await factory.CreateAuthenticatedStaffClientAsync("cashier@bab-al-hara.local", "Cashier", "Cashier Staff");
+        using var cashierContent = new MultipartFormDataContent();
+        cashierContent.Add(new ByteArrayContent(webpBytes), "file", "test.webp");
+        var cashierPost = await cashierClient.PostAsync($"/api/management/menu-items/{itemId}/image", cashierContent);
+        Assert.Equal(HttpStatusCode.Forbidden, cashierPost.StatusCode);
+        var cashierDelete = await cashierClient.DeleteAsync($"/api/management/menu-items/{itemId}/image");
+        Assert.Equal(HttpStatusCode.Forbidden, cashierDelete.StatusCode);
+
+        var driverClient = await factory.CreateAuthenticatedStaffClientAsync("driver@bab-al-hara.local", "Driver", "Driver Staff");
+        using var driverContent = new MultipartFormDataContent();
+        driverContent.Add(new ByteArrayContent(webpBytes), "file", "test.webp");
+        var driverPost = await driverClient.PostAsync($"/api/management/menu-items/{itemId}/image", driverContent);
+        Assert.Equal(HttpStatusCode.Forbidden, driverPost.StatusCode);
+        var driverDelete = await driverClient.DeleteAsync($"/api/management/menu-items/{itemId}/image");
+        Assert.Equal(HttpStatusCode.Forbidden, driverDelete.StatusCode);
+    }
+
     private sealed record AntiforgeryTokenDto(string RequestToken);
 
     private sealed record CreateOrderItemRequest(Guid MenuItemId, int Quantity);

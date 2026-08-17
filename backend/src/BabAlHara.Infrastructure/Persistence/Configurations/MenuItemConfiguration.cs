@@ -35,12 +35,18 @@ public sealed class MenuItemConfiguration : IEntityTypeConfiguration<MenuItem>
         builder.Property(item => item.IsActive).IsRequired();
         builder.Property(item => item.IsAvailable).IsRequired();
         builder.Property(item => item.RowVersion).IsRowVersion();
+        builder.Property(item => item.ImageAssetId).IsRequired(false);
         builder.HasIndex(item => new { item.CategoryId, item.IsActive, item.IsAvailable });
         builder
             .HasOne(item => item.Category)
             .WithMany(category => category.MenuItems)
             .HasForeignKey(item => item.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder
+            .HasOne(item => item.ImageAsset)
+            .WithMany()
+            .HasForeignKey(item => item.ImageAssetId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasData(
             new { Id = new Guid("20000000-0000-0000-0000-000000000001"), CategoryId = new Guid("10000000-0000-0000-0000-000000000001"), NameAr = "مشكل مشاوي باب الحارة", NameEn = "Bab Al Hara mixed grill", DescriptionAr = "كفتة وكباب وشيش طاووق مع خضار مشوية.", DescriptionEn = "Kofta, kebab, and shish tawook with grilled vegetables.", Price = 295m, ImageReference = "/images/menu/mixed-grill.webp", PreparationMinutes = 28, DisplayOrder = 10, IsActive = true, IsAvailable = true },
