@@ -1,7 +1,10 @@
-<app-customer-header />
+﻿<app-customer-header />
 
 <main class="cart-shell">
   <a class="back-link" routerLink="/">← {{ copy().common.backToMenu }}</a>
+
+  <app-restaurant-paused-banner />
+
   <div class="cart-heading">
     <h1>{{ copy().cart.title }}</h1>
     <span>{{ cart.itemCount() }} {{ copy().cart.itemCount }}</span>

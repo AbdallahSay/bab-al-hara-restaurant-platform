@@ -1,3 +1,9 @@
+export interface RestaurantPublicStatusResponse {
+  readonly acceptingOrders: boolean;
+  readonly messageAr?: string | null;
+  readonly messageEn?: string | null;
+}
+
 export interface Category {
   readonly id: string;
   readonly nameAr: string;

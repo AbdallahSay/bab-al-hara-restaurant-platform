@@ -24,6 +24,9 @@ export interface UiCopy {
     readonly takeaway: string;
     readonly delivery: string;
     readonly cash: string;
+    readonly restaurantPausedFallback: string;
+    readonly restaurantPausedBrowsingNotice: string;
+    readonly restaurantPausedSubmitTooltip: string;
   };
   readonly menu: {
     readonly eyebrow: string;
@@ -98,6 +101,8 @@ export interface UiCopy {
     readonly orderTypeDelivery: string;
     readonly savedContactNotice: string;
     readonly clearSavedContact: string;
+    readonly restaurantNotAcceptingOrdersError: string;
+    readonly restaurantPausedButtonNotice: string;
   };
   readonly success: {
     readonly eyebrow: string;
@@ -402,6 +407,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       takeaway: 'استلام من الفرع',
       delivery: 'توصيل',
       cash: 'الدفع عند الاستلام',
+      restaurantPausedFallback: 'المطعم لا يستقبل طلبات جديدة مؤقتًا',
+      restaurantPausedBrowsingNotice: 'يمكنك تصفح القائمة وإضافة الأصناف إلى السلة للطلب لاحقًا.',
+      restaurantPausedSubmitTooltip: 'المطعم متوقف مؤقتًا عن استقبال الطلبات',
     },
     menu: {
       eyebrow: 'اطلب مباشرة',
@@ -476,6 +484,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       orderTypeDelivery: 'توصيل للمنزل',
       savedContactNotice: 'استخدمنا بياناتك المحفوظة على هذا الجهاز',
       clearSavedContact: 'مسح البيانات المحفوظة',
+      restaurantNotAcceptingOrdersError:
+        'المطعم متوقف مؤقتًا عن استقبال طلبات جديدة. تم الاحتفاظ بسلتك ويمكنك إرسال الطلب فور استئناف العمل.',
+      restaurantPausedButtonNotice: 'المطعم متوقف مؤقتًا عن استقبال الطلبات',
     },
     success: {
       eyebrow: 'تم استلام الطلب',
@@ -792,6 +803,10 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       takeaway: 'Takeaway',
       delivery: 'Delivery',
       cash: 'Cash',
+      restaurantPausedFallback: 'The restaurant is temporarily paused for new orders',
+      restaurantPausedBrowsingNotice:
+        'You can still browse the menu and add items to your cart for later.',
+      restaurantPausedSubmitTooltip: 'The restaurant is temporarily paused for orders',
     },
     menu: {
       eyebrow: 'Order directly',
@@ -867,6 +882,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       orderTypeDelivery: 'Delivery to address',
       savedContactNotice: 'We filled in your saved details on this device',
       clearSavedContact: 'Clear saved details',
+      restaurantNotAcceptingOrdersError:
+        'The restaurant is temporarily paused for new orders. Your cart has been saved and you can submit once orders resume.',
+      restaurantPausedButtonNotice: 'The restaurant is temporarily paused for orders',
     },
     success: {
       eyebrow: 'Order received',
