@@ -5,6 +5,10 @@ import { of, throwError } from 'rxjs';
 
 import { LanguageService } from '../../../core/i18n/language.service';
 import { CartService } from '../cart/cart.service';
+import {
+  CUSTOMER_CONTACT_STORAGE_KEY,
+  CustomerContactProfileService,
+} from '../customer-contact-profile.service';
 import { CustomerApiService } from '../customer-api.service';
 import { CreatedOrder, MenuItem } from '../order.models';
 import { OrderReceiptService } from '../success/order-receipt.service';
@@ -218,6 +222,100 @@ describe('CheckoutPage', () => {
     expect(mobileBar).toBeTruthy();
     expect(mobileBar.querySelector('.mobile-action-bar__amount').textContent).toContain('٨٥');
     expect(mobileBar.querySelector('.mobile-action-bar__btn')).toBeTruthy();
+  });
+
+  it('prefills contact info for returning customers with saved profile', async () => {
+    localStorage.setItem(
+      CUSTOMER_CONTACT_STORAGE_KEY,
+      JSON.stringify({ name: 'محمود سامي', phone: '01099887766' }),
+    );
+
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+    const nameInput: HTMLInputElement = fixture.nativeElement.querySelector('#customer-name');
+    const phoneInput: HTMLInputElement = fixture.nativeElement.querySelector('#customer-phone');
+
+    expect(nameInput.value).toBe('محمود سامي');
+    expect(phoneInput.value).toBe('01099887766');
+
+    // Contextual badge is displayed
+    expect(fixture.nativeElement.querySelector('.saved-contact-badge')).toBeTruthy();
+    expect(fixture.nativeElement.textContent).toContain('استخدمنا بياناتك المحفوظة');
+  });
+
+  it('allows returning customers to clear saved contact details', async () => {
+    localStorage.setItem(
+      CUSTOMER_CONTACT_STORAGE_KEY,
+      JSON.stringify({ name: 'خالد يوسف', phone: '01211223344' }),
+    );
+
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+    const clearBtn: HTMLButtonElement = fixture.nativeElement.querySelector('.clear-contact-btn');
+    expect(clearBtn).toBeTruthy();
+
+    clearBtn.click();
+    fixture.detectChanges();
+
+    const nameInput: HTMLInputElement = fixture.nativeElement.querySelector('#customer-name');
+    const phoneInput: HTMLInputElement = fixture.nativeElement.querySelector('#customer-phone');
+    expect(nameInput.value).toBe('');
+    expect(phoneInput.value).toBe('');
+    expect(fixture.nativeElement.querySelector('.saved-contact-badge')).toBeNull();
+    expect(localStorage.getItem(CUSTOMER_CONTACT_STORAGE_KEY)).toBeNull();
+  });
+
+  it('persists customer contact details only upon successful order creation and updates them on subsequent orders', async () => {
+    let callCount = 0;
+    const fixture = await createFixture({
+      createOrder: () => {
+        callCount++;
+        if (callCount === 1) {
+          return of(ORDER);
+        }
+        return of({ ...ORDER, publicCode: 'BH-TEST-456' });
+      },
+    });
+
+    const contactProfile = TestBed.inject(CustomerContactProfileService);
+    expect(contactProfile.profile()).toBeNull();
+
+    fillContact(fixture);
+    fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(contactProfile.profile()).toEqual({
+      name: 'Ahmed Hassan',
+      phone: '01012345678',
+    });
+
+    const stored = JSON.parse(
+      localStorage.getItem(CUSTOMER_CONTACT_STORAGE_KEY) ?? '{}',
+    ) as unknown;
+    expect(stored).toEqual({
+      name: 'Ahmed Hassan',
+      phone: '01012345678',
+    });
+  });
+
+  it('does NOT save contact details if order creation fails', async () => {
+    const fixture = await createFixture({
+      createOrder: () =>
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 500,
+              error: { code: 'internal_error' },
+            }),
+        ),
+    });
+
+    const contactProfile = TestBed.inject(CustomerContactProfileService);
+    fillContact(fixture);
+
+    fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(contactProfile.profile()).toBeNull();
+    expect(localStorage.getItem(CUSTOMER_CONTACT_STORAGE_KEY)).toBeNull();
   });
 
   async function createFixture(apiOverrides: Partial<CustomerApiService>) {

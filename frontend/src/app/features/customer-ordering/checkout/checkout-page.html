@@ -140,7 +140,32 @@
             <h2 id="contact-title">{{ copy().checkout.contactTitle }}</h2>
           </div>
 
-          <div class="field-grid">
+          @if (hasPrefilledContact()) {
+            <div class="saved-contact-badge" role="status">
+              <div class="saved-contact-badge__content">
+                <svg
+                  class="saved-contact-icon"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M7 4h6M7 8h6M5 16h10a2 2 0 002-2V4a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                <span>{{ copy().checkout.savedContactNotice }}</span>
+              </div>
+              <button type="button" class="clear-contact-btn" (click)="clearSavedContact()">
+                {{ copy().checkout.clearSavedContact }}
+              </button>
+            </div>
+          }
+
+          <div class="contact-stack">
             <div class="field-group">
               <label for="customer-name">
                 {{ copy().checkout.name }}

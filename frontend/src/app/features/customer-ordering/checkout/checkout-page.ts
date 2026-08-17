@@ -17,6 +17,7 @@ import { LanguageService } from '../../../core/i18n/language.service';
 import { CustomerHeader } from '../../../shared/customer-header/customer-header';
 import { CartService } from '../cart/cart.service';
 import { CustomerApiService } from '../customer-api.service';
+import { CustomerContactProfileService } from '../customer-contact-profile.service';
 import { CreateOrderRequest, DeliveryArea, OrderType, ProblemDetails } from '../order.models';
 import { OrderReceiptService } from '../success/order-receipt.service';
 
@@ -33,6 +34,7 @@ export class CheckoutPage implements OnInit {
   private readonly api = inject(CustomerApiService);
   private readonly router = inject(Router);
   private readonly receipt = inject(OrderReceiptService);
+  private readonly contactProfile = inject(CustomerContactProfileService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly language = inject(LanguageService);
@@ -43,6 +45,7 @@ export class CheckoutPage implements OnInit {
   protected readonly submitted = signal(false);
   protected readonly sending = signal(false);
   protected readonly errorMessage = signal('');
+  protected readonly hasPrefilledContact = signal(false);
   protected readonly form = new FormGroup({
     customerName: new FormControl('', {
       nonNullable: true,
@@ -119,7 +122,20 @@ export class CheckoutPage implements OnInit {
     if (this.cart.items().length === 0) {
       this.errorMessage.set(this.copy().checkout.emptyCart);
     }
+    const savedContact = this.contactProfile.profile();
+    if (savedContact) {
+      this.form.controls.customerName.setValue(savedContact.name);
+      this.form.controls.customerPhone.setValue(savedContact.phone);
+      this.hasPrefilledContact.set(true);
+    }
     this.loadDeliveryAreas();
+  }
+
+  protected clearSavedContact(): void {
+    this.contactProfile.clear();
+    this.hasPrefilledContact.set(false);
+    this.form.controls.customerName.setValue('');
+    this.form.controls.customerPhone.setValue('');
   }
 
   protected loadDeliveryAreas(): void {
@@ -180,6 +196,10 @@ export class CheckoutPage implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (order) => {
+          this.contactProfile.save({
+            name: request.customerName,
+            phone: request.customerPhone,
+          });
           this.receipt.save({
             order,
             displayedTotalChanged: Math.abs(order.total - displayedTotal) > 0.001,
