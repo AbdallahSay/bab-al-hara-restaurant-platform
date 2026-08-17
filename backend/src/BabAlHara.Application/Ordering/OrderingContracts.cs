@@ -25,19 +25,26 @@ public sealed record CreatedOrderDto(
     decimal DeliveryFee,
     decimal Total,
     PaymentMethod PaymentMethod,
-    PaymentStatus PaymentStatus,
-    string TrackingToken);
+    PaymentStatus PaymentStatus);
 
 public sealed record OrderRejection(string Code, string Message, bool IsConflict = false);
 
-public sealed record CreateOrderOutcome(CreatedOrderDto? Order, OrderRejection? Rejection)
+public sealed record CreateOrderOutcome(
+    CreatedOrderDto? Order,
+    string? RawTrackingToken,
+    DateTimeOffset? TrackingTokenExpiresAtUtc,
+    OrderRejection? Rejection)
 {
     public bool IsSuccess => Order is not null;
 
-    public static CreateOrderOutcome Success(CreatedOrderDto order) => new(order, null);
+    public static CreateOrderOutcome Success(
+        CreatedOrderDto order,
+        string rawTrackingToken,
+        DateTimeOffset trackingTokenExpiresAtUtc) =>
+        new(order, rawTrackingToken, trackingTokenExpiresAtUtc, null);
 
     public static CreateOrderOutcome Failure(string code, string message, bool isConflict = false) =>
-        new(null, new OrderRejection(code, message, isConflict));
+        new(null, null, null, new OrderRejection(code, message, isConflict));
 }
 
 public interface IOrderApplicationService

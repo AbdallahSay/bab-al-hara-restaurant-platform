@@ -67,7 +67,10 @@ public sealed partial class OrderApplicationService(
         var deliveryAreaOutcome = await ResolveDeliveryAreaAsync(command, cancellationToken);
         if (deliveryAreaOutcome.Rejection is not null)
         {
-            return new CreateOrderOutcome(null, deliveryAreaOutcome.Rejection);
+            return CreateOrderOutcome.Failure(
+                deliveryAreaOutcome.Rejection.Code,
+                deliveryAreaOutcome.Rejection.Message,
+                deliveryAreaOutcome.Rejection.IsConflict);
         }
 
         var now = timeProvider.GetUtcNow();
@@ -100,7 +103,8 @@ public sealed partial class OrderApplicationService(
 
         var rawToken = trackingService.GenerateTrackingToken();
         var tokenHash = trackingService.HashToken(rawToken);
-        order.SetTrackingTokenHash(tokenHash);
+        var expiresAtUtc = order.CreatedAt.AddDays(7);
+        order.SetTrackingCredentials(tokenHash, expiresAtUtc);
 
         dbContext.Orders.Add(order);
 
@@ -118,20 +122,22 @@ public sealed partial class OrderApplicationService(
             LogRealtimeNotificationFailure(logger, order.PublicCode, exception);
         }
 
-        return CreateOrderOutcome.Success(new CreatedOrderDto(
-            order.PublicCode,
-            order.CreatedAt,
-            order.OrderType,
-            order.Status,
-            order.DeliveryAreaNameAr,
-            order.DeliveryAreaNameEn,
-            order.Address,
-            order.Subtotal,
-            order.DeliveryFee,
-            order.Total,
-            order.PaymentMethod,
-            order.PaymentStatus,
-            rawToken));
+        return CreateOrderOutcome.Success(
+            new CreatedOrderDto(
+                order.PublicCode,
+                order.CreatedAt,
+                order.OrderType,
+                order.Status,
+                order.DeliveryAreaNameAr,
+                order.DeliveryAreaNameEn,
+                order.Address,
+                order.Subtotal,
+                order.DeliveryFee,
+                order.Total,
+                order.PaymentMethod,
+                order.PaymentStatus),
+            rawToken,
+            expiresAtUtc);
     }
 
     private static CreateOrderOutcome? ValidateCommand(CreateOrderCommand command)

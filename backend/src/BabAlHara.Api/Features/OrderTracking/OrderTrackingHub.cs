@@ -1,9 +1,9 @@
+using System.Security.Cryptography;
+using System.Text;
 using BabAlHara.Application.Tracking;
 using BabAlHara.Infrastructure.Persistence;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace BabAlHara.Api.Features.OrderTracking;
 
@@ -12,14 +12,30 @@ public interface IOrderTrackingClient
     Task OrderTrackingUpdated(CustomerOrderTrackingDto data);
 }
 
-public sealed class OrderTrackingHub(AppDbContext dbContext) : Hub<IOrderTrackingClient>
+public sealed class OrderTrackingHub(AppDbContext dbContext, IWebHostEnvironment env) : Hub<IOrderTrackingClient>
 {
     private const string GroupPrefix = "tracking:";
 
     public override async Task OnConnectedAsync()
     {
         var httpContext = Context.GetHttpContext();
-        var rawToken = httpContext?.Request.Query["access_token"].FirstOrDefault();
+        if (httpContext is null)
+        {
+            Context.Abort();
+            return;
+        }
+
+        var publicCode = httpContext.Request.Query["publicCode"].FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(publicCode))
+        {
+            Context.Abort();
+            return;
+        }
+
+        var rawToken = TrackingCookieHelper.GetTrackingTokenFromCookie(
+            httpContext.Request,
+            publicCode,
+            env.IsDevelopment());
 
         if (string.IsNullOrWhiteSpace(rawToken))
         {
@@ -39,19 +55,25 @@ public sealed class OrderTrackingHub(AppDbContext dbContext) : Hub<IOrderTrackin
             return;
         }
 
-        var publicCode = await dbContext.Orders
+        var order = await dbContext.Orders
             .AsNoTracking()
-            .Where(o => o.TrackingTokenHash == hash)
-            .Select(o => o.PublicCode)
+            .Where(o => o.PublicCode == publicCode && o.TrackingTokenHash == hash)
+            .Select(o => new { o.PublicCode, o.TrackingTokenExpiresAtUtc })
             .FirstOrDefaultAsync();
 
-        if (publicCode is null)
+        if (order is null)
         {
             Context.Abort();
             return;
         }
 
-        await Groups.AddToGroupAsync(Context.ConnectionId, $"{GroupPrefix}{publicCode}");
+        if (order.TrackingTokenExpiresAtUtc.HasValue && order.TrackingTokenExpiresAtUtc.Value <= DateTimeOffset.UtcNow)
+        {
+            Context.Abort();
+            return;
+        }
+
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"{GroupPrefix}{order.PublicCode}");
         await base.OnConnectedAsync();
     }
 }

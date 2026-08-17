@@ -15,10 +15,11 @@ public static class OrderTrackingEndpoints
                 async (
                     string publicCode,
                     HttpRequest request,
+                    IWebHostEnvironment env,
                     ICustomerOrderTrackingService trackingService,
                     CancellationToken cancellationToken) =>
                 {
-                    var rawToken = request.Headers["X-Tracking-Token"].FirstOrDefault();
+                    var rawToken = TrackingCookieHelper.GetTrackingTokenFromCookie(request, publicCode, env.IsDevelopment());
 
                     if (string.IsNullOrWhiteSpace(rawToken))
                     {

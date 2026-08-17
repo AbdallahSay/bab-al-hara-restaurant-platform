@@ -418,6 +418,10 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTimeOffset?>("TrackingTokenExpiresAtUtc")
+                        .HasPrecision(7)
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("TrackingTokenHash")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
