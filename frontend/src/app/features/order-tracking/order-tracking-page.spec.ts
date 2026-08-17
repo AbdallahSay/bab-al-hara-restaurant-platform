@@ -72,8 +72,8 @@ describe('OrderTrackingPage', () => {
   };
 
   class MockTrackingApiService {
-    getTrackingHandler: (code: string, token: string) => Observable<CustomerOrderTracking> =
-      () => of(mockDeliveryTracking);
+    getTrackingHandler: (code: string, token: string) => Observable<CustomerOrderTracking> = () =>
+      of(mockDeliveryTracking);
 
     getTracking(code: string, token: string): Observable<CustomerOrderTracking> {
       return this.getTrackingHandler(code, token);
@@ -81,7 +81,9 @@ describe('OrderTrackingPage', () => {
   }
 
   class MockTrackingHubService {
-    readonly connectionState$ = new BehaviorSubject<HubConnectionState>(HubConnectionState.Connected);
+    readonly connectionState$ = new BehaviorSubject<HubConnectionState>(
+      HubConnectionState.Connected,
+    );
     readonly trackingUpdate$ = new Subject<CustomerOrderTracking>();
     readonly reconnected$ = new Subject<void>();
 
