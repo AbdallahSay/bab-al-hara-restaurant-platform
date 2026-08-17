@@ -134,7 +134,148 @@ public sealed class OrderStateTransitionTests
         Assert.True(item.IsAvailable);
     }
 
-    private static Order CreateSampleOrder()
+    [Fact]
+    public void AssignDriverSucceedsForReadyDeliveryOrder()
+    {
+        var order = CreateDeliveryOrderWithStatus(OrderStatus.Ready);
+        var driverId = Guid.NewGuid();
+        var now = DateTimeOffset.UtcNow;
+
+        var history = order.AssignDriver(driverId, "Driver Tarek", "cashier-1", "Cashier", now);
+
+        Assert.Equal(driverId, order.DriverId);
+        Assert.Equal("Driver Tarek", order.DriverName);
+        Assert.Equal(now, order.DriverAssignedAtUtc);
+        Assert.Equal(OrderStatus.Ready, order.Status);
+        Assert.Equal(OrderStatus.Ready, history.PreviousStatus);
+        Assert.Equal(OrderStatus.Ready, history.NewStatus);
+        Assert.Contains("Driver Tarek", history.Notes);
+    }
+
+    [Fact]
+    public void AssignDriverThrowsWhenOrderIsTakeaway()
+    {
+        var order = CreateTakeawayOrderWithStatus(OrderStatus.Ready);
+        var driverId = Guid.NewGuid();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            order.AssignDriver(driverId, "Driver Tarek", "cashier-1", "Cashier", DateTimeOffset.UtcNow));
+        Assert.Contains("Driver assignment is only allowed for delivery orders", ex.Message);
+    }
+
+    [Theory]
+    [InlineData(OrderStatus.Pending)]
+    [InlineData(OrderStatus.Confirmed)]
+    [InlineData(OrderStatus.Preparing)]
+    [InlineData(OrderStatus.Delivered)]
+    public void AssignDriverThrowsWhenOrderIsNotReady(OrderStatus status)
+    {
+        var order = CreateDeliveryOrderWithStatus(status);
+        var driverId = Guid.NewGuid();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            order.AssignDriver(driverId, "Driver Tarek", "cashier-1", "Cashier", DateTimeOffset.UtcNow));
+        Assert.Contains("Order must be Ready", ex.Message);
+    }
+
+    [Fact]
+    public void AssignDriverThrowsForInvalidArguments()
+    {
+        var order = CreateDeliveryOrderWithStatus(OrderStatus.Ready);
+
+        Assert.Throws<ArgumentException>(() =>
+            order.AssignDriver(Guid.Empty, "Driver Tarek", "cashier-1", "Cashier", DateTimeOffset.UtcNow));
+
+        Assert.Throws<ArgumentException>(() =>
+            order.AssignDriver(Guid.NewGuid(), "", "cashier-1", "Cashier", DateTimeOffset.UtcNow));
+
+        Assert.Throws<ArgumentException>(() =>
+            order.AssignDriver(Guid.NewGuid(), "   ", "cashier-1", "Cashier", DateTimeOffset.UtcNow));
+    }
+
+    [Fact]
+    public void DeliveryOrderTransitionsReadyToOnTheWayToDeliveredAndSettlesCash()
+    {
+        var order = CreateDeliveryOrderWithStatus(OrderStatus.Ready);
+        var driverId = Guid.NewGuid();
+        var now = DateTimeOffset.UtcNow;
+
+        order.AssignDriver(driverId, "Driver Tarek", "cashier-1", "Cashier", now);
+
+        Assert.True(order.CanTransitionTo(OrderStatus.OnTheWay));
+        var h1 = order.TransitionStatus(OrderStatus.OnTheWay, driverId.ToString(), "Driver Tarek", "Driver", now.AddMinutes(1));
+        Assert.Equal(OrderStatus.OnTheWay, order.Status);
+        Assert.Equal(PaymentStatus.Pending, order.PaymentStatus);
+
+        Assert.True(order.CanTransitionTo(OrderStatus.Delivered));
+        var h2 = order.TransitionStatus(OrderStatus.Delivered, driverId.ToString(), "Driver Tarek", "Driver", now.AddMinutes(15));
+        Assert.Equal(OrderStatus.Delivered, order.Status);
+        Assert.Equal(PaymentStatus.Paid, order.PaymentStatus);
+    }
+
+    [Fact]
+    public void DeliveryOrderCannotTransitionReadyToDeliveredDirectly()
+    {
+        var order = CreateDeliveryOrderWithStatus(OrderStatus.Ready);
+        var driverId = Guid.NewGuid();
+        order.AssignDriver(driverId, "Driver Tarek", "cashier-1", "Cashier", DateTimeOffset.UtcNow);
+
+        Assert.False(order.CanTransitionTo(OrderStatus.Delivered));
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            order.TransitionStatus(OrderStatus.Delivered, driverId.ToString(), "Driver Tarek", "Driver", DateTimeOffset.UtcNow));
+        Assert.Contains("Cannot transition an order from Ready to Delivered", ex.Message);
+    }
+
+    [Fact]
+    public void DeliveryOrderCannotTransitionReadyToOnTheWayWithoutDriver()
+    {
+        var order = CreateDeliveryOrderWithStatus(OrderStatus.Ready);
+
+        Assert.False(order.CanTransitionTo(OrderStatus.OnTheWay));
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            order.TransitionStatus(OrderStatus.OnTheWay, "driver-1", "Driver Tarek", "Driver", DateTimeOffset.UtcNow));
+        Assert.Contains("Cannot transition an order from Ready to OnTheWay", ex.Message);
+    }
+
+    [Fact]
+    public void TakeawayOrderCannotTransitionReadyToOnTheWay()
+    {
+        var order = CreateTakeawayOrderWithStatus(OrderStatus.Ready);
+
+        Assert.False(order.CanTransitionTo(OrderStatus.OnTheWay));
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            order.TransitionStatus(OrderStatus.OnTheWay, "driver-1", "Driver Tarek", "Driver", DateTimeOffset.UtcNow));
+        Assert.Contains("Cannot transition an order from Ready to OnTheWay", ex.Message);
+    }
+
+    [Fact]
+    public void TakeawayOrderCanTransitionReadyToDeliveredDirectlyAndSettlesCash()
+    {
+        var order = CreateTakeawayOrderWithStatus(OrderStatus.Ready);
+        var now = DateTimeOffset.UtcNow;
+
+        Assert.True(order.CanTransitionTo(OrderStatus.Delivered));
+        order.TransitionStatus(OrderStatus.Delivered, "cashier-1", "Cashier Mona", "Cashier", now);
+
+        Assert.Equal(OrderStatus.Delivered, order.Status);
+        Assert.Equal(PaymentStatus.Paid, order.PaymentStatus);
+    }
+
+    [Theory]
+    [InlineData(OrderStatus.Pending, OrderStatus.OnTheWay)]
+    [InlineData(OrderStatus.Confirmed, OrderStatus.OnTheWay)]
+    [InlineData(OrderStatus.Preparing, OrderStatus.OnTheWay)]
+    public void EarlyStatusesCannotTransitionToOnTheWay(OrderStatus initialStatus, OrderStatus targetStatus)
+    {
+        var order = CreateDeliveryOrderWithStatus(initialStatus);
+
+        Assert.False(order.CanTransitionTo(targetStatus));
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+            order.TransitionStatus(targetStatus, "driver-1", "Driver Tarek", "Driver", DateTimeOffset.UtcNow));
+        Assert.Contains(initialStatus.ToString(), exception.Message);
+    }
+
+    private static Order CreateSampleTakeawayOrder()
     {
         var order = new Order(
             Guid.NewGuid(),
@@ -154,49 +295,73 @@ public sealed class OrderStateTransitionTests
         return order;
     }
 
-    private static Order CreateOrderWithStatus(OrderStatus status)
+    private static Order CreateSampleDeliveryOrder()
     {
-        var order = CreateSampleOrder();
-        if (status == OrderStatus.Pending)
+        var order = new Order(
+            Guid.NewGuid(),
+            "BH-TEST-000002",
+            DateTimeOffset.UtcNow,
+            OrderType.Delivery,
+            "Ahmed Ali",
+            "01012345678",
+            Guid.NewGuid(),
+            "مدينة نصر",
+            "Nasr City",
+            "10 Street, Block 2",
+            35m,
+            "Fast please");
+
+        order.AddItem(Guid.NewGuid(), Guid.NewGuid(), "مشكل مشاوي", "Mixed Grill", 1, 295m);
+        return order;
+    }
+
+    private static Order CreateTakeawayOrderWithStatus(OrderStatus status)
+    {
+        var order = CreateSampleTakeawayOrder();
+        if (status == OrderStatus.Pending) return order;
+
+        order.TransitionTo(OrderStatus.Confirmed);
+        if (status == OrderStatus.Confirmed) return order;
+
+        order.TransitionTo(OrderStatus.Preparing);
+        if (status == OrderStatus.Preparing) return order;
+
+        order.TransitionTo(OrderStatus.Ready);
+        if (status == OrderStatus.Ready) return order;
+
+        if (status == OrderStatus.Delivered)
         {
+            order.TransitionTo(OrderStatus.Delivered);
             return order;
         }
 
-        if (status == OrderStatus.Confirmed)
-        {
-            order.TransitionTo(OrderStatus.Confirmed);
-            return order;
-        }
+        return order;
+    }
 
-        if (status == OrderStatus.Preparing)
-        {
-            order.TransitionTo(OrderStatus.Confirmed);
-            order.TransitionTo(OrderStatus.Preparing);
-            return order;
-        }
+    private static Order CreateDeliveryOrderWithStatus(OrderStatus status)
+    {
+        var order = CreateSampleDeliveryOrder();
+        if (status == OrderStatus.Pending) return order;
 
-        if (status == OrderStatus.Ready)
-        {
-            order.TransitionTo(OrderStatus.Confirmed);
-            order.TransitionTo(OrderStatus.Preparing);
-            order.TransitionTo(OrderStatus.Ready);
-            return order;
-        }
+        order.TransitionTo(OrderStatus.Confirmed);
+        if (status == OrderStatus.Confirmed) return order;
+
+        order.TransitionTo(OrderStatus.Preparing);
+        if (status == OrderStatus.Preparing) return order;
+
+        order.TransitionTo(OrderStatus.Ready);
+        if (status == OrderStatus.Ready) return order;
 
         if (status == OrderStatus.OnTheWay)
         {
-            order.TransitionTo(OrderStatus.Confirmed);
-            order.TransitionTo(OrderStatus.Preparing);
-            order.TransitionTo(OrderStatus.Ready);
+            order.AssignDriver(Guid.NewGuid(), "Driver 1", "cashier", "Cashier", DateTimeOffset.UtcNow);
             order.TransitionTo(OrderStatus.OnTheWay);
             return order;
         }
 
         if (status == OrderStatus.Delivered)
         {
-            order.TransitionTo(OrderStatus.Confirmed);
-            order.TransitionTo(OrderStatus.Preparing);
-            order.TransitionTo(OrderStatus.Ready);
+            order.AssignDriver(Guid.NewGuid(), "Driver 1", "cashier", "Cashier", DateTimeOffset.UtcNow);
             order.TransitionTo(OrderStatus.OnTheWay);
             order.TransitionTo(OrderStatus.Delivered);
             return order;
@@ -204,4 +369,8 @@ public sealed class OrderStateTransitionTests
 
         return order;
     }
+
+    private static Order CreateSampleOrder() => CreateSampleTakeawayOrder();
+
+    private static Order CreateOrderWithStatus(OrderStatus status) => CreateTakeawayOrderWithStatus(status);
 }

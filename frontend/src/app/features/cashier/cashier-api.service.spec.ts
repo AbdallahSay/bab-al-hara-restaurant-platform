@@ -98,4 +98,58 @@ describe('CashierApiService', () => {
       expect(result).toBe('error');
     });
   });
+
+  describe('getDrivers', () => {
+    it('should make GET /api/cashier/drivers', () => {
+      const mockDrivers = [
+        { id: 'd1', name: 'Ahmed Driver', phone: '01000000001', isAvailable: true },
+        { id: 'd2', name: 'Mahmoud Driver', phone: '01000000002', isAvailable: false },
+      ];
+
+      let result: unknown;
+      service.getDrivers().subscribe((data) => (result = data));
+
+      const req = httpTesting.expectOne('http://test.api/cashier/drivers');
+      expect(req.request.method).toBe('GET');
+      expect(req.request.withCredentials).toBe(true);
+      req.flush(mockDrivers);
+
+      expect(result).toEqual(mockDrivers);
+    });
+  });
+
+  describe('assignDriver', () => {
+    it('should make POST /api/orders/{id}/assign-driver', () => {
+      let result: string | undefined;
+      service.assignDriver('order-123', 'driver-456', 'v1').subscribe((res) => (result = res));
+
+      const req = httpTesting.expectOne('http://test.api/orders/order-123/assign-driver');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.withCredentials).toBe(true);
+      expect(req.request.body).toEqual({ driverId: 'driver-456', rowVersion: 'v1' });
+      req.flush({});
+
+      expect(result).toBe('success');
+    });
+
+    it('should return stale on 409 Conflict', () => {
+      let result: string | undefined;
+      service.assignDriver('order-123', 'driver-456', 'v1').subscribe((res) => (result = res));
+
+      const req = httpTesting.expectOne('http://test.api/orders/order-123/assign-driver');
+      req.flush('Conflict', { status: 409, statusText: 'Conflict' });
+
+      expect(result).toBe('stale');
+    });
+
+    it('should return error on 500 error', () => {
+      let result: string | undefined;
+      service.assignDriver('order-123', 'driver-456', 'v1').subscribe((res) => (result = res));
+
+      const req = httpTesting.expectOne('http://test.api/orders/order-123/assign-driver');
+      req.flush('Server Error', { status: 500, statusText: 'Server Error' });
+
+      expect(result).toBe('error');
+    });
+  });
 });

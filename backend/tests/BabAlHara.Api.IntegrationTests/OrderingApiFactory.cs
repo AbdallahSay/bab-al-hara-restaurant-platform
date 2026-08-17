@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using BabAlHara.Application.Driver;
 using BabAlHara.Application.Kitchen;
 using BabAlHara.Application.Ordering;
 using BabAlHara.Domain.Catalog;
@@ -36,6 +37,7 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
     private readonly SwitchingOrderCodeGenerator orderCodeGenerator = new();
 
     public RecordingKitchenRealtimeNotifier Notifier { get; } = new();
+    public RecordingDriverRealtimeNotifier DriverNotifier { get; } = new();
 
     public async Task InitializeAsync()
     {
@@ -54,6 +56,7 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
     public async Task ResetAsync()
     {
         Notifier.Clear();
+        DriverNotifier.Clear();
         orderCodeGenerator.UseDefault();
 
         await using var dbContext = CreateDbContext();
@@ -215,10 +218,12 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
             services.RemoveAll<AppDbContext>();
             services.RemoveAll<IKitchenRealtimeNotifier>();
             services.RemoveAll<INewOrderNotifier>();
+            services.RemoveAll<IDriverRealtimeNotifier>();
             services.RemoveAll<IOrderCodeGenerator>();
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
             services.AddSingleton<IKitchenRealtimeNotifier>(Notifier);
             services.AddSingleton<INewOrderNotifier>(Notifier);
+            services.AddSingleton<IDriverRealtimeNotifier>(DriverNotifier);
             services.AddSingleton<IOrderCodeGenerator>(orderCodeGenerator);
         });
     }
@@ -276,6 +281,33 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
             orders.Clear();
             statusChanges.Clear();
             availabilityChanges.Clear();
+        }
+    }
+
+    public sealed class RecordingDriverRealtimeNotifier : IDriverRealtimeNotifier
+    {
+        private readonly List<DriverAssignedEvent> driverAssignedEvents = [];
+        private readonly List<OrderStatusChangedEvent> statusChanges = [];
+
+        public IReadOnlyList<DriverAssignedEvent> DriverAssignedEvents => driverAssignedEvents;
+        public IReadOnlyList<OrderStatusChangedEvent> StatusChanges => statusChanges;
+
+        public Task NotifyDriverAssignedAsync(DriverAssignedEvent evt, CancellationToken cancellationToken)
+        {
+            driverAssignedEvents.Add(evt);
+            return Task.CompletedTask;
+        }
+
+        public Task NotifyOrderStatusChangedAsync(OrderStatusChangedEvent evt, CancellationToken cancellationToken)
+        {
+            statusChanges.Add(evt);
+            return Task.CompletedTask;
+        }
+
+        public void Clear()
+        {
+            driverAssignedEvents.Clear();
+            statusChanges.Clear();
         }
     }
 

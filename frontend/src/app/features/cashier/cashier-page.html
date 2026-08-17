@@ -100,14 +100,96 @@
 
             <footer class="order-ticket__actions">
               @if (order.orderType === 'Delivery') {
-                <div class="delivery-status">
+                <div class="delivery-section">
                   <div class="delivery-detail">
                     <strong>{{ areaName(order) }}</strong>
                     @if (order.address) {
                       <span>{{ order.address }}</span>
                     }
                   </div>
-                  <div class="waiting-driver">⏳ {{ copy().cashier.waitingForDriver }}</div>
+
+                  @if (order.driverId || order.driverName) {
+                    <div class="assigned-driver-card">
+                      <div class="assigned-driver-info">
+                        <span class="driver-icon" aria-hidden="true">🚗</span>
+                        <div class="driver-text">
+                          <span class="driver-label">{{ copy().cashier.assignedDriver }}</span>
+                          <strong class="driver-name">{{ order.driverName }}</strong>
+                        </div>
+                      </div>
+                      <div
+                        class="driver-status-badge"
+                        [class.is-ontheway]="order.status === 'OnTheWay'"
+                      >
+                        <span>{{ copy().cashier.driverStatus }}:</span>
+                        <strong>{{ statusLabel(order.status) }}</strong>
+                      </div>
+                    </div>
+                  } @else {
+                    @if (confirmingAssignments().has(order.id)) {
+                      <div class="assignment-confirm" role="dialog" aria-modal="true">
+                        <strong>{{ copy().cashier.assignConfirmTitle }}</strong>
+                        <p>{{ copy().cashier.assignConfirmBody }}</p>
+                        <div class="driver-preview">
+                          <span>{{ copy().cashier.assignedDriver }}:</span>
+                          <strong>{{ getDriverName(getSelectedDriver(order.id)) }}</strong>
+                        </div>
+                        <div class="assignment-confirm__buttons">
+                          <button
+                            class="button"
+                            type="button"
+                            (click)="cancelAssign(order.id)"
+                            [disabled]="inFlightAssignments().has(order.id)"
+                          >
+                            {{ copy().cashier.assignConfirmNo }}
+                          </button>
+                          <button
+                            class="button button--primary"
+                            type="button"
+                            (click)="confirmAssign(order)"
+                            [disabled]="inFlightAssignments().has(order.id)"
+                          >
+                            {{ copy().cashier.assignConfirmYes }}
+                          </button>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="driver-assignment-form">
+                        <label [for]="'driver-select-' + order.id" class="driver-select-label">
+                          {{ copy().cashier.selectDriver }}
+                        </label>
+                        <select
+                          [id]="'driver-select-' + order.id"
+                          class="driver-select"
+                          [value]="getSelectedDriver(order.id)"
+                          (change)="onSelectDriver(order.id, $event)"
+                          [disabled]="inFlightAssignments().has(order.id)"
+                        >
+                          <option value="">{{ copy().cashier.selectDriverPlaceholder }}</option>
+                          @for (driver of drivers(); track driver.id) {
+                            <option [value]="driver.id">{{ driver.name }}</option>
+                          }
+                        </select>
+                        <button
+                          class="button button--primary button--large assign-driver-button"
+                          type="button"
+                          [disabled]="
+                            !getSelectedDriver(order.id) || inFlightAssignments().has(order.id)
+                          "
+                          (click)="initiateAssign(order.id)"
+                        >
+                          🚗 {{ copy().cashier.assignDriver }}
+                        </button>
+                      </div>
+                    }
+
+                    @if (staleAssignmentOrders().has(order.id)) {
+                      <p class="error-text">{{ copy().cashier.assignDriverStaleError }}</p>
+                    }
+                    @if (errorAssignmentOrders().has(order.id)) {
+                      <p class="error-text">{{ copy().cashier.assignDriverError }}</p>
+                    }
+                  }
                 </div>
               } @else {
                 @if (confirmingOrders().has(order.id)) {
@@ -117,6 +199,7 @@
                     <div class="handoff-confirm__buttons">
                       <button
                         class="button"
+                        type="button"
                         (click)="cancelHandoff(order.id)"
                         [disabled]="inFlightHandoffs().has(order.id)"
                       >
@@ -124,6 +207,7 @@
                       </button>
                       <button
                         class="button button--danger"
+                        type="button"
                         (click)="confirmHandoff(order)"
                         [disabled]="inFlightHandoffs().has(order.id)"
                       >
@@ -134,18 +218,19 @@
                 } @else {
                   <button
                     class="button button--primary button--large handoff-button"
+                    type="button"
                     (click)="initiateHandoff(order.id)"
                   >
                     ✓ {{ copy().cashier.handoff }}
                   </button>
                 }
-              }
 
-              @if (staleOrders().has(order.id)) {
-                <p class="error-text">{{ copy().cashier.handoffStaleError }}</p>
-              }
-              @if (errorOrders().has(order.id)) {
-                <p class="error-text">{{ copy().cashier.handoffError }}</p>
+                @if (staleOrders().has(order.id)) {
+                  <p class="error-text">{{ copy().cashier.handoffStaleError }}</p>
+                }
+                @if (errorOrders().has(order.id)) {
+                  <p class="error-text">{{ copy().cashier.handoffError }}</p>
+                }
               }
             </footer>
           </article>

@@ -102,6 +102,12 @@ public sealed class Order
 
     public PaymentStatus PaymentStatus { get; private set; }
 
+    public Guid? DriverId { get; private set; }
+
+    public string? DriverName { get; private set; }
+
+    public DateTimeOffset? DriverAssignedAtUtc { get; private set; }
+
     public byte[] RowVersion { get; private set; } = [];
 
     public IReadOnlyCollection<OrderItem> Items => items;
@@ -128,8 +134,74 @@ public sealed class Order
         Total = Subtotal + DeliveryFee;
     }
 
-    public bool CanTransitionTo(OrderStatus nextStatus) =>
-        AllowedTransitions.TryGetValue(Status, out var allowed) && allowed.Contains(nextStatus);
+    public OrderStatusHistory AssignDriver(
+        Guid driverId,
+        string driverName,
+        string? actorId,
+        string? actorRole,
+        DateTimeOffset assignedAtUtc)
+    {
+        if (OrderType != OrderType.Delivery)
+        {
+            throw new InvalidOperationException("Driver assignment is only allowed for delivery orders.");
+        }
+
+        if (Status != OrderStatus.Ready)
+        {
+            throw new InvalidOperationException($"Cannot assign a driver to an order with status '{Status}'. Order must be Ready.");
+        }
+
+        if (driverId == Guid.Empty)
+        {
+            throw new ArgumentException("Driver ID cannot be empty.", nameof(driverId));
+        }
+
+        if (string.IsNullOrWhiteSpace(driverName))
+        {
+            throw new ArgumentException("Driver name cannot be empty.", nameof(driverName));
+        }
+
+        DriverId = driverId;
+        DriverName = driverName.Trim();
+        DriverAssignedAtUtc = assignedAtUtc;
+
+        var history = new OrderStatusHistory(
+            Guid.NewGuid(),
+            Id,
+            Status,
+            Status,
+            actorId,
+            actorName: null,
+            actorRole,
+            assignedAtUtc,
+            $"Assigned driver {DriverName} ({driverId})");
+
+        statusHistory.Add(history);
+        return history;
+    }
+
+    public bool CanTransitionTo(OrderStatus nextStatus)
+    {
+        if (Status == OrderStatus.Ready)
+        {
+            if (OrderType == OrderType.Takeaway)
+            {
+                return nextStatus == OrderStatus.Delivered;
+            }
+
+            if (OrderType == OrderType.Delivery)
+            {
+                return nextStatus == OrderStatus.OnTheWay && DriverId.HasValue;
+            }
+        }
+
+        if (Status == OrderStatus.OnTheWay)
+        {
+            return OrderType == OrderType.Delivery && nextStatus == OrderStatus.Delivered;
+        }
+
+        return AllowedTransitions.TryGetValue(Status, out var allowed) && allowed.Contains(nextStatus);
+    }
 
     public OrderStatusHistory TransitionStatus(
         OrderStatus nextStatus,
@@ -146,6 +218,11 @@ public sealed class Order
 
         var previousStatus = Status;
         Status = nextStatus;
+
+        if (nextStatus == OrderStatus.Delivered && PaymentMethod == PaymentMethod.Cash)
+        {
+            PaymentStatus = PaymentStatus.Paid;
+        }
 
         var history = new OrderStatusHistory(
             Guid.NewGuid(),

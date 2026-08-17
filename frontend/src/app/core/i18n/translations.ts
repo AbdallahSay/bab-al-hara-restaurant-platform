@@ -215,6 +215,82 @@ export interface UiCopy {
     readonly address: string;
     readonly area: string;
     readonly signOut: string;
+    readonly selectDriver: string;
+    readonly selectDriverPlaceholder: string;
+    readonly assignDriver: string;
+    readonly assignedDriver: string;
+    readonly assignConfirmTitle: string;
+    readonly assignConfirmBody: string;
+    readonly assignConfirmYes: string;
+    readonly assignConfirmNo: string;
+    readonly assignDriverSuccess: string;
+    readonly assignDriverStaleError: string;
+    readonly assignDriverError: string;
+    readonly driverStatus: string;
+    readonly statusReady: string;
+    readonly statusOnTheWay: string;
+    readonly statusDelivered: string;
+  };
+  readonly driver: {
+    readonly title: string;
+    readonly assignedOrders: string;
+    readonly connectionLabel: string;
+    readonly ordersLabel: string;
+    readonly signOut: string;
+    readonly loading: string;
+    readonly emptyTitle: string;
+    readonly emptyBody: string;
+    readonly emptyFilterTitle: string;
+    readonly emptyFilterBody: string;
+    readonly queueError: string;
+    readonly connected: string;
+    readonly connecting: string;
+    readonly reconnecting: string;
+    readonly disconnected: string;
+    readonly newAssignment: string;
+    readonly orderCode: string;
+    readonly customer: string;
+    readonly phone: string;
+    readonly callCustomer: string;
+    readonly address: string;
+    readonly deliveryArea: string;
+    readonly note: string;
+    readonly items: string;
+    readonly subtotal: string;
+    readonly deliveryFee: string;
+    readonly total: string;
+    readonly paymentMethod: string;
+    readonly paymentStatus: string;
+    readonly cashOnDelivery: string;
+    readonly paid: string;
+    readonly unpaid: string;
+    readonly allFilter: string;
+    readonly readyFilter: string;
+    readonly onTheWayFilter: string;
+    readonly deliveredFilter: string;
+    readonly startDelivery: string;
+    readonly markDelivered: string;
+    readonly startingDelivery: string;
+    readonly markingDelivered: string;
+    readonly confirmStartDeliveryTitle: string;
+    readonly confirmStartDeliveryMessage: string;
+    readonly confirmMarkDeliveredTitle: string;
+    readonly confirmMarkDeliveredMessage: string;
+    readonly confirm: string;
+    readonly cancel: string;
+    readonly refresh: string;
+    readonly orderUpdatedByOther: string;
+    readonly actionError: string;
+    readonly deliveryStartedSuccess: string;
+    readonly orderDeliveredSuccess: string;
+    readonly receivedAt: string;
+    readonly elapsed: string;
+    readonly minute: string;
+    readonly minutes: string;
+    readonly signInTitle: string;
+    readonly signInDescription: string;
+    readonly searchOrders: string;
+    readonly status: Readonly<Record<string, string>>;
   };
 }
 
@@ -441,6 +517,90 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       address: 'العنوان',
       area: 'المنطقة',
       signOut: 'تسجيل الخروج',
+      selectDriver: 'اختر السائق',
+      selectDriverPlaceholder: '-- اختر سائقاً للتوصيل --',
+      assignDriver: 'تعيين سائق',
+      assignedDriver: 'السائق',
+      assignConfirmTitle: 'تأكيد تعيين السائق',
+      assignConfirmBody: 'هل أنت متأكد من تعيين السائق لهذا الطلب؟',
+      assignConfirmYes: 'نعم، تعيين السائق',
+      assignConfirmNo: 'إلغاء',
+      assignDriverSuccess: 'تم تعيين السائق بنجاح',
+      assignDriverStaleError: 'تم تعديل الطلب من قبل مستخدم آخر، يرجى إعادة المحاولة',
+      assignDriverError: 'حدث خطأ أثناء تعيين السائق، يرجى المحاولة مرة أخرى',
+      driverStatus: 'حالة التوصيل',
+      statusReady: 'جاهز للتوصيل',
+      statusOnTheWay: 'في الطريق',
+      statusDelivered: 'تم التسليم',
+    },
+
+    driver: {
+      title: 'شاشة السائق',
+      assignedOrders: 'طلبات التوصيل المسندة',
+      connectionLabel: 'حالة اتصال شاشة التوصيل',
+      ordersLabel: 'قائمة طلبات التوصيل',
+      signOut: 'تسجيل الخروج',
+      loading: 'جاري تحميل الطلبات المسندة…',
+      emptyTitle: 'لا توجد طلبات توصيل مسندة',
+      emptyBody: 'ستظهر الطلبات المسندة إليك هنا فور تعيينها.',
+      emptyFilterTitle: 'لا توجد طلبات في هذا القسم',
+      emptyFilterBody: 'لا توجد طلبات مسندة تطابق التصفية المحددة حالياً.',
+      queueError: 'تعذر تحميل طلبات التوصيل. أعد المحاولة.',
+      connected: 'متصل بالتحديثات المباشرة',
+      connecting: 'جاري الاتصال…',
+      reconnecting: 'انقطع الاتصال، جاري إعادة الاتصال…',
+      disconnected: 'التحديث المباشر متوقف',
+      newAssignment: 'تم إسناد طلب توصيل جديد!',
+      orderCode: 'طلب #',
+      customer: 'العميل',
+      phone: 'رقم الهاتف',
+      callCustomer: 'اتصال بالعميل',
+      address: 'عنوان التوصيل',
+      deliveryArea: 'منطقة التوصيل',
+      note: 'ملاحظات العميل',
+      items: 'الأصناف المطلوبة',
+      subtotal: 'المجموع الفرعي',
+      deliveryFee: 'رسوم التوصيل',
+      total: 'الإجمالي المطلوب تحصيله',
+      paymentMethod: 'طريقة الدفع',
+      paymentStatus: 'حالة الدفع',
+      cashOnDelivery: 'الدفع عند الاستلام (كاش)',
+      paid: 'مدفوع',
+      unpaid: 'غير مدفوع (مطلوب تحصيله)',
+      allFilter: 'كل المسند',
+      readyFilter: 'جاهز للاستلام',
+      onTheWayFilter: 'في الطريق',
+      deliveredFilter: 'تم التسليم',
+      startDelivery: 'بدء التوصيل',
+      markDelivered: 'تم التسليم',
+      startingDelivery: 'جاري بدء التوصيل…',
+      markingDelivered: 'جاري تأكيد التسليم…',
+      confirmStartDeliveryTitle: 'تأكيد استلام وبدء التوصيل',
+      confirmStartDeliveryMessage: 'هل استلمت الطلب من المطعم وجاهز للبدء بالتوصيل إلى العنوان؟',
+      confirmMarkDeliveredTitle: 'تأكيد تسليم الطلب',
+      confirmMarkDeliveredMessage: 'هل تم تسليم الطلب للعميل واستلام المبلغ المطلوب بالكامل؟',
+      confirm: 'تأكيد',
+      cancel: 'إلغاء',
+      refresh: 'تحديث البيانات',
+      orderUpdatedByOther: 'تم تحديث حالة هذا الطلب من جهة أخرى، تم تحديث الشاشة.',
+      actionError: 'تعذر تنفيذ العملية. حاول مرة أخرى.',
+      deliveryStartedSuccess: 'تم بدء التوصيل بنجاح.',
+      orderDeliveredSuccess: 'تم تأكيد تسليم الطلب بنجاح.',
+      receivedAt: 'وقت الطلب',
+      elapsed: 'الوقت المنقضي',
+      minute: 'دقيقة',
+      minutes: 'دقائق',
+      signInTitle: 'دخول السائقين',
+      signInDescription: 'هذه الشاشة مخصصة لكباتن وسائقي التوصيل المصرح لهم.',
+      searchOrders: 'بحث برقم الطلب أو الاسم أو العنوان…',
+      status: {
+        Pending: 'قيد الانتظار',
+        Confirmed: 'مؤكد',
+        Preparing: 'قيد التجهيز',
+        Ready: 'جاهز للاستلام',
+        OnTheWay: 'في الطريق للتوصيل',
+        Delivered: 'تم التسليم',
+      },
     },
   },
   en: {
@@ -666,6 +826,92 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       address: 'Address',
       area: 'Area',
       signOut: 'Sign out',
+      selectDriver: 'Select Driver',
+      selectDriverPlaceholder: '-- Select delivery driver --',
+      assignDriver: 'Assign Driver',
+      assignedDriver: 'Driver',
+      assignConfirmTitle: 'Confirm Driver Assignment',
+      assignConfirmBody: 'Are you sure you want to assign the driver to this order?',
+      assignConfirmYes: 'Yes, assign driver',
+      assignConfirmNo: 'Cancel',
+      assignDriverSuccess: 'Driver assigned successfully',
+      assignDriverStaleError: 'Order was updated by another user, please try again',
+      assignDriverError: 'Failed to assign driver, please try again',
+      driverStatus: 'Delivery Status',
+      statusReady: 'Ready for Delivery',
+      statusOnTheWay: 'On the way',
+      statusDelivered: 'Delivered',
+    },
+
+    driver: {
+      title: 'Driver Screen',
+      assignedOrders: 'Assigned Deliveries',
+      connectionLabel: 'Driver connection status',
+      ordersLabel: 'Assigned deliveries list',
+      signOut: 'Sign out',
+      loading: 'Loading assigned orders…',
+      emptyTitle: 'No assigned deliveries',
+      emptyBody: 'Orders assigned to you for delivery will appear here.',
+      emptyFilterTitle: 'No orders in this section',
+      emptyFilterBody: 'There are no orders matching this filter.',
+      queueError: 'Failed to load assigned deliveries. Try again.',
+      connected: 'Live updates connected',
+      connecting: 'Connecting…',
+      reconnecting: 'Connection lost, reconnecting…',
+      disconnected: 'Live updates disconnected',
+      newAssignment: 'New delivery assigned!',
+      orderCode: 'Order #',
+      customer: 'Customer',
+      phone: 'Phone number',
+      callCustomer: 'Call customer',
+      address: 'Delivery address',
+      deliveryArea: 'Delivery area',
+      note: 'Customer note',
+      items: 'Order items',
+      subtotal: 'Subtotal',
+      deliveryFee: 'Delivery fee',
+      total: 'Total to collect',
+      paymentMethod: 'Payment method',
+      paymentStatus: 'Payment status',
+      cashOnDelivery: 'Cash on Delivery',
+      paid: 'Paid',
+      unpaid: 'Unpaid (Collect cash)',
+      allFilter: 'All Assigned',
+      readyFilter: 'Ready for Pickup',
+      onTheWayFilter: 'On The Way',
+      deliveredFilter: 'Delivered',
+      startDelivery: 'Start delivery',
+      markDelivered: 'Mark delivered',
+      startingDelivery: 'Starting delivery…',
+      markingDelivered: 'Marking delivered…',
+      confirmStartDeliveryTitle: 'Confirm Delivery Pickup',
+      confirmStartDeliveryMessage:
+        'Have you collected this order and are starting delivery to the customer?',
+      confirmMarkDeliveredTitle: 'Confirm Delivery Completion',
+      confirmMarkDeliveredMessage:
+        'Has this order been delivered to the customer and total cash collected?',
+      confirm: 'Confirm',
+      cancel: 'Cancel',
+      refresh: 'Refresh data',
+      orderUpdatedByOther: 'This order was updated by another user. Display refreshed.',
+      actionError: 'Failed to update order. Try again.',
+      deliveryStartedSuccess: 'Delivery started successfully.',
+      orderDeliveredSuccess: 'Order marked as delivered successfully.',
+      receivedAt: 'Order time',
+      elapsed: 'Elapsed',
+      minute: 'min',
+      minutes: 'mins',
+      signInTitle: 'Driver sign in',
+      signInDescription: 'This screen is restricted to authorised delivery drivers.',
+      searchOrders: 'Search by order number, name, or address…',
+      status: {
+        Pending: 'Pending',
+        Confirmed: 'Confirmed',
+        Preparing: 'Preparing',
+        Ready: 'Ready for pickup',
+        OnTheWay: 'On the way',
+        Delivered: 'Delivered',
+      },
     },
   },
 };

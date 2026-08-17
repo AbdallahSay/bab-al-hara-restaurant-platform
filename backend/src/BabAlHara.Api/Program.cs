@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using BabAlHara.Api.Features.Cashier;
 using BabAlHara.Api.Features.Catalog;
+using BabAlHara.Api.Features.Driver;
 using BabAlHara.Api.Features.Kitchen;
 using BabAlHara.Api.Features.Ordering;
 using BabAlHara.Api.Platform.Errors;
@@ -9,6 +10,7 @@ using BabAlHara.Api.Platform.Health;
 using BabAlHara.Api.Platform.Observability;
 using BabAlHara.Api.Platform.Security;
 using BabAlHara.Application.Cashier;
+using BabAlHara.Application.Driver;
 using BabAlHara.Application.Kitchen;
 using BabAlHara.Infrastructure;
 using BabAlHara.Infrastructure.Persistence;
@@ -97,6 +99,10 @@ builder.Services.AddSingleton<INewOrderNotifier>(sp =>
     sp.GetRequiredService<SignalRKitchenRealtimeNotifier>());
 builder.Services.AddSingleton<ICashierOrderCompletedNotifier, SignalRCashierNotifier>();
 
+builder.Services.AddSingleton<SignalRDriverRealtimeNotifier>();
+builder.Services.AddSingleton<IDriverRealtimeNotifier>(sp =>
+    sp.GetRequiredService<SignalRDriverRealtimeNotifier>());
+
 //
 // Authorization
 //
@@ -119,6 +125,15 @@ builder.Services
                 .RequireAuthenticatedUser()
                 .RequireRole(
                     DevelopmentDataSeeder.CashierRole,
+                    DevelopmentDataSeeder.ManagerRole,
+                    DevelopmentDataSeeder.AdminRole))
+    .AddPolicy(
+        AuthorizationPolicies.Driver,
+        policy =>
+            policy
+                .RequireAuthenticatedUser()
+                .RequireRole(
+                    DevelopmentDataSeeder.DriverRole,
                     DevelopmentDataSeeder.ManagerRole,
                     DevelopmentDataSeeder.AdminRole));
 
@@ -365,12 +380,17 @@ app.MapOrderEndpoints();
 app.MapKitchenEndpoints();
 
 app.MapCashierEndpoints();
+app.MapDriverEndpoints();
 
 //
 // SignalR
 //
 
 app.MapHub<KitchenHub>("/hubs/kitchen");
+app.MapHub<CashierHub>("/hubs/cashier");
+
+app.MapHub<DriverHub>("/hubs/driver");
+
 app.MapHub<CashierHub>("/hubs/cashier");
 
 //
