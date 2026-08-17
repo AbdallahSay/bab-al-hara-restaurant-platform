@@ -1,0 +1,96 @@
+<div class="hub-layout">
+  <header class="hub-header">
+    <div class="hub-header__brand">
+      <h1 class="brand-title">{{ copy().brand.name }}</h1>
+      <span class="hub-badge">{{ copy().management.title }}</span>
+    </div>
+    <div class="hub-header__nav">
+      <a routerLink="/management" class="nav-link is-active">{{ copy().management.navHub }}</a>
+      <a routerLink="/management/menu" class="nav-link">{{ copy().management.navMenu }}</a>
+      <a routerLink="/" class="nav-link nav-link--customer" target="_blank">
+        {{ copy().management.viewCustomerMenu }} ↗
+      </a>
+    </div>
+    <div class="hub-header__actions">
+      <div class="lang-switch">
+        <button
+          type="button"
+          class="lang-btn"
+          [class.is-active]="language.current() === 'ar'"
+          (click)="setLanguage('ar')"
+        >
+          العربية
+        </button>
+        <button
+          type="button"
+          class="lang-btn"
+          [class.is-active]="language.current() === 'en'"
+          (click)="setLanguage('en')"
+        >
+          English
+        </button>
+      </div>
+      <button type="button" class="btn-signout" (click)="signOut()">
+        {{ copy().management.signOut }}
+      </button>
+    </div>
+  </header>
+
+  <main class="hub-content">
+    <div class="hub-grid">
+      <!-- Restaurant Operational Control -->
+      <section class="hub-section hub-section--control">
+        <app-restaurant-status-card />
+      </section>
+
+      <!-- Quick Stats & Nav Section -->
+      <section class="hub-section hub-section--stats">
+        <div class="stats-card">
+          <div class="stats-header">
+            <h2 class="stats-title">{{ copy().management.stats.title }}</h2>
+            <a routerLink="/management/menu" class="btn btn-secondary btn-sm">
+              {{ copy().management.navMenu }} →
+            </a>
+          </div>
+
+          @if (loading()) {
+            <div class="stats-loading" role="status">
+              <div class="stat-item skeleton"></div>
+              <div class="stat-item skeleton"></div>
+              <div class="stat-item skeleton"></div>
+              <div class="stat-item skeleton"></div>
+            </div>
+          } @else if (error()) {
+            <div class="alert alert-error" role="alert">
+              <p>{{ error() }}</p>
+              <button type="button" class="btn btn-sm btn-secondary" (click)="loadData()">
+                {{ copy().management.errors.retry }}
+              </button>
+            </div>
+          } @else {
+            <div class="stats-grid">
+              <div class="stat-box">
+                <span class="stat-label">{{ copy().management.stats.activeCategories }}</span>
+                <span class="stat-value"
+                  >{{ activeCategoriesCount() }} / {{ categories().length }}</span
+                >
+              </div>
+              <div class="stat-box stat-box--success">
+                <span class="stat-label">{{ copy().management.stats.availableItems }}</span>
+                <span class="stat-value">{{ availableItemsCount() }}</span>
+              </div>
+              <div class="stat-box stat-box--warning">
+                <span class="stat-label">{{ copy().management.stats.soldOutItems }}</span>
+                <span class="stat-value">{{ soldOutItemsCount() }}</span>
+              </div>
+              <div class="stat-box stat-box--archived">
+                <span class="stat-label">{{ copy().management.stats.archivedItems }}</span>
+                <span class="stat-value">{{ archivedItemsCount() }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
