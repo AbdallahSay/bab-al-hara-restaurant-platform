@@ -90,6 +90,92 @@ export class CartService {
     this.items.set([]);
   }
 
+  mergeItems(
+    items: readonly {
+      readonly menuItemId: string;
+      readonly nameAr: string;
+      readonly nameEn: string;
+      readonly imageReference: string;
+      readonly unitPrice: number;
+      readonly quantity: number;
+    }[],
+  ): void {
+    if (!items.length) return;
+
+    this.items.update((current) => {
+      const next = [...current];
+      for (const item of items) {
+        if (item.quantity <= 0) continue;
+        const existingIdx = next.findIndex((c) => c.menuItemId === item.menuItemId);
+        if (existingIdx >= 0) {
+          const existing = next[existingIdx]!;
+          const newQty = Math.min(99, existing.quantity + item.quantity);
+          next[existingIdx] = {
+            ...existing,
+            nameAr: item.nameAr,
+            nameEn: item.nameEn,
+            imageReference: item.imageReference,
+            unitPrice: item.unitPrice,
+            quantity: newQty,
+            isAvailable: true,
+          };
+        } else {
+          next.push({
+            menuItemId: item.menuItemId,
+            nameAr: item.nameAr,
+            nameEn: item.nameEn,
+            imageReference: item.imageReference,
+            unitPrice: item.unitPrice,
+            quantity: Math.min(99, Math.max(1, item.quantity)),
+            isAvailable: true,
+          });
+        }
+      }
+      return next;
+    });
+  }
+
+  replaceItems(
+    items: readonly {
+      readonly menuItemId: string;
+      readonly nameAr: string;
+      readonly nameEn: string;
+      readonly imageReference: string;
+      readonly unitPrice: number;
+      readonly quantity: number;
+    }[],
+  ): void {
+    const itemMap = new Map<string, CartItem>();
+
+    for (const item of items) {
+      if (item.quantity <= 0) continue;
+      const existing = itemMap.get(item.menuItemId);
+      if (existing) {
+        const updatedQty = Math.min(99, existing.quantity + item.quantity);
+        itemMap.set(item.menuItemId, {
+          ...existing,
+          unitPrice: item.unitPrice,
+          nameAr: item.nameAr,
+          nameEn: item.nameEn,
+          imageReference: item.imageReference,
+          quantity: updatedQty,
+        });
+      } else {
+        itemMap.set(item.menuItemId, {
+          menuItemId: item.menuItemId,
+          nameAr: item.nameAr,
+          nameEn: item.nameEn,
+          imageReference: item.imageReference,
+          unitPrice: item.unitPrice,
+          quantity: Math.min(99, Math.max(1, item.quantity)),
+          isAvailable: true,
+        });
+      }
+    }
+
+    this.items.set(Array.from(itemMap.values()));
+  }
+
   syncCatalog(menuItems: readonly MenuItem[]): void {
     const catalog = new Map(menuItems.map((item) => [item.id, item]));
     this.items.update((items) =>

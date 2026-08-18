@@ -63,6 +63,86 @@
       </p>
     </section>
 
+    <!-- Reorder Feedback Alert / Toast -->
+    @if (reorderFeedback(); as fb) {
+      <aside
+        class="reorder-feedback reorder-feedback--{{ fb.type }}"
+        role="status"
+        aria-live="polite"
+      >
+        <div class="reorder-feedback__body">
+          <span class="reorder-feedback__icon" aria-hidden="true">
+            @if (fb.type === 'error') {
+              ⚠️
+            } @else if (fb.type === 'partial') {
+              ℹ️
+            } @else {
+              ✓
+            }
+          </span>
+          <div class="reorder-feedback__text">
+            <p class="reorder-feedback__msg">{{ fb.message }}</p>
+            @if (fb.unavailableItems && fb.unavailableItems.length > 0) {
+              <ul class="reorder-feedback__skipped-list">
+                @for (unItem of fb.unavailableItems; track unItem.historicalNameAr) {
+                  <li>
+                    <span class="skipped-item-name">
+                      {{ localizedText(unItem.historicalNameAr, unItem.historicalNameEn) }}
+                    </span>
+                    <span class="skipped-item-reason">
+                      ({{ getUnavailableReasonText(unItem.reason) }})
+                    </span>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        </div>
+        <div class="reorder-feedback__actions">
+          @if (fb.type !== 'error') {
+            <a routerLink="/cart" class="button button--secondary button--small view-cart-btn">
+              {{ copy().orderTracking.reorder.viewCart }}
+            </a>
+          }
+          <button
+            type="button"
+            class="reorder-feedback__dismiss"
+            [attr.aria-label]="copy().orderTracking.reorder.cancelAction"
+            (click)="dismissFeedback()"
+          >
+            ✕
+          </button>
+        </div>
+      </aside>
+    }
+
+    <!-- Reorder CTA for Delivered Orders -->
+    @if (t.status === 'Delivered') {
+      <section class="tracking-card reorder-card" aria-label="Reorder">
+        <div class="reorder-card__content">
+          <div class="reorder-card__info">
+            <h2 class="reorder-card__title">{{ copy().orderTracking.reorder.previewTitle }}</h2>
+            <p class="reorder-card__desc">{{ copy().orderTracking.reorder.previewDescription }}</p>
+          </div>
+          <button
+            type="button"
+            class="button button--primary reorder-btn"
+            [disabled]="reorderLoading()"
+            [attr.aria-busy]="reorderLoading()"
+            (click)="onReorder()"
+          >
+            @if (reorderLoading()) {
+              <span class="spinner spinner--small" aria-hidden="true"></span>
+              <span>{{ copy().orderTracking.reorder.loadingPreview }}</span>
+            } @else {
+              <span class="reorder-icon" aria-hidden="true">🔁</span>
+              <span>{{ copy().orderTracking.reorder.orderAgain }}</span>
+            }
+          </button>
+        </div>
+      </section>
+    }
+
     <!-- Status Stepper -->
     <section class="tracking-card stepper-card" aria-label="Order progress">
       <ol class="stepper" role="list">
@@ -150,5 +230,104 @@
         </div>
       }
     </section>
+
+    <!-- Cart Merge / Replace Confirmation Modal -->
+    @if (showMergeDialog() && pendingReorderPreview(); as preview) {
+      <div
+        class="modal-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="merge-dialog-title"
+        (keydown.escape)="closeMergeDialog()"
+      >
+        <div class="modal-card">
+          <h3 id="merge-dialog-title" class="modal-card__title">
+            {{ copy().orderTracking.reorder.mergeConfirmTitle }}
+          </h3>
+          <p class="modal-card__question">
+            {{ copy().orderTracking.reorder.mergeConfirmQuestion }}
+          </p>
+
+          <p class="modal-card__notice">
+            <span aria-hidden="true">ℹ️</span>
+            {{ copy().orderTracking.reorder.priceChangeNotice }}
+          </p>
+
+          @if (preview.unavailableItems.length > 0) {
+            <div class="modal-card__skipped-notice">
+              <p class="skipped-notice-title">
+                {{ copy().orderTracking.reorder.partialSuccessNotice }}
+              </p>
+              <ul class="skipped-notice-list">
+                @for (unItem of preview.unavailableItems; track unItem.historicalNameAr) {
+                  <li>
+                    <span>{{
+                      localizedText(unItem.historicalNameAr, unItem.historicalNameEn)
+                    }}</span>
+                    <span class="skipped-item-badge">{{
+                      getUnavailableReasonText(unItem.reason)
+                    }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+          <div class="modal-card__actions">
+            <button type="button" class="button button--primary" (click)="confirmMerge()">
+              {{ copy().orderTracking.reorder.mergeAction }}
+            </button>
+            <button type="button" class="button button--secondary" (click)="confirmReplace()">
+              {{ copy().orderTracking.reorder.replaceAction }}
+            </button>
+            <button type="button" class="button button--ghost" (click)="closeMergeDialog()">
+              {{ copy().orderTracking.reorder.cancelAction }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- All Unavailable Dialog -->
+    @if (showUnavailableDialog()) {
+      <div
+        class="modal-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="unavailable-dialog-title"
+        (keydown.escape)="closeUnavailableDialog()"
+      >
+        <div class="modal-card">
+          <h3 id="unavailable-dialog-title" class="modal-card__title">
+            {{ copy().orderTracking.reorder.previewTitle }}
+          </h3>
+          <p class="modal-card__question">
+            {{ copy().orderTracking.reorder.allUnavailableNotice }}
+          </p>
+
+          @if (unavailableDialogItems().length > 0) {
+            <ul class="skipped-notice-list">
+              @for (unItem of unavailableDialogItems(); track unItem.historicalNameAr) {
+                <li>
+                  <span>{{ localizedText(unItem.historicalNameAr, unItem.historicalNameEn) }}</span>
+                  <span class="skipped-item-badge">{{
+                    getUnavailableReasonText(unItem.reason)
+                  }}</span>
+                </li>
+              }
+            </ul>
+          }
+
+          <div class="modal-card__actions">
+            <a routerLink="/" class="button button--primary" (click)="closeUnavailableDialog()">
+              {{ copy().common.backToMenu }}
+            </a>
+            <button type="button" class="button button--ghost" (click)="closeUnavailableDialog()">
+              {{ copy().orderTracking.reorder.cancelAction }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   }
 </main>

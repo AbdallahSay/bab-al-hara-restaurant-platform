@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { CustomerOrderTracking } from './order-tracking.models';
+import type { CustomerOrderTracking, ReorderPreview } from './order-tracking.models';
 import { TrackingApiService } from './tracking-api.service';
 
 describe('TrackingApiService', () => {
@@ -63,5 +63,47 @@ describe('TrackingApiService', () => {
 
     req.flush(mockTracking);
     expect(result).toEqual(mockTracking);
+  });
+
+  it('performs reorder-preview POST with withCredentials', () => {
+    const mockPreview: ReorderPreview = {
+      publicCode: 'BH-TRACK-1',
+      orderType: 'Delivery',
+      eligibleItems: [
+        {
+          menuItemId: 'item-1',
+          nameAr: 'شاورما',
+          nameEn: 'Shawarma',
+          imageReference: '/images/shawarma.webp',
+          quantity: 2,
+          currentPrice: 50,
+        },
+      ],
+      unavailableItems: [
+        {
+          menuItemId: 'item-2',
+          historicalNameAr: 'سلطة قديمة',
+          historicalNameEn: 'Old Salad',
+          reason: 'SoldOut',
+        },
+      ],
+      suggestedDeliveryAreaId: 'area-1',
+      suggestedDeliveryAreaNameAr: 'المعادي',
+      suggestedDeliveryAreaNameEn: 'Maadi',
+      suggestedAddress: '123 Nile St',
+      suggestedCustomerNote: 'Extra garlic',
+    };
+
+    let result: ReorderPreview | undefined;
+    service.reorderPreview('BH-TRACK-1').subscribe((data) => {
+      result = data;
+    });
+
+    const req = httpTesting.expectOne('/api/orders/track/BH-TRACK-1/reorder-preview');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.withCredentials).toBe(true);
+
+    req.flush(mockPreview);
+    expect(result).toEqual(mockPreview);
   });
 });
