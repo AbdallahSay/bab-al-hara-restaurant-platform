@@ -103,7 +103,9 @@ export class DriverPage implements OnInit, OnDestroy {
   }
 
   protected loadOrders(): void {
-    this.state.set('loading');
+    if (this.orders().length === 0) {
+      this.state.set('loading');
+    }
     this.api
       .getAssignedOrders()
       .pipe(takeUntilDestroyed(this.destroyRef))

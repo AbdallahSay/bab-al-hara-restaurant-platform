@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -34,6 +35,7 @@ export type FulfillmentFilter = 'ALL' | 'Takeaway' | 'Delivery';
   imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './operations-command-center-page.html',
   styleUrls: ['./operations-command-center-page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OperationsCommandCenterPage implements OnInit {
   private readonly managementApi = inject(ManagementApiService);

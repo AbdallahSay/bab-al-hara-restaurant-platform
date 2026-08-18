@@ -186,7 +186,10 @@
                             [src]="item.imageReference"
                             [alt]="localizedItem(item)"
                             class="thumb-img"
+                            width="48"
+                            height="48"
                             loading="lazy"
+                            decoding="async"
                             (error)="onThumbnailError($event)"
                           />
                         } @else {
@@ -561,6 +564,10 @@
                     [src]="imagePreviewUrl()"
                     [alt]="copy().management.menuItems.sectionImage"
                     class="image-card__preview-img"
+                    width="240"
+                    height="180"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
 

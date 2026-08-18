@@ -59,6 +59,9 @@
                 [alt]="itemName(item)"
                 width="640"
                 height="480"
+                loading="lazy"
+                decoding="async"
+                (error)="onImageError($event)"
               />
               @if (!item.isAvailable) {
                 <span class="availability-label">{{ copy().common.unavailable }}</span>
