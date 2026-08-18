@@ -1,4 +1,4 @@
-import {
+﻿import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { interval } from 'rxjs';
+import { debounceTime, interval, Subject } from 'rxjs';
 
 import { localizedText } from '../../core/i18n/formatters';
 import { LanguageService } from '../../core/i18n/language.service';
@@ -39,6 +39,7 @@ export class DriverPage implements OnInit, OnDestroy {
   private readonly sessions = inject(StaffSessionService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly refreshTrigger$ = new Subject<void>();
 
   protected readonly language = inject(LanguageService);
   protected readonly copy = this.language.copy;
@@ -102,8 +103,10 @@ export class DriverPage implements OnInit, OnDestroy {
     this.language.setLanguage(language);
   }
 
-  protected loadOrders(): void {
-    this.state.set('loading');
+  protected loadOrders(silent = false): void {
+    if (!silent && this.orders().length === 0) {
+      this.state.set('loading');
+    }
     this.api
       .getAssignedOrders()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -256,8 +259,8 @@ export class DriverPage implements OnInit, OnDestroy {
         currentStale.add(order.id);
         this.staleOrders.set(currentStale);
 
-        // Auto refresh after delay
-        setTimeout(() => this.loadOrders(), 2500);
+        // Auto refresh after delay via debounced trigger
+        setTimeout(() => this.refreshTrigger$.next(), 2500);
       } else {
         const currentErrors = new Set(this.errorOrders());
         currentErrors.add(order.id);
@@ -287,6 +290,10 @@ export class DriverPage implements OnInit, OnDestroy {
   private startSync(): void {
     this.loadOrders();
 
+    this.refreshTrigger$
+      .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadOrders(true));
+
     this.realtime.orderAssigned$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((payload) => {
       if (this.isFullDriverOrder(payload)) {
         this.orders.update((list) => {
@@ -303,7 +310,7 @@ export class DriverPage implements OnInit, OnDestroy {
               ];
         });
       } else {
-        this.loadOrders();
+        this.refreshTrigger$.next();
       }
     });
 
@@ -331,10 +338,10 @@ export class DriverPage implements OnInit, OnDestroy {
           );
 
           if (!found) {
-            this.loadOrders();
+            this.refreshTrigger$.next();
           }
         } else {
-          this.loadOrders();
+          this.refreshTrigger$.next();
         }
       });
 
@@ -352,7 +359,7 @@ export class DriverPage implements OnInit, OnDestroy {
 
     this.realtime.reconnected$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.loadOrders());
+      .subscribe(() => this.loadOrders(true));
 
     void this.realtime.start().catch(() => undefined);
   }
