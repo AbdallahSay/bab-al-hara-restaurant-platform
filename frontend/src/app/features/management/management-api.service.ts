@@ -25,12 +25,9 @@ export class ManagementApiService {
   private readonly apiBaseUrl = inject(APP_ENVIRONMENT).apiBaseUrl;
 
   getRestaurantControlStatus(): Observable<RestaurantControlDto> {
-    return this.http.get<RestaurantControlDto>(
-      `${this.apiBaseUrl}/management/restaurant/status`,
-      {
-        withCredentials: true,
-      },
-    );
+    return this.http.get<RestaurantControlDto>(`${this.apiBaseUrl}/management/restaurant/status`, {
+      withCredentials: true,
+    });
   }
 
   updateRestaurantControlStatus(
@@ -71,22 +68,15 @@ export class ManagementApiService {
   createCategory(request: CreateCategoryRequest): Observable<CategoryManagementDto> {
     return this.customerApi.antiforgeryToken().pipe(
       switchMap((token) =>
-        this.http.post<CategoryManagementDto>(
-          `${this.apiBaseUrl}/management/categories`,
-          request,
-          {
-            headers: { 'X-XSRF-TOKEN': token },
-            withCredentials: true,
-          },
-        ),
+        this.http.post<CategoryManagementDto>(`${this.apiBaseUrl}/management/categories`, request, {
+          headers: { 'X-XSRF-TOKEN': token },
+          withCredentials: true,
+        }),
       ),
     );
   }
 
-  updateCategory(
-    id: string,
-    request: UpdateCategoryRequest,
-  ): Observable<CategoryManagementDto> {
+  updateCategory(id: string, request: UpdateCategoryRequest): Observable<CategoryManagementDto> {
     return this.customerApi.antiforgeryToken().pipe(
       switchMap((token) =>
         this.http.put<CategoryManagementDto>(
@@ -147,22 +137,15 @@ export class ManagementApiService {
   createMenuItem(request: CreateMenuItemRequest): Observable<MenuItemManagementDto> {
     return this.customerApi.antiforgeryToken().pipe(
       switchMap((token) =>
-        this.http.post<MenuItemManagementDto>(
-          `${this.apiBaseUrl}/management/menu-items`,
-          request,
-          {
-            headers: { 'X-XSRF-TOKEN': token },
-            withCredentials: true,
-          },
-        ),
+        this.http.post<MenuItemManagementDto>(`${this.apiBaseUrl}/management/menu-items`, request, {
+          headers: { 'X-XSRF-TOKEN': token },
+          withCredentials: true,
+        }),
       ),
     );
   }
 
-  updateMenuItem(
-    id: string,
-    request: UpdateMenuItemRequest,
-  ): Observable<MenuItemManagementDto> {
+  updateMenuItem(id: string, request: UpdateMenuItemRequest): Observable<MenuItemManagementDto> {
     return this.customerApi.antiforgeryToken().pipe(
       switchMap((token) =>
         this.http.put<MenuItemManagementDto>(
@@ -222,10 +205,7 @@ export class ManagementApiService {
     );
   }
 
-  uploadMenuItemImage(
-    id: string,
-    file: File,
-  ): Observable<MenuItemManagementDto> {
+  uploadMenuItemImage(id: string, file: File): Observable<MenuItemManagementDto> {
     const formData = new FormData();
     formData.append('file', file);
 
