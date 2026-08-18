@@ -52,6 +52,49 @@ public static class OrderTrackingEndpoints
             .Produces<CustomerOrderTrackingDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
 
+        endpoints
+            .MapPost(
+                "/api/orders/track/{publicCode}/reorder-preview",
+                async (
+                    string publicCode,
+                    HttpRequest request,
+                    IWebHostEnvironment env,
+                    ICustomerOrderTrackingService trackingService,
+                    CancellationToken cancellationToken) =>
+                {
+                    var rawToken = TrackingCookieHelper.GetTrackingTokenFromCookie(request, publicCode, env.IsDevelopment());
+
+                    if (string.IsNullOrWhiteSpace(rawToken))
+                    {
+                        return Results.Unauthorized();
+                    }
+
+                    // Validate Base64Url format
+                    try
+                    {
+                        Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Decode(rawToken);
+                    }
+                    catch
+                    {
+                        return Results.Unauthorized();
+                    }
+
+                    var dto = await trackingService.GetReorderPreviewAsync(publicCode, rawToken, cancellationToken);
+
+                    if (dto is null)
+                    {
+                        return Results.Unauthorized();
+                    }
+
+                    return Results.Ok(dto);
+                })
+            .RequireRateLimiting("tracking-read")
+            .WithName("GetOrderReorderPreview")
+            .WithTags("Orders")
+            .AllowAnonymous()
+            .Produces<ReorderPreviewDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized);
+
         return endpoints;
     }
 }
