@@ -101,6 +101,9 @@ export interface UiCopy {
     readonly orderTypeDelivery: string;
     readonly savedContactNotice: string;
     readonly clearSavedContact: string;
+    readonly savedAddressNotice: string;
+    readonly clearSavedAddress: string;
+    readonly staleDeliveryAreaWarning: string;
     readonly restaurantNotAcceptingOrdersError: string;
     readonly restaurantPausedButtonNotice: string;
   };
@@ -379,6 +382,27 @@ export interface UiCopy {
       readonly readyTakeaway: string;
       readonly onTheWay: string;
       readonly delivered: string;
+    };
+    readonly reorder: {
+      readonly orderAgain: string;
+      readonly loadingPreview: string;
+      readonly previewTitle: string;
+      readonly previewDescription: string;
+      readonly mergeConfirmTitle: string;
+      readonly mergeConfirmQuestion: string;
+      readonly mergeAction: string;
+      readonly replaceAction: string;
+      readonly cancelAction: string;
+      readonly partialSuccessNotice: string;
+      readonly allUnavailableNotice: string;
+      readonly priceChangeNotice: string;
+      readonly successToast: string;
+      readonly viewCart: string;
+      readonly unavailableReasons: {
+        readonly soldOut: string;
+        readonly unavailable: string;
+      };
+      readonly errorToast: string;
     };
   };
   readonly management: {
@@ -730,6 +754,9 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       orderTypeDelivery: 'توصيل للمنزل',
       savedContactNotice: 'استخدمنا بياناتك المحفوظة على هذا الجهاز',
       clearSavedContact: 'مسح البيانات المحفوظة',
+      savedAddressNotice: 'محفوظ على هذا الجهاز لتسهيل طلبك القادم.',
+      clearSavedAddress: 'مسح العنوان المحفوظ',
+      staleDeliveryAreaWarning: 'منطقة التوصيل المحفوظة لم تعد متاحة. اختر منطقة أخرى.',
       restaurantNotAcceptingOrdersError:
         'المطعم متوقف مؤقتًا عن استقبال طلبات جديدة. تم الاحتفاظ بسلتك ويمكنك إرسال الطلب فور استئناف العمل.',
       restaurantPausedButtonNotice: 'المطعم متوقف مؤقتًا عن استقبال الطلبات',
@@ -1023,6 +1050,30 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         readyTakeaway: 'طلبك جاهز للاستلام',
         onTheWay: 'طلبك في الطريق',
         delivered: 'تم تسليم طلبك',
+      },
+      reorder: {
+        orderAgain: 'اطلب نفس الطلب مرة أخرى',
+        loadingPreview: 'جاري مراجعة الأصناف…',
+        previewTitle: 'إعادة الطلب',
+        previewDescription: 'مراجعة أصناف الطلب وإضافتها للسلة',
+        mergeConfirmTitle: 'تحديث السلة',
+        mergeConfirmQuestion:
+          'لديك أصناف بالفعل في السلة. هل تريد إضافة أصناف الطلب السابق إليها أم استبدال السلة؟',
+        mergeAction: 'إضافة إلى السلة',
+        replaceAction: 'استبدال السلة',
+        cancelAction: 'إلغاء',
+        partialSuccessNotice:
+          'تمت إضافة الأصناف المتاحة إلى السلة. بعض أصناف طلبك السابق لم تعد متاحة.',
+        allUnavailableNotice:
+          'أصناف هذا الطلب لم تعد متاحة حاليًا. يمكنك تصفح المنيو واختيار بدائل.',
+        priceChangeNotice: 'قد تكون الأسعار قد تغيرت منذ طلبك السابق.',
+        successToast: 'تمت إضافة أصناف الطلب إلى السلة بنجاح',
+        viewCart: 'عرض السلة',
+        unavailableReasons: {
+          soldOut: 'غير متوفر حاليًا',
+          unavailable: 'غير متاح',
+        },
+        errorToast: 'تعذر تجهيز إعادة الطلب. يرجى المحاولة مرة أخرى.',
       },
     },
     management: {
@@ -1374,6 +1425,10 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       orderTypeDelivery: 'Delivery to address',
       savedContactNotice: 'We filled in your saved details on this device',
       clearSavedContact: 'Clear saved details',
+      savedAddressNotice: 'Saved on this device for faster checkout next time.',
+      clearSavedAddress: 'Clear saved address',
+      staleDeliveryAreaWarning:
+        'The saved delivery area is no longer available. Please select another area.',
       restaurantNotAcceptingOrdersError:
         'The restaurant is temporarily paused for new orders. Your cart has been saved and you can submit once orders resume.',
       restaurantPausedButtonNotice: 'The restaurant is temporarily paused for orders',
@@ -1674,6 +1729,30 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         readyTakeaway: 'Your order is ready for pickup',
         onTheWay: 'Your order is on the way',
         delivered: 'Your order has been delivered',
+      },
+      reorder: {
+        orderAgain: 'Order again',
+        loadingPreview: 'Checking items…',
+        previewTitle: 'Reorder',
+        previewDescription: 'Review items from this order and add them to your cart',
+        mergeConfirmTitle: 'Cart already has items',
+        mergeConfirmQuestion:
+          'You already have items in your cart. Would you like to add these items or replace your cart?',
+        mergeAction: 'Add to cart',
+        replaceAction: 'Replace cart',
+        cancelAction: 'Cancel',
+        partialSuccessNotice:
+          'Available items were added to your cart. Some items from your previous order are no longer available.',
+        allUnavailableNotice:
+          'Items from this order are no longer available. You can browse the menu for alternatives.',
+        priceChangeNotice: 'Prices may have changed since your previous order.',
+        successToast: 'Items from this order have been added to your cart',
+        viewCart: 'View Cart',
+        unavailableReasons: {
+          soldOut: 'Sold out',
+          unavailable: 'Unavailable',
+        },
+        errorToast: 'Could not prepare reorder. Please try again.',
       },
     },
     management: {

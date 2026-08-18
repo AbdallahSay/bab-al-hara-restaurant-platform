@@ -1,4 +1,4 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -19,6 +19,7 @@ import { RestaurantPausedBanner } from '../../../shared/restaurant-paused-banner
 import { CartService } from '../cart/cart.service';
 import { CustomerApiService } from '../customer-api.service';
 import { CustomerContactProfileService } from '../customer-contact-profile.service';
+import { CustomerPreferencesService } from '../customer-preferences.service';
 import { CreateOrderRequest, DeliveryArea, OrderType, ProblemDetails } from '../order.models';
 import { RestaurantStatusService } from '../restaurant-status.service';
 import { OrderReceiptService } from '../success/order-receipt.service';
@@ -37,6 +38,7 @@ export class CheckoutPage implements OnInit {
   private readonly router = inject(Router);
   private readonly receipt = inject(OrderReceiptService);
   private readonly contactProfile = inject(CustomerContactProfileService);
+  private readonly preferencesService = inject(CustomerPreferencesService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly language = inject(LanguageService);
@@ -49,6 +51,8 @@ export class CheckoutPage implements OnInit {
   protected readonly sending = signal(false);
   protected readonly errorMessage = signal('');
   protected readonly hasPrefilledContact = signal(false);
+  protected readonly hasSavedAddress = signal(false);
+  protected readonly staleAreaWarning = signal(false);
   protected readonly form = new FormGroup({
     customerName: new FormControl('', {
       nonNullable: true,
@@ -131,6 +135,32 @@ export class CheckoutPage implements OnInit {
       this.form.controls.customerPhone.setValue(savedContact.phone);
       this.hasPrefilledContact.set(true);
     }
+
+    const savedPrefs = this.preferencesService.getPreferences();
+    if (savedPrefs) {
+      if (savedPrefs.orderType === 'Delivery') {
+        this.form.controls.orderType.setValue('Delivery');
+      } else {
+        this.form.controls.orderType.setValue('Takeaway');
+      }
+
+      if (savedPrefs.address) {
+        this.form.controls.address.setValue(savedPrefs.address);
+      }
+
+      if (savedPrefs.address || savedPrefs.deliveryAreaId) {
+        this.hasSavedAddress.set(true);
+      }
+    }
+
+    this.form.controls.deliveryAreaId.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.staleAreaWarning()) {
+          this.staleAreaWarning.set(false);
+        }
+      });
+
     this.statusService.loadStatus().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
     this.loadDeliveryAreas();
   }
@@ -140,6 +170,14 @@ export class CheckoutPage implements OnInit {
     this.hasPrefilledContact.set(false);
     this.form.controls.customerName.setValue('');
     this.form.controls.customerPhone.setValue('');
+  }
+
+  protected clearSavedAddress(): void {
+    this.preferencesService.clearSavedAddress();
+    this.hasSavedAddress.set(false);
+    this.staleAreaWarning.set(false);
+    this.form.controls.deliveryAreaId.setValue('');
+    this.form.controls.address.setValue('');
   }
 
   protected loadDeliveryAreas(): void {
@@ -153,6 +191,16 @@ export class CheckoutPage implements OnInit {
           this.deliveryAreas.set(areas);
           this.areaState.set('ready');
           this.form.controls.deliveryAreaId.enable({ emitEvent: false });
+
+          const savedPrefs = this.preferencesService.getPreferences();
+          if (savedPrefs?.deliveryAreaId) {
+            const areaExists = areas.some((a) => a.id === savedPrefs.deliveryAreaId);
+            if (areaExists) {
+              this.form.controls.deliveryAreaId.setValue(savedPrefs.deliveryAreaId);
+            } else {
+              this.staleAreaWarning.set(true);
+            }
+          }
         },
         error: () => {
           this.areaState.set('error');
@@ -208,6 +256,27 @@ export class CheckoutPage implements OnInit {
             name: request.customerName,
             phone: request.customerPhone,
           });
+
+          if (orderType === 'Delivery') {
+            const selected = this.selectedArea();
+            this.preferencesService.savePreferences({
+              orderType: 'Delivery',
+              deliveryAreaId: this.selectedAreaId() || null,
+              deliveryAreaNameAr: selected?.nameAr ?? null,
+              deliveryAreaNameEn: selected?.nameEn ?? null,
+              address: this.form.controls.address.value.trim() || null,
+            });
+          } else {
+            const existing = this.preferencesService.getPreferences();
+            this.preferencesService.savePreferences({
+              orderType: 'Takeaway',
+              deliveryAreaId: existing?.deliveryAreaId ?? null,
+              deliveryAreaNameAr: existing?.deliveryAreaNameAr ?? null,
+              deliveryAreaNameEn: existing?.deliveryAreaNameEn ?? null,
+              address: existing?.address ?? null,
+            });
+          }
+
           this.receipt.save({
             order,
             displayedTotalChanged: Math.abs(order.total - displayedTotal) > 0.001,
