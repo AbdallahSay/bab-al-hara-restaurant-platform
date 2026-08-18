@@ -181,11 +181,12 @@
   content: '';
   position: absolute;
   inset-block-start: 0;
-  inset-inline-start: 0.6875rem; /* centre the line under the icon */
+  inset-inline-start: calc(
+    0.75rem - 1px
+  ); /* perfectly centres under 1.5rem icon in both RTL and LTR */
   inline-size: 2px;
   block-size: 100%;
   background: var(--color-border);
-  transform: translateX(-50%);
 }
 
 /* Override line color for completed steps */
@@ -249,9 +250,10 @@
   align-items: center;
   justify-content: space-between;
   inline-size: 100%;
+  min-block-size: 2.75rem;
   background: none;
   border: none;
-  padding: 0;
+  padding: var(--space-2) 0;
   font-size: 1rem;
   font-weight: 700;
   color: var(--color-ink);

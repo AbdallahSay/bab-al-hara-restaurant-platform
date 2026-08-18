@@ -307,7 +307,10 @@
   font-weight: 750;
   text-decoration: underline;
   cursor: pointer;
-  padding: 0.15rem 0.25rem;
+  padding: 0.5rem 0.5rem;
+  min-block-size: 2.75rem;
+  display: inline-flex;
+  align-items: center;
   border-radius: 0.25rem;
 }
 

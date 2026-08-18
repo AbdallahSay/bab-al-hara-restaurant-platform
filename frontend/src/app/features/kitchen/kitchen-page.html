@@ -339,10 +339,15 @@
         (click)="closeAvailabilityModal()"
         [attr.aria-label]="copy().kitchen.close"
       ></button>
-      <div class="modal-card modal-card--availability" role="dialog" aria-modal="true">
+      <div
+        class="modal-card modal-card--availability"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="availability-modal-title"
+      >
         <header class="modal-header">
           <div>
-            <h2>{{ copy().kitchen.availabilityTitle }}</h2>
+            <h2 id="availability-modal-title">{{ copy().kitchen.availabilityTitle }}</h2>
             <p>{{ copy().kitchen.availabilitySubtitle }}</p>
           </div>
           <button
@@ -436,8 +441,13 @@
         (click)="cancelToggleAvailability()"
         [attr.aria-label]="copy().kitchen.cancel"
       ></button>
-      <div class="modal-card modal-card--confirm" role="alertdialog" aria-modal="true">
-        <h3>{{ copy().kitchen.toggleConfirmTitle }}</h3>
+      <div
+        class="modal-card modal-card--confirm"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="confirm-modal-title"
+      >
+        <h3 id="confirm-modal-title">{{ copy().kitchen.toggleConfirmTitle }}</h3>
         <p>
           {{ copy().kitchen.toggleConfirmMessage }}
           <strong

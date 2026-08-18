@@ -159,6 +159,7 @@
                         [href]="'tel:' + order.customerPhone"
                         class="call-btn"
                         [attr.aria-label]="copy().driver.callCustomer + ': ' + order.customerPhone"
+                        dir="ltr"
                       >
                         📞 {{ order.customerPhone }}
                       </a>
@@ -299,9 +300,9 @@
 
   <!-- Accessible Action Confirmation Modal -->
   @if (confirmingAction(); as action) {
-    <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="driver-modal-title">
       <div class="modal-card">
-        <h3 id="modal-title" class="modal-card__title">
+        <h3 id="driver-modal-title" class="modal-card__title">
           {{
             action.type === 'start-delivery'
               ? copy().driver.startDeliveryConfirmTitle

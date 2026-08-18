@@ -3,6 +3,7 @@
   Component,
   computed,
   DestroyRef,
+  HostListener,
   inject,
   OnDestroy,
   OnInit,
@@ -297,6 +298,15 @@ export class KitchenPage implements OnInit, OnDestroy {
     this.audioContext ??= new AudioContext();
     void this.audioContext.resume();
     this.soundEnabled.set(true);
+  }
+
+  @HostListener('document:keydown.escape')
+  protected handleEscape(): void {
+    if (this.pendingAvailabilityToggle()) {
+      this.cancelToggleAvailability();
+    } else if (this.isAvailabilityModalOpen()) {
+      this.closeAvailabilityModal();
+    }
   }
 
   protected signOut(): void {
