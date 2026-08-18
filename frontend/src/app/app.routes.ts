@@ -110,9 +110,9 @@ export const routes: Routes = [
     path: 'management/operations',
     canActivate: [managementAuthGuard],
     loadComponent: () =>
-      import(
-        './features/management/operations-command-center-page/operations-command-center-page'
-      ).then((m) => m.OperationsCommandCenterPage),
+      import('./features/management/operations-command-center-page/operations-command-center-page').then(
+        (m) => m.OperationsCommandCenterPage,
+      ),
     title: 'Operations Command Center | Bab Al Hara',
   },
   { path: '**', redirectTo: '' },
