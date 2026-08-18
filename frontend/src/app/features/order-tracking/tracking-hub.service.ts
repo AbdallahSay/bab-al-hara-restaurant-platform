@@ -1,12 +1,21 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
+﻿import { Injectable, OnDestroy } from '@angular/core';
+import {
+  HubConnection,
+  HubConnectionBuilder,
+  HubConnectionState,
+  LogLevel,
+} from '@microsoft/signalr';
 import { BehaviorSubject, Subject } from 'rxjs';
 
+import { createOperationalRetryPolicy } from '../../core/realtime/realtime-retry-policy';
 import { CustomerOrderTracking } from './order-tracking.models';
 
 @Injectable()
 export class TrackingHubService implements OnDestroy {
   private connection: HubConnection | null = null;
+  private startPromise: Promise<void> | null = null;
+  private currentPublicCode: string | null = null;
+
   readonly connectionState$ = new BehaviorSubject<HubConnectionState>(
     HubConnectionState.Disconnected,
   );
@@ -14,47 +23,78 @@ export class TrackingHubService implements OnDestroy {
   readonly reconnected$ = new Subject<void>();
 
   async startConnection(publicCode: string): Promise<void> {
+    if (this.connection && this.currentPublicCode === publicCode) {
+      if (this.connection.state === HubConnectionState.Connected) {
+        this.connectionState$.next(HubConnectionState.Connected);
+        return;
+      }
+      if (this.startPromise) {
+        return this.startPromise;
+      }
+    }
+
     if (this.connection) {
       await this.stopConnection();
     }
 
+    this.currentPublicCode = publicCode;
     const hubUrl = `/hubs/order-tracking?publicCode=${encodeURIComponent(publicCode)}`;
 
-    this.connection = new HubConnectionBuilder().withUrl(hubUrl).withAutomaticReconnect().build();
+    const connection = new HubConnectionBuilder()
+      .withUrl(hubUrl)
+      .withAutomaticReconnect(createOperationalRetryPolicy())
+      .configureLogging(LogLevel.Warning)
+      .build();
 
-    this.connection.on('OrderTrackingUpdated', (data: CustomerOrderTracking) => {
+    this.connection = connection;
+
+    connection.on('OrderTrackingUpdated', (data: CustomerOrderTracking) => {
       this.trackingUpdate$.next(data);
     });
 
-    this.connection.onreconnected(() => {
+    connection.onreconnected(() => {
       this.connectionState$.next(HubConnectionState.Connected);
       this.reconnected$.next();
     });
 
-    this.connection.onclose(() => {
+    connection.onclose(() => {
       this.connectionState$.next(HubConnectionState.Disconnected);
     });
 
-    this.connection.onreconnecting(() => {
+    connection.onreconnecting(() => {
       this.connectionState$.next(HubConnectionState.Reconnecting);
     });
 
-    try {
-      await this.connection.start();
-      this.connectionState$.next(HubConnectionState.Connected);
-    } catch {
-      this.connectionState$.next(HubConnectionState.Disconnected);
-    }
+    this.connectionState$.next(HubConnectionState.Connecting);
+    this.startPromise = connection
+      .start()
+      .then(() => {
+        this.connectionState$.next(HubConnectionState.Connected);
+      })
+      .catch((err) => {
+        this.connectionState$.next(HubConnectionState.Disconnected);
+        throw err;
+      })
+      .finally(() => {
+        this.startPromise = null;
+      });
+
+    return this.startPromise;
   }
 
   async stopConnection(): Promise<void> {
+    this.startPromise = null;
+    this.currentPublicCode = null;
     if (this.connection) {
+      const conn = this.connection;
+      this.connection = null;
       try {
-        await this.connection.stop();
+        if (conn.state !== HubConnectionState.Disconnected) {
+          await conn.stop();
+        }
       } catch {
         // Safe cleanup
       }
-      this.connection = null;
       this.connectionState$.next(HubConnectionState.Disconnected);
     }
   }

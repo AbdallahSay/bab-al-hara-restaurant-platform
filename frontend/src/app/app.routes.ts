@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { cashierGuard, driverGuard, kitchenGuard } from './core/auth/staff.guards';
+import { managementAuthGuard } from './features/management/management-auth.guard';
 
 export const routes: Routes = [
   {
@@ -89,10 +90,7 @@ export const routes: Routes = [
   },
   {
     path: 'management',
-    canActivate: [
-      () =>
-        import('./features/management/management-auth.guard').then((m) => m.managementAuthGuard),
-    ],
+    canActivate: [managementAuthGuard],
     loadComponent: () =>
       import('./features/management/management-hub-page/management-hub-page').then(
         (m) => m.ManagementHubPage,
@@ -101,22 +99,16 @@ export const routes: Routes = [
   },
   {
     path: 'management/menu',
-    canActivate: [
-      () =>
-        import('./features/management/management-auth.guard').then((m) => m.managementAuthGuard),
-    ],
+    canActivate: [managementAuthGuard],
     loadComponent: () =>
       import('./features/management/management-menu-page/management-menu-page').then(
         (m) => m.ManagementMenuPage,
       ),
-    title: 'Menu Management | Bab Al Hara',
+    title: 'Manage Menu | Bab Al Hara',
   },
   {
     path: 'management/operations',
-    canActivate: [
-      () =>
-        import('./features/management/management-auth.guard').then((m) => m.managementAuthGuard),
-    ],
+    canActivate: [managementAuthGuard],
     loadComponent: () =>
       import('./features/management/operations-command-center-page/operations-command-center-page').then(
         (m) => m.OperationsCommandCenterPage,

@@ -133,4 +133,11 @@ export class MenuPage implements OnInit {
   protected money(value: number): string {
     return formatMoney(value, this.language.current());
   }
+
+  protected onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img && !img.src.includes('/images/menu/default.webp')) {
+      img.src = '/images/menu/default.webp';
+    }
+  }
 }

@@ -1,8 +1,9 @@
-import {
+﻿import {
   ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
+  HostListener,
   inject,
   OnDestroy,
   OnInit,
@@ -169,7 +170,7 @@ export class KitchenPage implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (orders) => {
-          this.orders.set(orders);
+          this.orders.set(this.deduplicateOrders(orders));
           this.state.set('ready');
         },
         error: (error: { readonly status?: number }) => {
@@ -299,6 +300,15 @@ export class KitchenPage implements OnInit, OnDestroy {
     this.soundEnabled.set(true);
   }
 
+  @HostListener('document:keydown.escape')
+  protected handleEscape(): void {
+    if (this.pendingAvailabilityToggle()) {
+      this.cancelToggleAvailability();
+    } else if (this.isAvailabilityModalOpen()) {
+      this.closeAvailabilityModal();
+    }
+  }
+
   protected signOut(): void {
     this.sessions
       .signOutKitchen()
@@ -369,6 +379,18 @@ export class KitchenPage implements OnInit, OnDestroy {
 
   private clearSubmitting(publicCode: string): void {
     this.submittingCodes.update((codes) => codes.filter((c) => c !== publicCode));
+  }
+
+  private deduplicateOrders(orders: readonly KitchenOrder[]): readonly KitchenOrder[] {
+    const seen = new Set<string>();
+    const result: KitchenOrder[] = [];
+    for (const order of orders) {
+      if (!seen.has(order.publicCode)) {
+        seen.add(order.publicCode);
+        result.push(order);
+      }
+    }
+    return result;
   }
 
   private updateOrderInList(updatedOrder: KitchenOrder): void {

@@ -8,6 +8,7 @@ import {
 import { Subject } from 'rxjs';
 
 import { APP_ENVIRONMENT } from '../../core/config/app-environment';
+import { createOperationalRetryPolicy } from '../../core/realtime/realtime-retry-policy';
 import {
   KitchenOrder,
   MenuItemAvailabilityChangedEvent,
@@ -23,6 +24,7 @@ export class KitchenRealtimeService {
   private readonly availabilityChanged = new Subject<MenuItemAvailabilityChangedEvent>();
   private readonly reconnected = new Subject<void>();
   private readonly connection: HubConnection;
+  private startPromise: Promise<void> | null = null;
 
   readonly status = signal<RealtimeStatus>('disconnected');
   readonly newOrders$ = this.newOrders.asObservable();
@@ -34,7 +36,7 @@ export class KitchenRealtimeService {
     const environment = inject(APP_ENVIRONMENT);
     this.connection = new HubConnectionBuilder()
       .withUrl(environment.kitchenHubUrl, { withCredentials: true })
-      .withAutomaticReconnect([0, 2000, 5000, 10_000])
+      .withAutomaticReconnect(createOperationalRetryPolicy())
       .configureLogging(LogLevel.Warning)
       .build();
 
@@ -54,22 +56,42 @@ export class KitchenRealtimeService {
   }
 
   async start(): Promise<void> {
-    if (this.connection.state !== HubConnectionState.Disconnected) {
+    if (this.connection.state === HubConnectionState.Connected) {
+      this.status.set('connected');
+      return;
+    }
+
+    if (this.startPromise) {
+      return this.startPromise;
+    }
+
+    if (this.connection.state === HubConnectionState.Connecting) {
+      this.status.set('connecting');
       return;
     }
 
     this.status.set('connecting');
-    try {
-      await this.connection.start();
-      this.status.set('connected');
-    } catch (error: unknown) {
-      this.status.set('disconnected');
-      throw error;
-    }
+    this.startPromise = this.connection
+      .start()
+      .then(() => {
+        this.status.set('connected');
+      })
+      .catch((error: unknown) => {
+        this.status.set('disconnected');
+        throw error;
+      })
+      .finally(() => {
+        this.startPromise = null;
+      });
+
+    return this.startPromise;
   }
 
   async stop(): Promise<void> {
-    await this.connection.stop();
+    this.startPromise = null;
+    if (this.connection.state !== HubConnectionState.Disconnected) {
+      await this.connection.stop();
+    }
     this.status.set('disconnected');
   }
 }

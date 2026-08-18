@@ -1,4 +1,4 @@
-import {
+﻿import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -107,6 +107,21 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
       return;
     }
 
+    // Set up hub event listeners once
+    this.hub.trackingUpdate$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
+      this.tracking.set(data);
+    });
+
+    this.hub.reconnected$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.api
+        .getTracking(this.publicCode)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (data) => this.tracking.set(data),
+          error: () => undefined,
+        });
+    });
+
     this.loadTracking();
   }
 
@@ -123,7 +138,7 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
         next: (data) => {
           this.tracking.set(data);
           this.state.set('loaded');
-          void this.connectHub();
+          void this.hub.startConnection(this.publicCode).catch(() => undefined);
         },
         error: () => {
           this.state.set('error');
@@ -175,32 +190,5 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
 
   protected orderTypeLabel(type: OrderType): string {
     return type === 'Takeaway' ? this.copy().common.takeaway : this.copy().common.delivery;
-  }
-
-  private async connectHub(): Promise<void> {
-    try {
-      await this.hub.startConnection(this.publicCode);
-    } catch {
-      // Hub failure is non-fatal — REST polling or reload provides fallback.
-      return;
-    }
-
-    this.hub.trackingUpdate$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
-      this.tracking.set(data);
-    });
-
-    this.hub.reconnected$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.api
-        .getTracking(this.publicCode)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: (data) => this.tracking.set(data),
-          error: () => undefined,
-        });
-    });
-
-    this.hub.connectionState$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      // Triggers change detection for connectivity banner
-    });
   }
 }

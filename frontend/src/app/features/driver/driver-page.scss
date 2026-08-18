@@ -107,7 +107,8 @@
   border-radius: var(--radius-sm);
 
   .lang-btn {
-    padding: 0.2rem 0.5rem;
+    min-block-size: 2.5rem;
+    padding: 0.3rem 0.65rem;
     border: 0;
     border-radius: var(--radius-sm);
     background: transparent;
@@ -125,7 +126,8 @@
 }
 
 .signout-btn {
-  padding: 0.3rem 0.65rem;
+  min-block-size: 2.5rem;
+  padding: 0.35rem 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: transparent;
@@ -686,6 +688,7 @@
 
 .modal-card {
   background: var(--color-surface);
+  overscroll-behavior: contain;
   border-radius: var(--radius-md);
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.25);
   max-width: 26rem;

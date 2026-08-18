@@ -86,7 +86,8 @@
   border-radius: 6px;
 
   .lang-btn {
-    padding: 0.25rem 0.5rem;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.65rem;
     font-size: 0.75rem;
     border: none;
     background: none;
@@ -530,6 +531,7 @@
 
 .modal-dialog {
   background: #ffffff;
+  overscroll-behavior: contain;
   border-radius: 12px;
   width: 100%;
   max-width: 500px;

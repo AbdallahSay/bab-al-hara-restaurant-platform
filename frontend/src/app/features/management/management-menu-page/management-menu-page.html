@@ -186,7 +186,10 @@
                             [src]="item.imageReference"
                             [alt]="localizedItem(item)"
                             class="thumb-img"
+                            width="48"
+                            height="48"
                             loading="lazy"
+                            decoding="async"
                             (error)="onThumbnailError($event)"
                           />
                         } @else {
@@ -345,16 +348,28 @@
   <!-- Category Modal -->
   @if (categoryModalOpen()) {
     <div class="modal-backdrop">
-      <div class="modal-dialog" role="dialog" aria-modal="true">
+      <div
+        class="modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="category-modal-title"
+      >
         <header class="modal-header">
-          <h3>
+          <h3 id="category-modal-title">
             {{
               editingCategory()
                 ? copy().management.categories.editCategory
                 : copy().management.categories.newCategory
             }}
           </h3>
-          <button type="button" class="btn-close" (click)="closeCategoryModal()">✕</button>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeCategoryModal()"
+            [attr.aria-label]="copy().management.categories.cancel"
+          >
+            ✕
+          </button>
         </header>
 
         @if (categoryError()) {
@@ -410,16 +425,28 @@
   <!-- Menu Item Modal (4 Structured Sections) -->
   @if (itemModalOpen()) {
     <div class="modal-backdrop">
-      <div class="modal-dialog modal-dialog--lg" role="dialog" aria-modal="true">
+      <div
+        class="modal-dialog modal-dialog--lg"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="item-modal-title"
+      >
         <header class="modal-header">
-          <h3>
+          <h3 id="item-modal-title">
             {{
               editingItem()
                 ? copy().management.menuItems.editItem
                 : copy().management.menuItems.newItem
             }}
           </h3>
-          <button type="button" class="btn-close" (click)="closeItemModal()">✕</button>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeItemModal()"
+            [attr.aria-label]="copy().management.menuItems.cancel"
+          >
+            ✕
+          </button>
         </header>
 
         @if (itemError()) {
@@ -561,6 +588,10 @@
                     [src]="imagePreviewUrl()"
                     [alt]="copy().management.menuItems.sectionImage"
                     class="image-card__preview-img"
+                    width="240"
+                    height="180"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
 
@@ -657,10 +688,24 @@
   <!-- Image Removal Confirmation Dialog -->
   @if (removeConfirmModalOpen()) {
     <div class="modal-backdrop modal-backdrop--confirm">
-      <div class="modal-dialog modal-dialog--sm" role="alertdialog" aria-modal="true">
+      <div
+        class="modal-dialog modal-dialog--sm"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="remove-confirm-title"
+      >
         <header class="modal-header">
-          <h3>{{ copy().management.menuItems.removeImageConfirmTitle }}</h3>
-          <button type="button" class="btn-close" (click)="cancelRemoveImage()">✕</button>
+          <h3 id="remove-confirm-title">
+            {{ copy().management.menuItems.removeImageConfirmTitle }}
+          </h3>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="cancelRemoveImage()"
+            [attr.aria-label]="copy().management.menuItems.removeImageConfirmNo"
+          >
+            ✕
+          </button>
         </header>
         <div class="confirm-body">
           <p>{{ copy().management.menuItems.removeImageConfirmBody }}</p>
