@@ -40,4 +40,30 @@ public interface ICustomerOrderTrackingService
     string GenerateTrackingToken();
     string HashToken(string rawToken);
     Task<CustomerOrderTrackingDto?> GetTrackingDataAsync(string publicCode, string rawToken, CancellationToken cancellationToken);
+    Task<ReorderPreviewDto?> GetReorderPreviewAsync(string publicCode, string rawToken, CancellationToken cancellationToken);
 }
+
+public sealed record ReorderEligibleItemDto(
+    Guid MenuItemId,
+    string NameAr,
+    string NameEn,
+    string ImageReference,
+    int Quantity,
+    decimal CurrentPrice);
+
+public sealed record ReorderUnavailableItemDto(
+    Guid? MenuItemId,
+    string HistoricalNameAr,
+    string HistoricalNameEn,
+    string Reason);
+
+public sealed record ReorderPreviewDto(
+    string PublicCode,
+    string OrderType,
+    IReadOnlyList<ReorderEligibleItemDto> EligibleItems,
+    IReadOnlyList<ReorderUnavailableItemDto> UnavailableItems,
+    Guid? SuggestedDeliveryAreaId,
+    string? SuggestedDeliveryAreaNameAr,
+    string? SuggestedDeliveryAreaNameEn,
+    string? SuggestedAddress,
+    string? SuggestedCustomerNote);
