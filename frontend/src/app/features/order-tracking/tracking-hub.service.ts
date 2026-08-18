@@ -1,5 +1,10 @@
 ﻿import { Injectable, OnDestroy } from '@angular/core';
-import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
+import {
+  HubConnection,
+  HubConnectionBuilder,
+  HubConnectionState,
+  LogLevel,
+} from '@microsoft/signalr';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 import { createOperationalRetryPolicy } from '../../core/realtime/realtime-retry-policy';
