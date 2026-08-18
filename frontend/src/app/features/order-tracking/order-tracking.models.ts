@@ -32,3 +32,31 @@ export interface CustomerOrderTracking {
   readonly address: string | null;
   readonly statusTimeline: readonly TrackingTimelineEntry[];
 }
+
+export interface ReorderEligibleItem {
+  readonly menuItemId: string;
+  readonly nameAr: string;
+  readonly nameEn: string;
+  readonly imageReference: string;
+  readonly quantity: number;
+  readonly currentPrice: number;
+}
+
+export interface ReorderUnavailableItem {
+  readonly menuItemId: string | null;
+  readonly historicalNameAr: string;
+  readonly historicalNameEn: string;
+  readonly reason: 'SoldOut' | 'Inactive' | 'NotFound' | string;
+}
+
+export interface ReorderPreview {
+  readonly publicCode: string;
+  readonly orderType: OrderType;
+  readonly eligibleItems: readonly ReorderEligibleItem[];
+  readonly unavailableItems: readonly ReorderUnavailableItem[];
+  readonly suggestedDeliveryAreaId: string | null;
+  readonly suggestedDeliveryAreaNameAr: string | null;
+  readonly suggestedDeliveryAreaNameEn: string | null;
+  readonly suggestedAddress: string | null;
+  readonly suggestedCustomerNote: string | null;
+}

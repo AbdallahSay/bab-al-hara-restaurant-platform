@@ -1,4 +1,4 @@
-﻿import {
+import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -15,7 +15,14 @@ import { HubConnectionState } from '@microsoft/signalr';
 import { formatMoney, localizedText } from '../../core/i18n/formatters';
 import { LanguageService } from '../../core/i18n/language.service';
 import { CustomerHeader } from '../../shared/customer-header/customer-header';
-import { CustomerOrderTracking, OrderStatus, OrderType } from './order-tracking.models';
+import { CartService } from '../customer-ordering/cart/cart.service';
+import {
+  CustomerOrderTracking,
+  OrderStatus,
+  OrderType,
+  ReorderPreview,
+  ReorderUnavailableItem,
+} from './order-tracking.models';
 import { TrackingApiService } from './tracking-api.service';
 import { TrackingHubService } from './tracking-hub.service';
 
@@ -24,6 +31,12 @@ type PageState = 'loading' | 'no-credential' | 'error' | 'loaded';
 interface StepDef {
   readonly key: OrderStatus;
   readonly label: () => string;
+}
+
+export interface ReorderFeedbackState {
+  readonly type: 'success' | 'partial' | 'error';
+  readonly message: string;
+  readonly unavailableItems?: readonly ReorderUnavailableItem[];
 }
 
 @Component({
@@ -37,6 +50,7 @@ interface StepDef {
 export class OrderTrackingPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(TrackingApiService);
+  protected readonly cart = inject(CartService);
   protected readonly hub = inject(TrackingHubService);
   protected readonly HubConnectionState = HubConnectionState;
   private readonly destroyRef = inject(DestroyRef);
@@ -53,6 +67,14 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
   protected readonly isReconnecting = computed(
     () => this.connectionState() === HubConnectionState.Reconnecting,
   );
+
+  // Reorder state
+  protected readonly reorderLoading = signal(false);
+  protected readonly reorderFeedback = signal<ReorderFeedbackState | null>(null);
+  protected readonly pendingReorderPreview = signal<ReorderPreview | null>(null);
+  protected readonly showMergeDialog = signal(false);
+  protected readonly showUnavailableDialog = signal(false);
+  protected readonly unavailableDialogItems = signal<readonly ReorderUnavailableItem[]>([]);
 
   protected readonly deliverySteps: readonly StepDef[] = [
     { key: 'Pending', label: () => this.copy().orderTracking.steps.pending },
@@ -190,5 +212,110 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
 
   protected orderTypeLabel(type: OrderType): string {
     return type === 'Takeaway' ? this.copy().common.takeaway : this.copy().common.delivery;
+  }
+
+  protected onReorder(): void {
+    if (!this.publicCode || this.reorderLoading()) {
+      return;
+    }
+
+    this.reorderLoading.set(true);
+    this.reorderFeedback.set(null);
+
+    this.api
+      .reorderPreview(this.publicCode)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (preview) => {
+          this.reorderLoading.set(false);
+
+          if (preview.eligibleItems.length === 0) {
+            this.unavailableDialogItems.set(preview.unavailableItems);
+            this.showUnavailableDialog.set(true);
+            return;
+          }
+
+          if (this.cart.items().length > 0) {
+            this.pendingReorderPreview.set(preview);
+            this.showMergeDialog.set(true);
+          } else {
+            this.applyReorder(preview, 'merge');
+          }
+        },
+        error: () => {
+          this.reorderLoading.set(false);
+          this.reorderFeedback.set({
+            type: 'error',
+            message: this.copy().orderTracking.reorder.errorToast,
+          });
+        },
+      });
+  }
+
+  protected confirmMerge(): void {
+    const preview = this.pendingReorderPreview();
+    if (preview) {
+      this.applyReorder(preview, 'merge');
+      this.closeMergeDialog();
+    }
+  }
+
+  protected confirmReplace(): void {
+    const preview = this.pendingReorderPreview();
+    if (preview) {
+      this.applyReorder(preview, 'replace');
+      this.closeMergeDialog();
+    }
+  }
+
+  protected closeMergeDialog(): void {
+    this.showMergeDialog.set(false);
+    this.pendingReorderPreview.set(null);
+  }
+
+  protected closeUnavailableDialog(): void {
+    this.showUnavailableDialog.set(false);
+    this.unavailableDialogItems.set([]);
+  }
+
+  protected dismissFeedback(): void {
+    this.reorderFeedback.set(null);
+  }
+
+  protected getUnavailableReasonText(reason: string): string {
+    if (reason === 'SoldOut') {
+      return this.copy().orderTracking.reorder.unavailableReasons.soldOut;
+    }
+    return this.copy().orderTracking.reorder.unavailableReasons.unavailable;
+  }
+
+  private applyReorder(preview: ReorderPreview, mode: 'merge' | 'replace'): void {
+    const items = preview.eligibleItems.map((item) => ({
+      menuItemId: item.menuItemId,
+      nameAr: item.nameAr,
+      nameEn: item.nameEn,
+      imageReference: item.imageReference,
+      unitPrice: item.currentPrice,
+      quantity: item.quantity,
+    }));
+
+    if (mode === 'merge') {
+      this.cart.mergeItems(items);
+    } else {
+      this.cart.replaceItems(items);
+    }
+
+    if (preview.unavailableItems.length > 0) {
+      this.reorderFeedback.set({
+        type: 'partial',
+        message: this.copy().orderTracking.reorder.partialSuccessNotice,
+        unavailableItems: preview.unavailableItems,
+      });
+    } else {
+      this.reorderFeedback.set({
+        type: 'success',
+        message: this.copy().orderTracking.reorder.successToast,
+      });
+    }
   }
 }

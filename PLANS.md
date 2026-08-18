@@ -90,16 +90,20 @@ Delivered Backend Slice:
 - Comprehensive domain unit tests and API integration test suite covering all transitions, concurrency conflicts, audit logs, and security
 - EF Core migration `KitchenOperations`
 
-## Phase 4 — Customer live tracking + notifications foundation
+## Phase 4 — Customer live tracking, notifications & repeat ordering
 
-- tracking page
-- SignalR status updates
-- resilient reconnect/re-fetch
-- notification outbox
-- WhatsApp provider interface and sandbox/test adapter
+Status: COMPLETE — 2026-08-18
 
-Acceptance:
-Customer sees server-authoritative status progression.
+- tracking page with SignalR status updates
+- resilient reconnect/re-fetch with HttpOnly tracking capability cookie
+- customer reorder CTA on Delivered orders
+- server-authoritative reorder preview endpoint (`POST /api/orders/track/{publicCode}/reorder-preview`)
+- current catalog availability, active status, and price resolution
+- accessible cart merge/replace choice modal
+- device-local versioned fulfillment preferences (`Takeaway` vs `Delivery`)
+- saved delivery address with stale delivery area detection and recovery
+- privacy-preserving "Clear saved address" UX
+- comprehensive unit, integration, and security test suites
 
 ## Phase 5 — Cashier
 

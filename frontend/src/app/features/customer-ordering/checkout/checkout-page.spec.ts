@@ -10,6 +10,10 @@ import {
   CustomerContactProfileService,
 } from '../customer-contact-profile.service';
 import { CustomerApiService } from '../customer-api.service';
+import {
+  CHECKOUT_PREFERENCES_STORAGE_KEY,
+  CustomerPreferencesService,
+} from '../customer-preferences.service';
 import { CreatedOrder, MenuItem } from '../order.models';
 import { OrderReceiptService } from '../success/order-receipt.service';
 import { CheckoutPage } from './checkout-page';
@@ -380,6 +384,252 @@ describe('CheckoutPage', () => {
 
     expect(contactProfile.profile()).toBeNull();
     expect(localStorage.getItem(CUSTOMER_CONTACT_STORAGE_KEY)).toBeNull();
+  });
+
+  it('handles no saved preferences gracefully (defaults to Takeaway and empty address)', async () => {
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+    const takeawayRadio: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[value="Takeaway"]');
+    const deliveryRadio: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[value="Delivery"]');
+
+    expect(takeawayRadio.checked).toBe(true);
+    expect(deliveryRadio.checked).toBe(false);
+    expect(fixture.nativeElement.querySelector('.saved-address-badge')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.stale-area-warning')).toBeNull();
+  });
+
+  it('restores saved Delivery preference, valid delivery area, and address text', async () => {
+    localStorage.setItem(
+      CHECKOUT_PREFERENCES_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        orderType: 'Delivery',
+        deliveryAreaId: 'area-1',
+        deliveryAreaNameAr: 'مدينة نصر',
+        deliveryAreaNameEn: 'Nasr City',
+        address: '15 Tayaran St, Nasr City',
+      }),
+    );
+
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+    fixture.detectChanges();
+
+    const deliveryRadio: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[value="Delivery"]');
+    expect(deliveryRadio.checked).toBe(true);
+
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector('#delivery-area');
+    expect(select.value).toBe('area-1');
+
+    const addressTextarea: HTMLTextAreaElement =
+      fixture.nativeElement.querySelector('#delivery-address');
+    expect(addressTextarea.value).toBe('15 Tayaran St, Nasr City');
+
+    // Contextual saved address badge is shown
+    expect(fixture.nativeElement.querySelector('.saved-address-badge')).toBeTruthy();
+    expect(fixture.nativeElement.textContent).toContain('محفوظ على هذا الجهاز');
+    expect(fixture.nativeElement.querySelector('.stale-area-warning')).toBeNull();
+  });
+
+  it('restores saved Takeaway preference', async () => {
+    localStorage.setItem(
+      CHECKOUT_PREFERENCES_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        orderType: 'Takeaway',
+        deliveryAreaId: null,
+        deliveryAreaNameAr: null,
+        deliveryAreaNameEn: null,
+        address: null,
+      }),
+    );
+
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+    const takeawayRadio: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[value="Takeaway"]');
+    expect(takeawayRadio.checked).toBe(true);
+  });
+
+  it('detects stale/invalid saved delivery area, does not preselect it, and shows localized warning while keeping address', async () => {
+    localStorage.setItem(
+      CHECKOUT_PREFERENCES_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        orderType: 'Delivery',
+        deliveryAreaId: 'old-stale-area-99',
+        deliveryAreaNameAr: 'منطقة ملغاة',
+        deliveryAreaNameEn: 'Deprecated Area',
+        address: 'Building 12, Floor 3',
+      }),
+    );
+
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+    fixture.detectChanges();
+
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector('#delivery-area');
+    // Stale ID must NOT be preselected
+    expect(select.value).toBe('');
+
+    const addressTextarea: HTMLTextAreaElement =
+      fixture.nativeElement.querySelector('#delivery-address');
+    // Address text is retained
+    expect(addressTextarea.value).toBe('Building 12, Floor 3');
+
+    // Stale delivery area warning is displayed
+    const warning = fixture.nativeElement.querySelector('.stale-area-warning');
+    expect(warning).toBeTruthy();
+    expect(warning.textContent).toContain('منطقة التوصيل المحفوظة لم تعد متاحة');
+
+    // If user chooses a valid area, the warning is dismissed
+    select.value = 'area-1';
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.stale-area-warning')).toBeNull();
+  });
+
+  it('safely handles corrupted / invalid JSON in localStorage without crashing checkout page', async () => {
+    localStorage.setItem(CHECKOUT_PREFERENCES_STORAGE_KEY, 'invalid-json{{');
+
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+    const takeawayRadio: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[value="Takeaway"]');
+    expect(takeawayRadio.checked).toBe(true);
+    expect(localStorage.getItem(CHECKOUT_PREFERENCES_STORAGE_KEY)).toBeNull();
+  });
+
+  it('allows clearing saved address, resetting delivery area and address without crashing', async () => {
+    localStorage.setItem(
+      CHECKOUT_PREFERENCES_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        orderType: 'Delivery',
+        deliveryAreaId: 'area-1',
+        deliveryAreaNameAr: 'مدينة نصر',
+        deliveryAreaNameEn: 'Nasr City',
+        address: '15 Tayaran St, Nasr City',
+      }),
+    );
+
+    const fixture = await createFixture({ createOrder: () => of(ORDER) });
+    fixture.detectChanges();
+
+    const clearAddressBtn: HTMLButtonElement =
+      fixture.nativeElement.querySelector('.clear-address-btn');
+    expect(clearAddressBtn).toBeTruthy();
+
+    clearAddressBtn.click();
+    fixture.detectChanges();
+
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector('#delivery-area');
+    const addressTextarea: HTMLTextAreaElement =
+      fixture.nativeElement.querySelector('#delivery-address');
+    expect(select.value).toBe('');
+    expect(addressTextarea.value).toBe('');
+    expect(fixture.nativeElement.querySelector('.saved-address-badge')).toBeNull();
+
+    const stored = JSON.parse(localStorage.getItem(CHECKOUT_PREFERENCES_STORAGE_KEY) ?? '{}');
+    expect(stored.deliveryAreaId).toBeNull();
+    expect(stored.address).toBeNull();
+  });
+
+  it('updates preferences upon successful Delivery order', async () => {
+    let capturedBody: unknown;
+    const fixture = await createFixture({
+      createOrder: (request) => {
+        capturedBody = request;
+        return of({
+          ...ORDER,
+          orderType: 'Delivery',
+          deliveryAreaNameAr: 'مدينة نصر',
+          deliveryAreaNameEn: 'Nasr City',
+          address: '44 Abbas El-Akkad St',
+          deliveryFee: 35,
+          total: 120,
+        });
+      },
+    });
+
+    fillContact(fixture);
+
+    // Select delivery
+    const deliveryRadio: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[value="Delivery"]');
+    deliveryRadio.click();
+    fixture.detectChanges();
+
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector('#delivery-area');
+    select.value = 'area-1';
+    select.dispatchEvent(new Event('change'));
+
+    const addressTextarea: HTMLTextAreaElement =
+      fixture.nativeElement.querySelector('#delivery-address');
+    addressTextarea.value = '44 Abbas El-Akkad St';
+    addressTextarea.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(capturedBody).toMatchObject({
+      orderType: 'Delivery',
+      deliveryAreaId: 'area-1',
+      address: '44 Abbas El-Akkad St',
+    });
+
+    const prefs = TestBed.inject(CustomerPreferencesService);
+    expect(prefs.getPreferences()).toEqual({
+      version: 1,
+      orderType: 'Delivery',
+      deliveryAreaId: 'area-1',
+      deliveryAreaNameAr: 'مدينة نصر',
+      deliveryAreaNameEn: 'Nasr City',
+      address: '44 Abbas El-Akkad St',
+    });
+  });
+
+  it('switching from Delivery to Takeaway keeps saved delivery address in local storage and does not submit it', async () => {
+    localStorage.setItem(
+      CHECKOUT_PREFERENCES_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        orderType: 'Delivery',
+        deliveryAreaId: 'area-1',
+        deliveryAreaNameAr: 'مدينة نصر',
+        deliveryAreaNameEn: 'Nasr City',
+        address: '15 Tayaran St, Nasr City',
+      }),
+    );
+
+    let submittedRequest: unknown;
+    const fixture = await createFixture({
+      createOrder: (req) => {
+        submittedRequest = req;
+        return of(ORDER);
+      },
+    });
+    fillContact(fixture);
+
+    // Switch to Takeaway
+    const takeawayRadio: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[value="Takeaway"]');
+    takeawayRadio.click();
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(submittedRequest).toMatchObject({
+      orderType: 'Takeaway',
+      deliveryAreaId: null,
+      address: null,
+    });
+
+    // Stored preferences still retain the previous address info for future use
+    const stored = JSON.parse(localStorage.getItem(CHECKOUT_PREFERENCES_STORAGE_KEY) ?? '{}');
+    expect(stored.orderType).toBe('Takeaway');
+    expect(stored.deliveryAreaId).toBe('area-1');
+    expect(stored.address).toBe('15 Tayaran St, Nasr City');
   });
 
   async function createFixture(apiOverrides: Partial<CustomerApiService>) {

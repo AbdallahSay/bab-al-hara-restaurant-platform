@@ -84,4 +84,60 @@ describe('CartService', () => {
     expect(service.items()[0]!.isAvailable).toBe(false);
     expect(service.subtotal()).toBe(92);
   });
+
+  it('merges new and existing items and caps quantity at 99', () => {
+    const service = TestBed.inject(CartService);
+    service.add(AVAILABLE_ITEM); // quantity = 1
+
+    service.mergeItems([
+      {
+        menuItemId: AVAILABLE_ITEM.id,
+        nameAr: AVAILABLE_ITEM.nameAr,
+        nameEn: AVAILABLE_ITEM.nameEn,
+        imageReference: AVAILABLE_ITEM.imageReference,
+        unitPrice: AVAILABLE_ITEM.price,
+        quantity: 150, // Should be capped
+      },
+      {
+        menuItemId: 'item-2',
+        nameAr: 'شاورما دجاج',
+        nameEn: 'Chicken Shawarma',
+        imageReference: '/images/shawarma.webp',
+        unitPrice: 50,
+        quantity: 2,
+      },
+    ]);
+
+    expect(service.items().length).toBe(2);
+    const existing = service.items().find((i) => i.menuItemId === AVAILABLE_ITEM.id);
+    expect(existing?.quantity).toBe(99);
+
+    const newItem = service.items().find((i) => i.menuItemId === 'item-2');
+    expect(newItem?.quantity).toBe(2);
+    expect(newItem?.unitPrice).toBe(50);
+  });
+
+  it('replaces all cart items with provided batch items', () => {
+    const service = TestBed.inject(CartService);
+    service.add(AVAILABLE_ITEM);
+    expect(service.itemCount()).toBe(1);
+
+    service.replaceItems([
+      {
+        menuItemId: 'item-new-1',
+        nameAr: 'طعمية',
+        nameEn: 'Taameya',
+        imageReference: '/images/taameya.webp',
+        unitPrice: 15,
+        quantity: 3,
+      },
+    ]);
+
+    expect(service.items().length).toBe(1);
+    expect(service.items()[0]!.menuItemId).toBe('item-new-1');
+    expect(service.items()[0]!.quantity).toBe(3);
+    expect(service.items()[0]!.unitPrice).toBe(15);
+    expect(service.itemCount()).toBe(3);
+    expect(service.subtotal()).toBe(45);
+  });
 });
