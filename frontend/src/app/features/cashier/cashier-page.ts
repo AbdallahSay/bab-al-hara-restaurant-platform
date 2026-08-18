@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { interval } from 'rxjs';
+import { debounceTime, interval, Subject } from 'rxjs';
 
 import { localizedText } from '../../core/i18n/formatters';
 import { LanguageService } from '../../core/i18n/language.service';
@@ -34,6 +34,7 @@ export class CashierPage implements OnInit, OnDestroy {
   private readonly sessions = inject(StaffSessionService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly refreshTrigger$ = new Subject<void>();
   private audioContext?: AudioContext;
 
   protected readonly language = inject(LanguageService);
@@ -149,8 +150,8 @@ export class CashierPage implements OnInit, OnDestroy {
     this.language.setLanguage(language);
   }
 
-  protected loadOrders(): void {
-    if (this.orders().length === 0) {
+  protected loadOrders(silent = false): void {
+    if (!silent && this.orders().length === 0) {
       this.state.set('loading');
     }
     this.loadDrivers();
@@ -160,7 +161,7 @@ export class CashierPage implements OnInit, OnDestroy {
       .subscribe({
         next: (orders) => {
           const prevCount = this.orders().length;
-          this.orders.set(orders);
+          this.orders.set(this.deduplicateOrders(orders));
           this.state.set('ready');
           this.confirmingOrders.set(new Set());
           this.inFlightHandoffs.set(new Set());
@@ -329,7 +330,7 @@ export class CashierPage implements OnInit, OnDestroy {
           confirming.delete(order.id);
           this.confirmingOrders.set(confirming);
 
-          setTimeout(() => this.loadOrders(), 2500);
+          setTimeout(() => this.refreshTrigger$.next(), 2500);
         } else {
           const errors = new Set(this.errorOrders());
           errors.add(order.id);
@@ -420,7 +421,7 @@ export class CashierPage implements OnInit, OnDestroy {
           const stale = new Set(this.staleAssignmentOrders());
           stale.add(order.id);
           this.staleAssignmentOrders.set(stale);
-          setTimeout(() => this.loadOrders(), 2500);
+          setTimeout(() => this.refreshTrigger$.next(), 2500);
         } else {
           const error = new Set(this.errorAssignmentOrders());
           error.add(order.id);
@@ -429,8 +430,24 @@ export class CashierPage implements OnInit, OnDestroy {
       });
   }
 
+  private deduplicateOrders(orders: readonly CashierOrderDto[]): readonly CashierOrderDto[] {
+    const seen = new Set<string>();
+    const result: CashierOrderDto[] = [];
+    for (const order of orders) {
+      if (!seen.has(order.id)) {
+        seen.add(order.id);
+        result.push(order);
+      }
+    }
+    return result;
+  }
+
   private startSync(): void {
     this.loadOrders();
+
+    this.refreshTrigger$
+      .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadOrders(true));
 
     this.realtime.orderCompleted$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -488,7 +505,7 @@ export class CashierPage implements OnInit, OnDestroy {
 
     this.realtime.reconnected$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.loadOrders());
+      .subscribe(() => this.refreshTrigger$.next());
 
     void this.realtime.start().catch(() => undefined);
   }
