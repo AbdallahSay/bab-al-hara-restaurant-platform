@@ -179,11 +179,31 @@
                   @for (item of filteredMenuItems(); track item.id) {
                     <tr [class.is-archived]="!item.isActive" [class.is-soldout]="!item.isAvailable">
                       <td class="cell-thumb">
-                        <img
-                          [src]="item.imageReference"
-                          [alt]="localizedItem(item)"
-                          class="thumb-img"
-                        />
+                        @if (
+                          item.imageReference && item.imageReference !== '/images/menu/default.webp'
+                        ) {
+                          <img
+                            [src]="item.imageReference"
+                            [alt]="localizedItem(item)"
+                            class="thumb-img"
+                            loading="lazy"
+                            (error)="onThumbnailError($event)"
+                          />
+                        } @else {
+                          <div class="thumb-placeholder" aria-hidden="true">
+                            <svg
+                              class="thumb-icon"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                            >
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                              <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                          </div>
+                        }
                       </td>
                       <td class="cell-name">
                         <div class="name-primary">{{ localizedItem(item) }}</div>
@@ -203,11 +223,10 @@
                       <td>
                         <button
                           type="button"
-                          class="status-toggle-btn"
+                          class="avail-toggle-btn"
                           [class.is-available]="item.isAvailable"
-                          [class.is-soldout]="!item.isAvailable"
+                          [class.is-unavailable]="!item.isAvailable"
                           (click)="toggleItemAvailability(item)"
-                          [title]="copy().management.menuItems.toggleAvailability"
                         >
                           <span class="dot"></span>
                           <span>
@@ -226,7 +245,6 @@
                           [class.is-active]="item.isActive"
                           [class.is-archived]="!item.isActive"
                           (click)="toggleItemStatus(item)"
-                          [title]="copy().management.menuItems.toggleStatus"
                         >
                           <span class="dot"></span>
                           <span>
@@ -389,7 +407,7 @@
     </div>
   }
 
-  <!-- Menu Item Modal -->
+  <!-- Menu Item Modal (4 Structured Sections) -->
   @if (itemModalOpen()) {
     <div class="modal-backdrop">
       <div class="modal-dialog modal-dialog--lg" role="dialog" aria-modal="true">
@@ -407,11 +425,23 @@
         @if (itemError()) {
           <div class="alert alert-error" role="alert">
             <p>{{ itemError() }}</p>
+            @if (persistedItemIdAfterCreate() && selectedImageFile()) {
+              <button
+                type="button"
+                class="btn btn-sm btn-secondary retry-btn"
+                (click)="retryImageUpload()"
+              >
+                {{ copy().management.menuItems.retryUpload }}
+              </button>
+            }
           </div>
         }
 
         <form [formGroup]="itemForm" (ngSubmit)="saveMenuItem()" class="modal-form">
-          <div class="form-grid">
+          <!-- SECTION 1: Basic Information -->
+          <fieldset class="form-section">
+            <legend class="section-legend">{{ copy().management.menuItems.sectionBasic }}</legend>
+
             <div class="form-group">
               <label for="item-cat">{{ copy().management.menuItems.category }} *</label>
               <select id="item-cat" formControlName="categoryId">
@@ -421,62 +451,48 @@
               </select>
             </div>
 
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="item-name-ar">{{ copy().management.menuItems.nameAr }} *</label>
+                <input id="item-name-ar" type="text" formControlName="nameAr" dir="rtl" />
+              </div>
+
+              <div class="form-group">
+                <label for="item-name-en">{{ copy().management.menuItems.nameEn }} *</label>
+                <input id="item-name-en" type="text" formControlName="nameEn" dir="ltr" />
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="item-desc-ar">{{ copy().management.menuItems.descriptionAr }}</label>
+                <textarea
+                  id="item-desc-ar"
+                  rows="2"
+                  formControlName="descriptionAr"
+                  dir="rtl"
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="item-desc-en">{{ copy().management.menuItems.descriptionEn }}</label>
+                <textarea
+                  id="item-desc-en"
+                  rows="2"
+                  formControlName="descriptionEn"
+                  dir="ltr"
+                ></textarea>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- SECTION 2: Selling -->
+          <fieldset class="form-section">
+            <legend class="section-legend">{{ copy().management.menuItems.sectionSelling }}</legend>
+
             <div class="form-group">
               <label for="item-price">{{ copy().management.menuItems.price }} (EGP) *</label>
               <input id="item-price" type="number" step="0.5" min="0.01" formControlName="price" />
-            </div>
-
-            <div class="form-group">
-              <label for="item-name-ar">{{ copy().management.menuItems.nameAr }} *</label>
-              <input id="item-name-ar" type="text" formControlName="nameAr" dir="rtl" />
-            </div>
-
-            <div class="form-group">
-              <label for="item-name-en">{{ copy().management.menuItems.nameEn }} *</label>
-              <input id="item-name-en" type="text" formControlName="nameEn" dir="ltr" />
-            </div>
-
-            <div class="form-group">
-              <label for="item-desc-ar">{{ copy().management.menuItems.descriptionAr }}</label>
-              <textarea
-                id="item-desc-ar"
-                rows="2"
-                formControlName="descriptionAr"
-                dir="rtl"
-              ></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="item-desc-en">{{ copy().management.menuItems.descriptionEn }}</label>
-              <textarea
-                id="item-desc-en"
-                rows="2"
-                formControlName="descriptionEn"
-                dir="ltr"
-              ></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="item-img">{{ copy().management.menuItems.image }}</label>
-              <input id="item-img" type="text" formControlName="imageReference" />
-            </div>
-
-            <div class="form-group">
-              <label for="item-prep"
-                >{{ copy().management.menuItems.preparationMinutes }} (min)</label
-              >
-              <input
-                id="item-prep"
-                type="number"
-                formControlName="preparationMinutes"
-                min="1"
-                max="240"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="item-order">{{ copy().management.menuItems.displayOrder }}</label>
-              <input id="item-order" type="number" formControlName="displayOrder" min="0" />
             </div>
 
             <div class="checkbox-row">
@@ -489,25 +505,174 @@
                 <span>{{ copy().management.menuItems.active }}</span>
               </label>
             </div>
-          </div>
+          </fieldset>
+
+          <!-- SECTION 3: Preparation / Ordering -->
+          <fieldset class="form-section">
+            <legend class="section-legend">
+              {{ copy().management.menuItems.sectionOrdering }}
+            </legend>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="item-prep"
+                  >{{ copy().management.menuItems.preparationMinutes }} (min)</label
+                >
+                <input
+                  id="item-prep"
+                  type="number"
+                  formControlName="preparationMinutes"
+                  min="1"
+                  max="240"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="item-order">{{ copy().management.menuItems.displayOrder }}</label>
+                <input id="item-order" type="number" formControlName="displayOrder" min="0" />
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- SECTION 4: Image Card -->
+          <fieldset class="form-section">
+            <legend class="section-legend">{{ copy().management.menuItems.sectionImage }}</legend>
+
+            <div
+              class="image-card"
+              [class.is-dragging]="isDraggingOver()"
+              [class.has-image]="!!imagePreviewUrl()"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onFileDropped($event)"
+            >
+              <input
+                #fileInput
+                type="file"
+                class="sr-only-input"
+                id="menu-item-image-input"
+                accept="image/jpeg,image/png,image/webp"
+                (change)="onFileSelected($event)"
+              />
+
+              @if (imagePreviewUrl()) {
+                <div class="image-card__preview-container">
+                  <img
+                    [src]="imagePreviewUrl()"
+                    [alt]="copy().management.menuItems.sectionImage"
+                    class="image-card__preview-img"
+                  />
+                </div>
+
+                <div class="image-card__actions">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-secondary"
+                    (click)="fileInput.click()"
+                    [disabled]="itemSaving() || imageUploading()"
+                  >
+                    {{ copy().management.menuItems.changeImage }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger-outline"
+                    (click)="requestRemoveImage()"
+                    [disabled]="itemSaving() || imageUploading()"
+                  >
+                    {{ copy().management.menuItems.removeImage }}
+                  </button>
+                </div>
+              } @else {
+                <div class="image-card__empty">
+                  <div class="image-card__icon-wrap" aria-hidden="true">
+                    <svg
+                      class="image-card__icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-choose-image"
+                    (click)="fileInput.click()"
+                    [disabled]="itemSaving() || imageUploading()"
+                  >
+                    {{ copy().management.menuItems.chooseImage }}
+                  </button>
+                  <p class="image-card__hint">{{ copy().management.menuItems.imageCardHint }}</p>
+                </div>
+              }
+
+              @if (imageUploading()) {
+                <div class="image-card__uploading-overlay" role="status">
+                  <div class="spinner"></div>
+                  <span>{{ copy().management.menuItems.uploadingImage }}</span>
+                </div>
+              }
+            </div>
+
+            @if (imageError()) {
+              <div class="image-card__error" role="alert">
+                <p>{{ imageError() }}</p>
+              </div>
+            }
+          </fieldset>
 
           <footer class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeItemModal()">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="closeItemModal()"
+              [disabled]="itemSaving() || imageUploading()"
+            >
               {{ copy().management.menuItems.cancel }}
             </button>
             <button
               type="submit"
               class="btn btn-primary"
-              [disabled]="itemSaving() || itemForm.invalid"
+              [disabled]="itemSaving() || imageUploading() || itemForm.invalid"
             >
-              @if (itemSaving()) {
-                <span>{{ copy().management.menuItems.saving }}</span>
+              @if (itemSaving() || imageUploading()) {
+                <span>{{
+                  imageUploading()
+                    ? copy().management.menuItems.uploadingImage
+                    : copy().management.menuItems.saving
+                }}</span>
               } @else {
                 <span>{{ copy().management.menuItems.save }}</span>
               }
             </button>
           </footer>
         </form>
+      </div>
+    </div>
+  }
+
+  <!-- Image Removal Confirmation Dialog -->
+  @if (removeConfirmModalOpen()) {
+    <div class="modal-backdrop modal-backdrop--confirm">
+      <div class="modal-dialog modal-dialog--sm" role="alertdialog" aria-modal="true">
+        <header class="modal-header">
+          <h3>{{ copy().management.menuItems.removeImageConfirmTitle }}</h3>
+          <button type="button" class="btn-close" (click)="cancelRemoveImage()">✕</button>
+        </header>
+        <div class="confirm-body">
+          <p>{{ copy().management.menuItems.removeImageConfirmBody }}</p>
+        </div>
+        <footer class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cancelRemoveImage()">
+            {{ copy().management.menuItems.removeImageConfirmNo }}
+          </button>
+          <button type="button" class="btn btn-danger" (click)="confirmRemoveImage()">
+            {{ copy().management.menuItems.removeImageConfirmYes }}
+          </button>
+        </footer>
       </div>
     </div>
   }

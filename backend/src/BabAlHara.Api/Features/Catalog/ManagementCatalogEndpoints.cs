@@ -208,6 +208,55 @@ public static class ManagementCatalogEndpoints
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden);
 
+        management
+            .MapPost(
+                "/menu-items/{id:guid}/image",
+                async (Guid id, IFormFile file, IManagementCatalogService service, CancellationToken cancellationToken) =>
+                {
+                    if (file is null || file.Length == 0)
+                    {
+                        return Results.Problem(
+                            title: "Validation Error",
+                            detail: "No image file was provided.",
+                            statusCode: StatusCodes.Status400BadRequest,
+                            extensions: new Dictionary<string, object?> { ["code"] = "missing_file" });
+                    }
+
+                    await using var stream = file.OpenReadStream();
+                    var result = await service.UploadMenuItemImageAsync(
+                        id,
+                        stream,
+                        file.ContentType,
+                        file.FileName,
+                        file.Length,
+                        cancellationToken);
+
+                    return result.IsSuccess ? Results.Ok(result.Data) : FormatProblemResult(result);
+                })
+            .WithMetadata(new RequireAntiforgeryTokenAttribute(true))
+            .DisableAntiforgery() // Antiforgery validated via header token attribute
+            .WithName("UploadMenuItemImage")
+            .Produces<MenuItemManagementDto>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden);
+
+        management
+            .MapDelete(
+                "/menu-items/{id:guid}/image",
+                async (Guid id, IManagementCatalogService service, CancellationToken cancellationToken) =>
+                {
+                    var result = await service.RemoveMenuItemImageAsync(id, cancellationToken);
+                    return result.IsSuccess ? Results.Ok(result.Data) : FormatProblemResult(result);
+                })
+            .WithMetadata(new RequireAntiforgeryTokenAttribute(true))
+            .WithName("RemoveMenuItemImage")
+            .Produces<MenuItemManagementDto>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden);
+
         return endpoints;
     }
 

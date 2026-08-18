@@ -97,6 +97,21 @@ export class ManagementMenuPage implements OnInit {
   protected readonly editingItem = signal<MenuItemManagementDto | null>(null);
   protected readonly itemSaving = signal(false);
   protected readonly itemError = signal<string | null>(null);
+
+  // Image Card State
+  protected readonly selectedImageFile = signal<File | null>(null);
+  protected readonly imagePreviewUrl = signal<string | null>(null);
+  protected readonly imageRemoved = signal(false);
+  protected readonly imageUploading = signal(false);
+  protected readonly imageError = signal<string | null>(null);
+  protected readonly removeConfirmModalOpen = signal(false);
+  protected readonly persistedItemIdAfterCreate = signal<string | null>(null);
+  protected readonly isDraggingOver = signal(false);
+
+  readonly maxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
+  readonly allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  readonly allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
+
   protected readonly itemForm = new FormGroup({
     categoryId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     nameAr: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -106,10 +121,6 @@ export class ManagementMenuPage implements OnInit {
     price: new FormControl(0, {
       nonNullable: true,
       validators: [Validators.required, Validators.min(0.01)],
-    }),
-    imageReference: new FormControl('/images/menu/default.webp', {
-      nonNullable: true,
-      validators: [Validators.required],
     }),
     preparationMinutes: new FormControl(15, {
       nonNullable: true,
@@ -284,6 +295,13 @@ export class ManagementMenuPage implements OnInit {
   openCreateItemModal(): void {
     this.editingItem.set(null);
     this.itemError.set(null);
+    this.imageError.set(null);
+    this.selectedImageFile.set(null);
+    this.imagePreviewUrl.set(null);
+    this.imageRemoved.set(false);
+    this.imageUploading.set(false);
+    this.persistedItemIdAfterCreate.set(null);
+
     const defaultCatId = this.categories().length > 0 ? (this.categories()[0]?.id ?? '') : '';
     this.itemForm.reset({
       categoryId: this.selectedCategoryId() || defaultCatId,
@@ -292,7 +310,6 @@ export class ManagementMenuPage implements OnInit {
       descriptionAr: '',
       descriptionEn: '',
       price: 50,
-      imageReference: '/images/menu/default.webp',
       preparationMinutes: 15,
       displayOrder: this.menuItems().length + 1,
       isActive: true,
@@ -304,6 +321,17 @@ export class ManagementMenuPage implements OnInit {
   openEditItemModal(item: MenuItemManagementDto): void {
     this.editingItem.set(item);
     this.itemError.set(null);
+    this.imageError.set(null);
+    this.selectedImageFile.set(null);
+    this.imageRemoved.set(false);
+    this.imageUploading.set(false);
+    this.persistedItemIdAfterCreate.set(null);
+
+    const hasValidImage = Boolean(
+      item.imageReference && item.imageReference !== '/images/menu/default.webp',
+    );
+    this.imagePreviewUrl.set(hasValidImage ? item.imageReference : null);
+
     this.itemForm.setValue({
       categoryId: item.categoryId,
       nameAr: item.nameAr,
@@ -311,7 +339,6 @@ export class ManagementMenuPage implements OnInit {
       descriptionAr: item.descriptionAr,
       descriptionEn: item.descriptionEn,
       price: item.price,
-      imageReference: item.imageReference,
       preparationMinutes: item.preparationMinutes,
       displayOrder: item.displayOrder,
       isActive: item.isActive,
@@ -323,8 +350,128 @@ export class ManagementMenuPage implements OnInit {
   closeItemModal(): void {
     this.itemModalOpen.set(false);
     this.editingItem.set(null);
+    this.selectedImageFile.set(null);
+    this.imagePreviewUrl.set(null);
+    this.imageRemoved.set(false);
+    this.imageUploading.set(false);
+    this.imageError.set(null);
+    this.persistedItemIdAfterCreate.set(null);
   }
 
+  // --- Image Card Handlers ---
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    if (file) {
+      this.processSelectedFile(file);
+    }
+    input.value = '';
+  }
+
+  onFileDropped(event: DragEvent): void {
+    event.preventDefault();
+    this.isDraggingOver.set(false);
+    if (!event.dataTransfer?.files || event.dataTransfer.files.length === 0) return;
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      this.processSelectedFile(file);
+    }
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.isDraggingOver.set(true);
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    this.isDraggingOver.set(false);
+  }
+
+  private processSelectedFile(file: File): void {
+    this.imageError.set(null);
+
+    // Size check
+    if (file.size > this.maxFileSizeBytes || file.size === 0) {
+      this.imageError.set(this.copy().management.menuItems.imageTooLarge);
+      return;
+    }
+
+    // Extension & MIME check
+    const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+    const isAllowedExt = this.allowedExtensions.includes(extension);
+    const isAllowedMime = this.allowedMimeTypes.includes(file.type);
+
+    if (!isAllowedExt && !isAllowedMime) {
+      this.imageError.set(this.copy().management.menuItems.imageFormatUnsupported);
+      return;
+    }
+
+    this.selectedImageFile.set(file);
+    this.imageRemoved.set(false);
+
+    // Live preview
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreviewUrl.set(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  requestRemoveImage(): void {
+    const editing = this.editingItem();
+    // If we only staged a local file, just clear staged file
+    if (this.selectedImageFile()) {
+      this.selectedImageFile.set(null);
+      this.imageError.set(null);
+      // Restore previous persisted image if editing
+      if (
+        editing &&
+        editing.imageReference &&
+        editing.imageReference !== '/images/menu/default.webp'
+      ) {
+        this.imagePreviewUrl.set(editing.imageReference);
+        this.imageRemoved.set(false);
+      } else {
+        this.imagePreviewUrl.set(null);
+        this.imageRemoved.set(false);
+      }
+      return;
+    }
+
+    // If there is an existing persisted image in an edit session, confirm
+    if (editing && this.imagePreviewUrl()) {
+      this.removeConfirmModalOpen.set(true);
+    } else {
+      this.imagePreviewUrl.set(null);
+      this.imageRemoved.set(true);
+    }
+  }
+
+  confirmRemoveImage(): void {
+    this.removeConfirmModalOpen.set(false);
+    this.imagePreviewUrl.set(null);
+    this.selectedImageFile.set(null);
+    this.imageRemoved.set(true);
+    this.imageError.set(null);
+  }
+
+  cancelRemoveImage(): void {
+    this.removeConfirmModalOpen.set(false);
+  }
+
+  retryImageUpload(): void {
+    const pendingItemId = this.persistedItemIdAfterCreate();
+    const stagedFile = this.selectedImageFile();
+    if (pendingItemId && stagedFile) {
+      this.itemSaving.set(true);
+      this.itemError.set(null);
+      this.uploadStagedImageAndFinish(pendingItemId, stagedFile);
+    }
+  }
+
+  // --- Save Flow ---
   saveMenuItem(): void {
     if (this.itemSaving() || this.itemForm.invalid) return;
 
@@ -334,6 +481,14 @@ export class ManagementMenuPage implements OnInit {
     const val = this.itemForm.getRawValue();
     const editing = this.editingItem();
 
+    // Check retry case
+    const pendingItemId = this.persistedItemIdAfterCreate();
+    const stagedFile = this.selectedImageFile();
+    if (pendingItemId && stagedFile) {
+      this.uploadStagedImageAndFinish(pendingItemId, stagedFile);
+      return;
+    }
+
     if (editing) {
       const req: UpdateMenuItemRequest = {
         categoryId: val.categoryId,
@@ -342,7 +497,7 @@ export class ManagementMenuPage implements OnInit {
         descriptionAr: val.descriptionAr.trim(),
         descriptionEn: val.descriptionEn.trim(),
         price: Number(val.price),
-        imageReference: val.imageReference.trim(),
+        imageReference: editing.imageReference,
         preparationMinutes: Number(val.preparationMinutes),
         displayOrder: Number(val.displayOrder),
         isActive: val.isActive,
@@ -354,11 +509,33 @@ export class ManagementMenuPage implements OnInit {
         .updateMenuItem(editing.id, req)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
-          next: () => {
-            this.itemSaving.set(false);
-            this.closeItemModal();
-            this.feedbackMessage.set(this.copy().management.menuItems.updateSuccess);
-            this.loadAll();
+          next: (savedItem) => {
+            if (this.selectedImageFile()) {
+              this.uploadStagedImageAndFinish(savedItem.id, this.selectedImageFile()!);
+            } else if (this.imageRemoved()) {
+              this.api
+                .deleteMenuItemImage(savedItem.id)
+                .pipe(takeUntilDestroyed(this.destroyRef))
+                .subscribe({
+                  next: () => {
+                    this.itemSaving.set(false);
+                    this.closeItemModal();
+                    this.feedbackMessage.set(this.copy().management.menuItems.updateSuccess);
+                    this.loadAll();
+                  },
+                  error: () => {
+                    this.itemSaving.set(false);
+                    this.closeItemModal();
+                    this.feedbackMessage.set(this.copy().management.menuItems.updateSuccess);
+                    this.loadAll();
+                  },
+                });
+            } else {
+              this.itemSaving.set(false);
+              this.closeItemModal();
+              this.feedbackMessage.set(this.copy().management.menuItems.updateSuccess);
+              this.loadAll();
+            }
           },
           error: (err) => {
             this.itemSaving.set(false);
@@ -377,7 +554,7 @@ export class ManagementMenuPage implements OnInit {
         descriptionAr: val.descriptionAr.trim(),
         descriptionEn: val.descriptionEn.trim(),
         price: Number(val.price),
-        imageReference: val.imageReference.trim(),
+        imageReference: '/images/menu/default.webp',
         preparationMinutes: Number(val.preparationMinutes),
         displayOrder: Number(val.displayOrder),
         isActive: val.isActive,
@@ -388,11 +565,16 @@ export class ManagementMenuPage implements OnInit {
         .createMenuItem(req)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
-          next: () => {
-            this.itemSaving.set(false);
-            this.closeItemModal();
-            this.feedbackMessage.set(this.copy().management.menuItems.createSuccess);
-            this.loadAll();
+          next: (createdItem) => {
+            if (this.selectedImageFile()) {
+              this.persistedItemIdAfterCreate.set(createdItem.id);
+              this.uploadStagedImageAndFinish(createdItem.id, this.selectedImageFile()!);
+            } else {
+              this.itemSaving.set(false);
+              this.closeItemModal();
+              this.feedbackMessage.set(this.copy().management.menuItems.createSuccess);
+              this.loadAll();
+            }
           },
           error: () => {
             this.itemSaving.set(false);
@@ -400,6 +582,31 @@ export class ManagementMenuPage implements OnInit {
           },
         });
     }
+  }
+
+  private uploadStagedImageAndFinish(itemId: string, file: File): void {
+    this.imageUploading.set(true);
+    this.api
+      .uploadMenuItemImage(itemId, file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.imageUploading.set(false);
+          this.itemSaving.set(false);
+          this.closeItemModal();
+          this.feedbackMessage.set(
+            this.editingItem()
+              ? this.copy().management.menuItems.updateSuccess
+              : this.copy().management.menuItems.createSuccess,
+          );
+          this.loadAll();
+        },
+        error: () => {
+          this.imageUploading.set(false);
+          this.itemSaving.set(false);
+          this.itemError.set(this.copy().management.menuItems.imageUploadFailed);
+        },
+      });
   }
 
   toggleItemAvailability(item: MenuItemManagementDto): void {
@@ -450,6 +657,11 @@ export class ManagementMenuPage implements OnInit {
           }
         },
       });
+  }
+
+  onThumbnailError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
   }
 
   localizedCategory(cat: CategoryManagementDto): string {

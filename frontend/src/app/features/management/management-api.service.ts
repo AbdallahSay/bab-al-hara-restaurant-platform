@@ -25,9 +25,12 @@ export class ManagementApiService {
   private readonly apiBaseUrl = inject(APP_ENVIRONMENT).apiBaseUrl;
 
   getRestaurantControlStatus(): Observable<RestaurantControlDto> {
-    return this.http.get<RestaurantControlDto>(`${this.apiBaseUrl}/management/restaurant/status`, {
-      withCredentials: true,
-    });
+    return this.http.get<RestaurantControlDto>(
+      `${this.apiBaseUrl}/management/restaurant/status`,
+      {
+        withCredentials: true,
+      },
+    );
   }
 
   updateRestaurantControlStatus(
@@ -50,29 +53,40 @@ export class ManagementApiService {
   getCategories(): Observable<readonly CategoryManagementDto[]> {
     return this.http.get<readonly CategoryManagementDto[]>(
       `${this.apiBaseUrl}/management/categories`,
-      { withCredentials: true },
+      {
+        withCredentials: true,
+      },
     );
   }
 
   getCategory(id: string): Observable<CategoryManagementDto> {
     return this.http.get<CategoryManagementDto>(
       `${this.apiBaseUrl}/management/categories/${encodeURIComponent(id)}`,
-      { withCredentials: true },
+      {
+        withCredentials: true,
+      },
     );
   }
 
   createCategory(request: CreateCategoryRequest): Observable<CategoryManagementDto> {
     return this.customerApi.antiforgeryToken().pipe(
       switchMap((token) =>
-        this.http.post<CategoryManagementDto>(`${this.apiBaseUrl}/management/categories`, request, {
-          headers: { 'X-XSRF-TOKEN': token },
-          withCredentials: true,
-        }),
+        this.http.post<CategoryManagementDto>(
+          `${this.apiBaseUrl}/management/categories`,
+          request,
+          {
+            headers: { 'X-XSRF-TOKEN': token },
+            withCredentials: true,
+          },
+        ),
       ),
     );
   }
 
-  updateCategory(id: string, request: UpdateCategoryRequest): Observable<CategoryManagementDto> {
+  updateCategory(
+    id: string,
+    request: UpdateCategoryRequest,
+  ): Observable<CategoryManagementDto> {
     return this.customerApi.antiforgeryToken().pipe(
       switchMap((token) =>
         this.http.put<CategoryManagementDto>(
@@ -107,9 +121,11 @@ export class ManagementApiService {
 
   getMenuItems(categoryId?: string): Observable<readonly MenuItemManagementDto[]> {
     let params = new HttpParams();
+
     if (categoryId) {
       params = params.set('categoryId', categoryId);
     }
+
     return this.http.get<readonly MenuItemManagementDto[]>(
       `${this.apiBaseUrl}/management/menu-items`,
       {
@@ -122,22 +138,31 @@ export class ManagementApiService {
   getMenuItem(id: string): Observable<MenuItemManagementDto> {
     return this.http.get<MenuItemManagementDto>(
       `${this.apiBaseUrl}/management/menu-items/${encodeURIComponent(id)}`,
-      { withCredentials: true },
+      {
+        withCredentials: true,
+      },
     );
   }
 
   createMenuItem(request: CreateMenuItemRequest): Observable<MenuItemManagementDto> {
     return this.customerApi.antiforgeryToken().pipe(
       switchMap((token) =>
-        this.http.post<MenuItemManagementDto>(`${this.apiBaseUrl}/management/menu-items`, request, {
-          headers: { 'X-XSRF-TOKEN': token },
-          withCredentials: true,
-        }),
+        this.http.post<MenuItemManagementDto>(
+          `${this.apiBaseUrl}/management/menu-items`,
+          request,
+          {
+            headers: { 'X-XSRF-TOKEN': token },
+            withCredentials: true,
+          },
+        ),
       ),
     );
   }
 
-  updateMenuItem(id: string, request: UpdateMenuItemRequest): Observable<MenuItemManagementDto> {
+  updateMenuItem(
+    id: string,
+    request: UpdateMenuItemRequest,
+  ): Observable<MenuItemManagementDto> {
     return this.customerApi.antiforgeryToken().pipe(
       switchMap((token) =>
         this.http.put<MenuItemManagementDto>(
@@ -191,7 +216,44 @@ export class ManagementApiService {
   getOperationsSnapshot(): Observable<OperationsCommandCenterResponse> {
     return this.http.get<OperationsCommandCenterResponse>(
       `${this.apiBaseUrl}/management/operations`,
-      { withCredentials: true },
+      {
+        withCredentials: true,
+      },
+    );
+  }
+
+  uploadMenuItemImage(
+    id: string,
+    file: File,
+  ): Observable<MenuItemManagementDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.customerApi.antiforgeryToken().pipe(
+      switchMap((token) =>
+        this.http.post<MenuItemManagementDto>(
+          `${this.apiBaseUrl}/management/menu-items/${encodeURIComponent(id)}/image`,
+          formData,
+          {
+            headers: { 'X-XSRF-TOKEN': token },
+            withCredentials: true,
+          },
+        ),
+      ),
+    );
+  }
+
+  deleteMenuItemImage(id: string): Observable<MenuItemManagementDto> {
+    return this.customerApi.antiforgeryToken().pipe(
+      switchMap((token) =>
+        this.http.delete<MenuItemManagementDto>(
+          `${this.apiBaseUrl}/management/menu-items/${encodeURIComponent(id)}/image`,
+          {
+            headers: { 'X-XSRF-TOKEN': token },
+            withCredentials: true,
+          },
+        ),
+      ),
     );
   }
 }

@@ -459,6 +459,7 @@ app.MapSecurityEndpoints();
 app.MapCatalogEndpoints();
 
 app.MapManagementCatalogEndpoints();
+app.MapMenuImageEndpoints();
 
 app.MapOrderEndpoints();
 
