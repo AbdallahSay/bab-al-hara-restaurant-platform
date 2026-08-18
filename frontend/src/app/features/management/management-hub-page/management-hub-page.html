@@ -6,6 +6,9 @@
     </div>
     <div class="hub-header__nav">
       <a routerLink="/management" class="nav-link is-active">{{ copy().management.navHub }}</a>
+      <a routerLink="/management/operations" class="nav-link">{{
+        copy().management.navOperations
+      }}</a>
       <a routerLink="/management/menu" class="nav-link">{{ copy().management.navMenu }}</a>
       <a routerLink="/" class="nav-link nav-link--customer" target="_blank">
         {{ copy().management.viewCustomerMenu }} ↗

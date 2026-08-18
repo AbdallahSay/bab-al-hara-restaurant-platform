@@ -395,7 +395,97 @@ export interface UiCopy {
     readonly overview: string;
     readonly navHub: string;
     readonly navMenu: string;
+    readonly navOperations: string;
     readonly viewCustomerMenu: string;
+    readonly operations: {
+      readonly title: string;
+      readonly subtitle: string;
+      readonly refresh: string;
+      readonly realtimeConnected: string;
+      readonly realtimeReconnecting: string;
+      readonly realtimeDisconnected: string;
+      readonly lastUpdated: string;
+      readonly summary: {
+        readonly activeOrders: string;
+        readonly pending: string;
+        readonly confirmed: string;
+        readonly preparing: string;
+        readonly ready: string;
+        readonly onTheWay: string;
+        readonly waitingDriver: string;
+      };
+      readonly attention: {
+        readonly title: string;
+        readonly noAttention: string;
+        readonly unassignedDelivery: string;
+        readonly unacknowledgedPending: string;
+        readonly inspectAction: string;
+      };
+      readonly activeQueue: {
+        readonly title: string;
+        readonly emptyActive: string;
+        readonly searchPlaceholder: string;
+        readonly filterAll: string;
+        readonly filterPending: string;
+        readonly filterPreparing: string;
+        readonly filterReady: string;
+        readonly filterOnTheWay: string;
+        readonly filterDelivery: string;
+        readonly filterTakeaway: string;
+        readonly colCode: string;
+        readonly colCustomer: string;
+        readonly colType: string;
+        readonly colStatus: string;
+        readonly colElapsedCreated: string;
+        readonly colElapsedStatus: string;
+        readonly colDriver: string;
+        readonly colTotal: string;
+        readonly colActions: string;
+        readonly viewOrder: string;
+        readonly noSearchResults: string;
+      };
+      readonly drawer: {
+        readonly title: string;
+        readonly close: string;
+        readonly orderCode: string;
+        readonly customerName: string;
+        readonly customerPhone: string;
+        readonly orderType: string;
+        readonly status: string;
+        readonly createdAt: string;
+        readonly address: string;
+        readonly deliveryArea: string;
+        readonly customerNote: string;
+        readonly noNote: string;
+        readonly itemsTitle: string;
+        readonly qty: string;
+        readonly subtotal: string;
+        readonly deliveryFee: string;
+        readonly total: string;
+        readonly paymentMethod: string;
+        readonly paymentStatus: string;
+        readonly cashOnDelivery: string;
+        readonly cashTakeaway: string;
+        readonly paid: string;
+        readonly pendingPayment: string;
+        readonly driverInfo: string;
+        readonly driverNotAssigned: string;
+        readonly assignedAt: string;
+        readonly historyTitle: string;
+        readonly noHistory: string;
+      };
+      readonly errors: {
+        readonly loadFailed: string;
+        readonly retry: string;
+      };
+      readonly time: {
+        readonly justNow: string;
+        readonly minutesAgo: string;
+        readonly hoursAgo: string;
+        readonly inStateForMinutes: string;
+        readonly inStateForHours: string;
+      };
+    };
     readonly restaurantControl: {
       readonly title: string;
       readonly subtitle: string;
@@ -929,7 +1019,97 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       overview: 'نظرة عامة',
       navHub: 'مركز الإدارة',
       navMenu: 'إدارة القائمة والأصناف',
+      navOperations: 'مركز العمليات',
       viewCustomerMenu: 'عرض قائمة العملاء',
+      operations: {
+        title: 'مركز قيادة العمليات',
+        subtitle: 'المتابعة المباشرة والتدخل الفوري لطلبات المطعم',
+        refresh: 'تحديث البيانات',
+        realtimeConnected: 'متصل بالتحديثات المباشرة',
+        realtimeReconnecting: 'جارٍ إعادة الاتصال...',
+        realtimeDisconnected: 'غير متصل',
+        lastUpdated: 'آخر تحديث',
+        summary: {
+          activeOrders: 'الطلبات النشطة',
+          pending: 'بانتظار التأكيد',
+          confirmed: 'تم التأكيد',
+          preparing: 'قيد التحضير',
+          ready: 'جاهز للتسليم',
+          onTheWay: 'في الطريق',
+          waitingDriver: 'توصيل بانتظار سائق',
+        },
+        attention: {
+          title: 'طلبات تحتاج تدخلاً فوريًا',
+          noAttention: 'لا توجد طلبات تحتاج تدخل الآن',
+          unassignedDelivery: 'طلب جاهز للتوصيل بانتظار تعيين سائق',
+          unacknowledgedPending: 'طلب جديد بانتظار التأكيد من المطبخ',
+          inspectAction: 'معاينة الطلب',
+        },
+        activeQueue: {
+          title: 'تدفق الطلبات النشطة',
+          emptyActive: 'لا توجد طلبات نشطة حاليًا',
+          searchPlaceholder: 'بحث برقم الطلب (مثال: BH-)...',
+          filterAll: 'الكل',
+          filterPending: 'بانتظار التأكيد',
+          filterPreparing: 'قيد التحضير',
+          filterReady: 'جاهز',
+          filterOnTheWay: 'في الطريق',
+          filterDelivery: 'توصيل',
+          filterTakeaway: 'استلام',
+          colCode: 'رقم الطلب',
+          colCustomer: 'العميل',
+          colType: 'نوع الطلب',
+          colStatus: 'الحالة',
+          colElapsedCreated: 'منذ الإنشاء',
+          colElapsedStatus: 'في الحالة الحالية',
+          colDriver: 'السائق',
+          colTotal: 'الإجمالي',
+          colActions: 'الإجراءات',
+          viewOrder: 'معاينة',
+          noSearchResults: 'لا توجد طلبات مطابقة للبحث',
+        },
+        drawer: {
+          title: 'تفاصيل الطلب التشغيلية',
+          close: 'إغلاق',
+          orderCode: 'رمز الطلب',
+          customerName: 'اسم العميل',
+          customerPhone: 'رقم الهاتف',
+          orderType: 'نوع الاستلام',
+          status: 'الحالة التشغيلية',
+          createdAt: 'وقت الطلب',
+          address: 'عنوان التوصيل',
+          deliveryArea: 'منطقة التوصيل',
+          customerNote: 'ملاحظة العميل',
+          noNote: 'لا توجد ملاحظات',
+          itemsTitle: 'أصناف الطلب',
+          qty: 'الكمية',
+          subtotal: 'المجموع الفرعي',
+          deliveryFee: 'رسوم التوصيل',
+          total: 'الإجمالي النهائي',
+          paymentMethod: 'طريقة الدفع',
+          paymentStatus: 'حالة الدفع',
+          cashOnDelivery: 'نقدًا عند الاستلام',
+          cashTakeaway: 'نقدًا عند الاستلام من المطعم',
+          paid: 'تم الدفع',
+          pendingPayment: 'بانتظار الدفع',
+          driverInfo: 'بيانات السائق',
+          driverNotAssigned: 'لم يتم تعيين سائق بعد',
+          assignedAt: 'تم التعيين في',
+          historyTitle: 'سجل التغييرات التشغيلية',
+          noHistory: 'لا يوجد سجل سابق',
+        },
+        errors: {
+          loadFailed: 'تعذر تحديث العمليات. حاول مرة أخرى.',
+          retry: 'إعادة المحاولة',
+        },
+        time: {
+          justNow: 'الآن',
+          minutesAgo: 'منذ {m} دقيقة',
+          hoursAgo: 'منذ {h} ساعة',
+          inStateForMinutes: 'في الحالة الحالية منذ {m} د',
+          inStateForHours: 'في الحالة الحالية منذ {h} س',
+        },
+      },
       restaurantControl: {
         title: 'حالة استقبال الطلبات',
         subtitle: 'التحكم في فتح المطعم أو إيقاف استقبال الطلبات مؤقتاً مع رسالة توضيحية للعملاء',
@@ -1470,7 +1650,97 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       overview: 'Overview',
       navHub: 'Management Hub',
       navMenu: 'Menu & Catalog',
+      navOperations: 'Operations Center',
       viewCustomerMenu: 'View Customer Menu',
+      operations: {
+        title: 'Operations Command Center',
+        subtitle: 'Live operational monitoring and order intervention',
+        refresh: 'Refresh Data',
+        realtimeConnected: 'Connected to live updates',
+        realtimeReconnecting: 'Reconnecting...',
+        realtimeDisconnected: 'Disconnected',
+        lastUpdated: 'Last updated',
+        summary: {
+          activeOrders: 'Active Orders',
+          pending: 'Pending',
+          confirmed: 'Confirmed',
+          preparing: 'Preparing',
+          ready: 'Ready',
+          onTheWay: 'On The Way',
+          waitingDriver: 'Waiting for Driver',
+        },
+        attention: {
+          title: 'Needs Attention',
+          noAttention: 'No orders need attention right now',
+          unassignedDelivery: 'Ready delivery order waiting for driver assignment',
+          unacknowledgedPending: 'New order waiting for kitchen confirmation',
+          inspectAction: 'Inspect Order',
+        },
+        activeQueue: {
+          title: 'Active Order Flow',
+          emptyActive: 'No active orders right now',
+          searchPlaceholder: 'Search by order code (e.g. BH-)...',
+          filterAll: 'All Active',
+          filterPending: 'Pending',
+          filterPreparing: 'Preparing',
+          filterReady: 'Ready',
+          filterOnTheWay: 'On The Way',
+          filterDelivery: 'Delivery',
+          filterTakeaway: 'Pickup',
+          colCode: 'Order Code',
+          colCustomer: 'Customer',
+          colType: 'Type',
+          colStatus: 'Status',
+          colElapsedCreated: 'Created',
+          colElapsedStatus: 'In State',
+          colDriver: 'Driver',
+          colTotal: 'Total',
+          colActions: 'Actions',
+          viewOrder: 'View',
+          noSearchResults: 'No matching orders found',
+        },
+        drawer: {
+          title: 'Operational Order Details',
+          close: 'Close',
+          orderCode: 'Public Code',
+          customerName: 'Customer Name',
+          customerPhone: 'Phone Number',
+          orderType: 'Fulfillment',
+          status: 'Operational Status',
+          createdAt: 'Placed At',
+          address: 'Delivery Address',
+          deliveryArea: 'Delivery Area',
+          customerNote: 'Customer Note',
+          noNote: 'No customer note',
+          itemsTitle: 'Order Items',
+          qty: 'Qty',
+          subtotal: 'Subtotal',
+          deliveryFee: 'Delivery Fee',
+          total: 'Grand Total',
+          paymentMethod: 'Payment Method',
+          paymentStatus: 'Payment Status',
+          cashOnDelivery: 'Cash on Delivery',
+          cashTakeaway: 'Cash at Pickup',
+          paid: 'Paid',
+          pendingPayment: 'Pending Payment',
+          driverInfo: 'Driver Information',
+          driverNotAssigned: 'No driver assigned yet',
+          assignedAt: 'Assigned at',
+          historyTitle: 'Status History Timeline',
+          noHistory: 'No history records',
+        },
+        errors: {
+          loadFailed: 'Failed to load operations. Please try again.',
+          retry: 'Retry',
+        },
+        time: {
+          justNow: 'Just now',
+          minutesAgo: '{m} min ago',
+          hoursAgo: '{h} hr ago',
+          inStateForMinutes: 'In state for {m}m',
+          inStateForHours: 'In state for {h}h',
+        },
+      },
       restaurantControl: {
         title: 'Order Acceptance Status',
         subtitle:

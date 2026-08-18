@@ -111,5 +111,17 @@ export const routes: Routes = [
       ),
     title: 'Menu Management | Bab Al Hara',
   },
+  {
+    path: 'management/operations',
+    canActivate: [
+      () =>
+        import('./features/management/management-auth.guard').then((m) => m.managementAuthGuard),
+    ],
+    loadComponent: () =>
+      import('./features/management/operations-command-center-page/operations-command-center-page').then(
+        (m) => m.OperationsCommandCenterPage,
+      ),
+    title: 'Operations Command Center | Bab Al Hara',
+  },
   { path: '**', redirectTo: '' },
 ];

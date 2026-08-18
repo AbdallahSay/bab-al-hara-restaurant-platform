@@ -4,6 +4,7 @@ using BabAlHara.Application.Delivery;
 using BabAlHara.Application.Driver;
 using BabAlHara.Application.Kitchen;
 using BabAlHara.Application.Ordering;
+using BabAlHara.Application.Operations;
 using BabAlHara.Application.RestaurantControl;
 using BabAlHara.Application.Tracking;
 using BabAlHara.Infrastructure.Cashier;
@@ -12,6 +13,7 @@ using BabAlHara.Infrastructure.Delivery;
 using BabAlHara.Infrastructure.Driver;
 using BabAlHara.Infrastructure.Identity;
 using BabAlHara.Infrastructure.Kitchen;
+using BabAlHara.Infrastructure.Operations;
 using BabAlHara.Infrastructure.Ordering;
 using BabAlHara.Infrastructure.Persistence;
 using BabAlHara.Infrastructure.RestaurantControl;
@@ -79,6 +81,7 @@ public static class DependencyInjection
         services.AddScoped<IDriverOrderService, DriverApplicationService>();
         services.AddScoped<ICustomerOrderTrackingService, CustomerOrderTrackingService>();
         services.AddScoped<IRestaurantControlService, RestaurantControlService>();
+        services.AddScoped<IOperationsQueryService, OperationsQueryService>();
         services.AddScoped<DevelopmentDataSeeder>();
 
         return services;

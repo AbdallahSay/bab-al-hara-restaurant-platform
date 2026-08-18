@@ -1,4 +1,4 @@
-﻿import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, switchMap } from 'rxjs';
 
@@ -9,6 +9,7 @@ import {
   CreateCategoryRequest,
   CreateMenuItemRequest,
   MenuItemManagementDto,
+  OperationsCommandCenterResponse,
   RestaurantControlDto,
   ToggleActiveRequest,
   ToggleMenuItemAvailabilityRequest,
@@ -184,6 +185,13 @@ export class ManagementApiService {
           },
         ),
       ),
+    );
+  }
+
+  getOperationsSnapshot(): Observable<OperationsCommandCenterResponse> {
+    return this.http.get<OperationsCommandCenterResponse>(
+      `${this.apiBaseUrl}/management/operations`,
+      { withCredentials: true },
     );
   }
 }

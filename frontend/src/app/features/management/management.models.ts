@@ -95,3 +95,71 @@ export interface ToggleMenuItemAvailabilityRequest {
   readonly isAvailable: boolean;
   readonly rowVersion?: string | null;
 }
+
+export interface OperationsSummaryDto {
+  readonly activeOrders: number;
+  readonly pending: number;
+  readonly confirmed: number;
+  readonly preparing: number;
+  readonly ready: number;
+  readonly onTheWay: number;
+  readonly deliveryWaitingForDriver: number;
+}
+
+export interface OperationsAttentionItemDto {
+  readonly orderId: string;
+  readonly publicCode: string;
+  readonly createdAtUtc: string;
+  readonly currentStatusSinceUtc: string;
+  readonly orderType: 'Takeaway' | 'Delivery';
+  readonly status: 'Pending' | 'Confirmed' | 'Preparing' | 'Ready' | 'OnTheWay' | 'Delivered';
+  readonly reasonCode: string;
+  readonly customerName: string;
+  readonly total: number;
+}
+
+export interface OperationsOrderItemDto {
+  readonly productNameAr: string;
+  readonly productNameEn: string;
+  readonly quantity: number;
+}
+
+export interface OperationsStatusHistoryDto {
+  readonly previousStatus:
+    'Pending' | 'Confirmed' | 'Preparing' | 'Ready' | 'OnTheWay' | 'Delivered';
+  readonly newStatus: 'Pending' | 'Confirmed' | 'Preparing' | 'Ready' | 'OnTheWay' | 'Delivered';
+  readonly actorRole: string | null;
+  readonly changedAtUtc: string;
+  readonly notes: string | null;
+}
+
+export interface OperationsActiveOrderDto {
+  readonly orderId: string;
+  readonly publicCode: string;
+  readonly createdAtUtc: string;
+  readonly currentStatusSinceUtc: string;
+  readonly orderType: 'Takeaway' | 'Delivery';
+  readonly status: 'Pending' | 'Confirmed' | 'Preparing' | 'Ready' | 'OnTheWay' | 'Delivered';
+  readonly customerName: string;
+  readonly customerPhone: string;
+  readonly deliveryAreaNameAr: string | null;
+  readonly deliveryAreaNameEn: string | null;
+  readonly address: string | null;
+  readonly customerNote: string | null;
+  readonly subtotal: number;
+  readonly deliveryFee: number;
+  readonly total: number;
+  readonly paymentMethod: 'Cash';
+  readonly paymentStatus: 'Pending' | 'Paid';
+  readonly driverId: string | null;
+  readonly driverName: string | null;
+  readonly driverAssignedAtUtc: string | null;
+  readonly items: readonly OperationsOrderItemDto[];
+  readonly statusHistory: readonly OperationsStatusHistoryDto[];
+}
+
+export interface OperationsCommandCenterResponse {
+  readonly summary: OperationsSummaryDto;
+  readonly attentionItems: readonly OperationsAttentionItemDto[];
+  readonly activeOrders: readonly OperationsActiveOrderDto[];
+}
