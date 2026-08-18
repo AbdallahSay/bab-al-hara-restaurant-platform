@@ -4,6 +4,7 @@ using BabAlHara.Api.Features.Cashier;
 using BabAlHara.Api.Features.Catalog;
 using BabAlHara.Api.Features.Driver;
 using BabAlHara.Api.Features.Kitchen;
+using BabAlHara.Api.Features.Operations;
 using BabAlHara.Api.Features.OrderTracking;
 using BabAlHara.Api.Features.Ordering;
 using BabAlHara.Api.Features.RestaurantControl;
@@ -14,6 +15,7 @@ using BabAlHara.Api.Platform.Security;
 using BabAlHara.Application.Cashier;
 using BabAlHara.Application.Driver;
 using BabAlHara.Application.Kitchen;
+using BabAlHara.Application.Operations;
 using BabAlHara.Application.Tracking;
 using BabAlHara.Infrastructure;
 using BabAlHara.Infrastructure.Persistence;
@@ -105,6 +107,10 @@ builder.Services.AddSingleton<ICashierOrderCompletedNotifier, SignalRCashierNoti
 builder.Services.AddSingleton<SignalRDriverRealtimeNotifier>();
 builder.Services.AddSingleton<IDriverRealtimeNotifier>(sp =>
     sp.GetRequiredService<SignalRDriverRealtimeNotifier>());
+
+builder.Services.AddSingleton<SignalROperationsRealtimeNotifier>();
+builder.Services.AddSingleton<IOperationsRealtimeNotifier>(sp =>
+    sp.GetRequiredService<SignalROperationsRealtimeNotifier>());
 
 builder.Services.AddScoped<ICustomerOrderTrackingNotifier, SignalRCustomerOrderTrackingNotifier>();
 
@@ -461,6 +467,7 @@ app.MapKitchenEndpoints();
 
 app.MapCashierEndpoints();
 app.MapDriverEndpoints();
+app.MapOperationsEndpoints();
 
 app.MapOrderTrackingEndpoints();
 app.MapRestaurantControlEndpoints();
@@ -473,6 +480,8 @@ app.MapHub<KitchenHub>("/hubs/kitchen");
 app.MapHub<CashierHub>("/hubs/cashier");
 
 app.MapHub<DriverHub>("/hubs/driver");
+
+app.MapHub<OperationsHub>("/hubs/operations");
 
 app.MapHub<OrderTrackingHub>("/hubs/order-tracking");
 

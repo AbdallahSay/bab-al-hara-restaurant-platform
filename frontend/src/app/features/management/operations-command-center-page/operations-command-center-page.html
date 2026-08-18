@@ -1,0 +1,840 @@
+<div class="ops-layout" [attr.dir]="language.current() === 'ar' ? 'rtl' : 'ltr'">
+  <!-- Top Management Header -->
+  <header class="ops-header">
+    <div class="ops-header__brand">
+      <h1 class="brand-title">{{ copy().brand.name }}</h1>
+      <span class="ops-badge">{{ copy().management.title }}</span>
+    </div>
+
+    <nav class="ops-header__nav" aria-label="Management Navigation">
+      <a routerLink="/management" class="nav-link">{{ copy().management.navHub }}</a>
+      <a routerLink="/management/operations" class="nav-link is-active">{{
+        copy().management.navOperations
+      }}</a>
+      <a routerLink="/management/menu" class="nav-link">{{ copy().management.navMenu }}</a>
+      <a routerLink="/" class="nav-link nav-link--customer" target="_blank" rel="noopener">
+        {{ copy().management.viewCustomerMenu }} ↗
+      </a>
+    </nav>
+
+    <div class="ops-header__actions">
+      <!-- Live Realtime Indicator -->
+      <div
+        class="realtime-indicator"
+        [ngClass]="'realtime-indicator--' + realtimeStatus()"
+        [attr.title]="
+          realtimeStatus() === 'connected'
+            ? copy().management.operations.realtimeConnected
+            : realtimeStatus() === 'reconnecting'
+              ? copy().management.operations.realtimeReconnecting
+              : copy().management.operations.realtimeDisconnected
+        "
+      >
+        <span class="status-dot"></span>
+        <span class="status-label">
+          @if (realtimeStatus() === 'connected') {
+            {{ copy().management.operations.realtimeConnected }}
+          } @else if (realtimeStatus() === 'reconnecting') {
+            {{ copy().management.operations.realtimeReconnecting }}
+          } @else {
+            {{ copy().management.operations.realtimeDisconnected }}
+          }
+        </span>
+      </div>
+
+      <!-- Manual Refresh Button -->
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm refresh-btn"
+        [disabled]="refreshing()"
+        (click)="loadOperations(false)"
+        [attr.aria-label]="copy().management.operations.refresh"
+      >
+        <span class="refresh-icon" [class.is-spinning]="refreshing()">🔄</span>
+        <span>{{ copy().management.operations.refresh }}</span>
+      </button>
+
+      <!-- Language Switch -->
+      <div class="lang-switch">
+        <button
+          type="button"
+          class="lang-btn"
+          [class.is-active]="language.current() === 'ar'"
+          (click)="setLanguage('ar')"
+        >
+          العربية
+        </button>
+        <button
+          type="button"
+          class="lang-btn"
+          [class.is-active]="language.current() === 'en'"
+          (click)="setLanguage('en')"
+        >
+          English
+        </button>
+      </div>
+
+      <!-- Sign Out -->
+      <button type="button" class="btn-signout" (click)="signOut()">
+        {{ copy().management.signOut }}
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="ops-main">
+    <!-- Page Title & Subtitle -->
+    <div class="ops-title-row">
+      <div>
+        <h2 class="ops-title">{{ copy().management.operations.title }}</h2>
+        <p class="ops-subtitle">{{ copy().management.operations.subtitle }}</p>
+      </div>
+      @if (lastUpdated()) {
+        <div class="last-updated-text">
+          {{ copy().management.operations.lastUpdated }}:
+          {{ lastUpdated() | date: 'mediumTime' }}
+        </div>
+      }
+    </div>
+
+    <!-- Error State -->
+    @if (error()) {
+      <div class="alert alert--error" role="alert">
+        <p>{{ error() }}</p>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="loadOperations(true)">
+          {{ copy().management.operations.errors.retry }}
+        </button>
+      </div>
+    }
+
+    <!-- Loading Skeletons -->
+    @if (loading()) {
+      <div class="ops-loading-skeleton" role="status" aria-live="polite">
+        <div class="summary-skeleton-grid">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+        <div class="queue-skeleton"></div>
+      </div>
+    } @else {
+      <!-- SECTION 1: Operation Summary Metrics Cards -->
+      <section class="ops-summary-section" aria-label="Operation Summary">
+        <div class="summary-grid">
+          <!-- Active Orders Card -->
+          <button
+            type="button"
+            class="summary-card summary-card--active"
+            [class.is-active]="statusFilter() === 'ALL' && fulfillmentFilter() === 'ALL'"
+            (click)="setStatusFilter('ALL'); setFulfillmentFilter('ALL')"
+          >
+            <div class="summary-card__icon">📦</div>
+            <div class="summary-card__content">
+              <span class="summary-card__label">{{
+                copy().management.operations.summary.activeOrders
+              }}</span>
+              <span class="summary-card__value">{{ summary().activeOrders }}</span>
+            </div>
+          </button>
+
+          <!-- Pending Orders Card -->
+          <button
+            type="button"
+            class="summary-card summary-card--pending"
+            [class.is-active]="statusFilter() === 'Pending'"
+            (click)="setStatusFilter('Pending')"
+          >
+            <div class="summary-card__icon">⏳</div>
+            <div class="summary-card__content">
+              <span class="summary-card__label">{{
+                copy().management.operations.summary.pending
+              }}</span>
+              <span class="summary-card__value">{{ summary().pending }}</span>
+            </div>
+          </button>
+
+          <!-- Preparing Orders Card -->
+          <button
+            type="button"
+            class="summary-card summary-card--preparing"
+            [class.is-active]="statusFilter() === 'Preparing'"
+            (click)="setStatusFilter('Preparing')"
+          >
+            <div class="summary-card__icon">🍳</div>
+            <div class="summary-card__content">
+              <span class="summary-card__label">{{
+                copy().management.operations.summary.preparing
+              }}</span>
+              <span class="summary-card__value">{{ summary().preparing }}</span>
+            </div>
+          </button>
+
+          <!-- Ready Orders Card -->
+          <button
+            type="button"
+            class="summary-card summary-card--ready"
+            [class.is-active]="statusFilter() === 'Ready'"
+            (click)="setStatusFilter('Ready')"
+          >
+            <div class="summary-card__icon">✅</div>
+            <div class="summary-card__content">
+              <span class="summary-card__label">{{
+                copy().management.operations.summary.ready
+              }}</span>
+              <span class="summary-card__value">{{ summary().ready }}</span>
+            </div>
+          </button>
+
+          <!-- On The Way Orders Card -->
+          <button
+            type="button"
+            class="summary-card summary-card--ontheway"
+            [class.is-active]="statusFilter() === 'OnTheWay'"
+            (click)="setStatusFilter('OnTheWay')"
+          >
+            <div class="summary-card__icon">🛵</div>
+            <div class="summary-card__content">
+              <span class="summary-card__label">{{
+                copy().management.operations.summary.onTheWay
+              }}</span>
+              <span class="summary-card__value">{{ summary().onTheWay }}</span>
+            </div>
+          </button>
+
+          <!-- Delivery Waiting for Driver Card -->
+          <button
+            type="button"
+            class="summary-card summary-card--waiting"
+            [class.is-active]="statusFilter() === 'WAITING_DRIVER'"
+            (click)="setStatusFilter('WAITING_DRIVER')"
+          >
+            <div class="summary-card__icon">⚠️</div>
+            <div class="summary-card__content">
+              <span class="summary-card__label">{{
+                copy().management.operations.summary.waitingDriver
+              }}</span>
+              <span class="summary-card__value">{{ summary().deliveryWaitingForDriver }}</span>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- SECTION 2: Needs Attention Section -->
+      <section class="ops-attention-section" aria-label="Needs Attention">
+        <div class="section-header">
+          <h3 class="section-title">
+            <span class="section-title__icon">⚡</span>
+            {{ copy().management.operations.attention.title }}
+            @if (attentionItems().length > 0) {
+              <span class="attention-count-badge">{{ attentionItems().length }}</span>
+            }
+          </h3>
+        </div>
+
+        @if (attentionItems().length === 0) {
+          <div class="attention-empty-card">
+            <span class="empty-icon">✓</span>
+            <p>{{ copy().management.operations.attention.noAttention }}</p>
+          </div>
+        } @else {
+          <div class="attention-grid">
+            @for (item of attentionItems(); track item.orderId) {
+              <div
+                class="attention-card"
+                role="button"
+                tabindex="0"
+                [class.attention-card--unassigned]="item.reasonCode === 'unassigned_ready_delivery'"
+                [class.attention-card--pending]="item.reasonCode === 'unacknowledged_pending'"
+                (click)="openOrderByCode(item.publicCode)"
+                (keydown.enter)="openOrderByCode(item.publicCode)"
+              >
+                <div class="attention-card__header">
+                  <span class="attention-card__code">{{ item.publicCode }}</span>
+                  <span class="attention-card__type">
+                    @if (item.orderType === 'Delivery') {
+                      🛵 {{ copy().management.operations.activeQueue.filterDelivery }}
+                    } @else {
+                      🛍️ {{ copy().management.operations.activeQueue.filterTakeaway }}
+                    }
+                  </span>
+                  <span class="attention-card__time">{{ formatElapsed(item.createdAtUtc) }}</span>
+                </div>
+
+                <div class="attention-card__body">
+                  <div class="attention-reason">
+                    <span class="reason-dot"></span>
+                    <span class="reason-text">{{ getAttentionReasonLabel(item.reasonCode) }}</span>
+                  </div>
+                  <div class="attention-customer">
+                    <span class="customer-name">{{ item.customerName }}</span>
+                    <span class="order-total">{{ formatCurrency(item.total) }}</span>
+                  </div>
+                </div>
+
+                <div class="attention-card__footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-xs"
+                    (click)="openOrderByCode(item.publicCode); $event.stopPropagation()"
+                  >
+                    {{ copy().management.operations.attention.inspectAction }} →
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- SECTION 3: Active Order Flow -->
+      <section class="ops-queue-section" aria-label="Active Order Flow">
+        <div class="queue-toolbar">
+          <div class="queue-toolbar__left">
+            <h3 class="section-title">
+              {{ copy().management.operations.activeQueue.title }}
+              <span class="queue-count-badge">{{ filteredOrders().length }}</span>
+            </h3>
+
+            <!-- Status Filters -->
+            <div class="filter-group" role="radiogroup" aria-label="Status Filters">
+              <button
+                type="button"
+                class="filter-pill"
+                [class.is-active]="statusFilter() === 'ALL'"
+                (click)="setStatusFilter('ALL')"
+              >
+                {{ copy().management.operations.activeQueue.filterAll }}
+              </button>
+              <button
+                type="button"
+                class="filter-pill"
+                [class.is-active]="statusFilter() === 'Pending'"
+                (click)="setStatusFilter('Pending')"
+              >
+                {{ copy().management.operations.activeQueue.filterPending }}
+              </button>
+              <button
+                type="button"
+                class="filter-pill"
+                [class.is-active]="statusFilter() === 'Preparing'"
+                (click)="setStatusFilter('Preparing')"
+              >
+                {{ copy().management.operations.activeQueue.filterPreparing }}
+              </button>
+              <button
+                type="button"
+                class="filter-pill"
+                [class.is-active]="statusFilter() === 'Ready'"
+                (click)="setStatusFilter('Ready')"
+              >
+                {{ copy().management.operations.activeQueue.filterReady }}
+              </button>
+              <button
+                type="button"
+                class="filter-pill"
+                [class.is-active]="statusFilter() === 'OnTheWay'"
+                (click)="setStatusFilter('OnTheWay')"
+              >
+                {{ copy().management.operations.activeQueue.filterOnTheWay }}
+              </button>
+            </div>
+
+            <!-- Fulfillment Filters -->
+            <div class="filter-group" role="radiogroup" aria-label="Fulfillment Filters">
+              <button
+                type="button"
+                class="filter-pill filter-pill--subtle"
+                [class.is-active]="fulfillmentFilter() === 'ALL'"
+                (click)="setFulfillmentFilter('ALL')"
+              >
+                {{ copy().management.operations.activeQueue.filterAll }}
+              </button>
+              <button
+                type="button"
+                class="filter-pill filter-pill--subtle"
+                [class.is-active]="fulfillmentFilter() === 'Takeaway'"
+                (click)="setFulfillmentFilter('Takeaway')"
+              >
+                🛍️ {{ copy().management.operations.activeQueue.filterTakeaway }}
+              </button>
+              <button
+                type="button"
+                class="filter-pill filter-pill--subtle"
+                [class.is-active]="fulfillmentFilter() === 'Delivery'"
+                (click)="setFulfillmentFilter('Delivery')"
+              >
+                🛵 {{ copy().management.operations.activeQueue.filterDelivery }}
+              </button>
+            </div>
+          </div>
+
+          <div class="queue-toolbar__right">
+            <!-- Search Bar -->
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input
+                type="search"
+                class="search-input"
+                [placeholder]="copy().management.operations.activeQueue.searchPlaceholder"
+                [ngModel]="searchQuery()"
+                (ngModelChange)="searchQuery.set($event)"
+                [attr.aria-label]="copy().management.operations.activeQueue.searchPlaceholder"
+              />
+              @if (searchQuery().length > 0) {
+                <button
+                  type="button"
+                  class="search-clear-btn"
+                  (click)="searchQuery.set('')"
+                  aria-label="Clear Search"
+                >
+                  ✕
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Orders Table / Cards -->
+        @if (filteredOrders().length === 0) {
+          <div class="queue-empty-state">
+            <span class="empty-icon">📋</span>
+            @if (searchQuery().length > 0) {
+              <p>{{ copy().management.operations.activeQueue.noSearchResults }}</p>
+              <button type="button" class="btn btn-secondary btn-sm" (click)="searchQuery.set('')">
+                {{ copy().management.operations.activeQueue.filterAll }}
+              </button>
+            } @else {
+              <p>{{ copy().management.operations.activeQueue.emptyActive }}</p>
+            }
+          </div>
+        } @else {
+          <!-- Desktop High-Density Table -->
+          <div class="table-responsive">
+            <table class="ops-table" aria-label="Active Orders Queue">
+              <thead>
+                <tr>
+                  <th scope="col">{{ copy().management.operations.activeQueue.colCode }}</th>
+                  <th scope="col">{{ copy().management.operations.activeQueue.colCustomer }}</th>
+                  <th scope="col">{{ copy().management.operations.activeQueue.colType }}</th>
+                  <th scope="col">{{ copy().management.operations.activeQueue.colStatus }}</th>
+                  <th scope="col">
+                    {{ copy().management.operations.activeQueue.colElapsedCreated }}
+                  </th>
+                  <th scope="col">
+                    {{ copy().management.operations.activeQueue.colElapsedStatus }}
+                  </th>
+                  <th scope="col">{{ copy().management.operations.activeQueue.colDriver }}</th>
+                  <th scope="col">{{ copy().management.operations.activeQueue.colTotal }}</th>
+                  <th scope="col">{{ copy().management.operations.activeQueue.colActions }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (order of filteredOrders(); track order.orderId) {
+                  <tr
+                    class="ops-table__row"
+                    tabindex="0"
+                    [class.is-selected]="selectedOrder()?.orderId === order.orderId"
+                    (click)="selectOrder(order)"
+                    (keydown.enter)="selectOrder(order)"
+                  >
+                    <!-- Public Code -->
+                    <td class="cell--code">
+                      <span class="public-code-badge">{{ order.publicCode }}</span>
+                    </td>
+
+                    <!-- Customer -->
+                    <td class="cell--customer">
+                      <div class="customer-info">
+                        <span class="customer-info__name">{{ order.customerName }}</span>
+                        @if (order.customerNote) {
+                          <span class="customer-info__has-note" title="Note attached">📝</span>
+                        }
+                      </div>
+                    </td>
+
+                    <!-- Fulfillment Type -->
+                    <td class="cell--type">
+                      @if (order.orderType === 'Delivery') {
+                        <span class="type-pill type-pill--delivery">
+                          🛵 {{ copy().management.operations.activeQueue.filterDelivery }}
+                        </span>
+                      } @else {
+                        <span class="type-pill type-pill--takeaway">
+                          🛍️ {{ copy().management.operations.activeQueue.filterTakeaway }}
+                        </span>
+                      }
+                    </td>
+
+                    <!-- Status -->
+                    <td class="cell--status">
+                      <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
+                        {{ getStatusLabel(order.status) }}
+                      </span>
+                    </td>
+
+                    <!-- Created Elapsed -->
+                    <td class="cell--time">
+                      <span class="elapsed-time">{{ formatElapsed(order.createdAtUtc) }}</span>
+                    </td>
+
+                    <!-- In State Elapsed -->
+                    <td class="cell--in-state">
+                      <span class="in-state-time">{{
+                        formatInState(order.currentStatusSinceUtc)
+                      }}</span>
+                    </td>
+
+                    <!-- Driver -->
+                    <td class="cell--driver">
+                      @if (order.orderType === 'Delivery') {
+                        @if (order.driverName) {
+                          <span class="driver-assigned">🛵 {{ order.driverName }}</span>
+                        } @else {
+                          <span class="driver-unassigned"
+                            >⚠️ {{ copy().management.operations.drawer.driverNotAssigned }}</span
+                          >
+                        }
+                      } @else {
+                        <span class="driver-na">—</span>
+                      }
+                    </td>
+
+                    <!-- Total -->
+                    <td class="cell--total">
+                      <span class="price-value">{{ formatCurrency(order.total) }}</span>
+                    </td>
+
+                    <!-- View Action -->
+                    <td class="cell--actions">
+                      <button
+                        type="button"
+                        class="btn btn-secondary btn-xs view-btn"
+                        (click)="selectOrder(order); $event.stopPropagation()"
+                        [attr.aria-label]="
+                          copy().management.operations.activeQueue.viewOrder +
+                          ' ' +
+                          order.publicCode
+                        "
+                      >
+                        {{ copy().management.operations.activeQueue.viewOrder }}
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Cards Flow -->
+          <div class="mobile-cards-flow">
+            @for (order of filteredOrders(); track order.orderId) {
+              <div
+                class="mobile-order-card"
+                role="button"
+                tabindex="0"
+                [class.is-selected]="selectedOrder()?.orderId === order.orderId"
+                (click)="selectOrder(order)"
+                (keydown.enter)="selectOrder(order)"
+              >
+                <div class="mobile-order-card__header">
+                  <span class="public-code-badge">{{ order.publicCode }}</span>
+                  <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
+                    {{ getStatusLabel(order.status) }}
+                  </span>
+                </div>
+
+                <div class="mobile-order-card__row">
+                  <span class="customer-info__name">{{ order.customerName }}</span>
+                  @if (order.orderType === 'Delivery') {
+                    <span class="type-pill type-pill--delivery">
+                      🛵 {{ copy().management.operations.activeQueue.filterDelivery }}
+                    </span>
+                  } @else {
+                    <span class="type-pill type-pill--takeaway">
+                      🛍️ {{ copy().management.operations.activeQueue.filterTakeaway }}
+                    </span>
+                  }
+                </div>
+
+                <div class="mobile-order-card__details">
+                  <div class="timing-detail">
+                    <span>🕒 {{ formatElapsed(order.createdAtUtc) }}</span>
+                    <span class="separator">•</span>
+                    <span>{{ formatInState(order.currentStatusSinceUtc) }}</span>
+                  </div>
+
+                  @if (order.orderType === 'Delivery') {
+                    <div class="driver-detail">
+                      @if (order.driverName) {
+                        <span>🛵 {{ order.driverName }}</span>
+                      } @else {
+                        <span class="driver-unassigned"
+                          >⚠️ {{ copy().management.operations.drawer.driverNotAssigned }}</span
+                        >
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div class="mobile-order-card__footer">
+                  <span class="price-value">{{ formatCurrency(order.total) }}</span>
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-xs"
+                    (click)="selectOrder(order); $event.stopPropagation()"
+                  >
+                    {{ copy().management.operations.activeQueue.viewOrder }} →
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    }
+  </main>
+
+  <!-- SECTION 4: Quick Order Inspection Side Drawer -->
+  @if (isDrawerOpen()) {
+    <div class="drawer-backdrop" (click)="closeDrawer()" aria-hidden="true"></div>
+
+    <aside
+      class="ops-drawer"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="copy().management.operations.drawer.title"
+    >
+      @if (selectedOrder(); as order) {
+        <div class="drawer-header">
+          <div class="drawer-header__title">
+            <span class="drawer-public-code">{{ order.publicCode }}</span>
+            <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
+              {{ getStatusLabel(order.status) }}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            class="drawer-close-btn"
+            (click)="closeDrawer()"
+            [attr.aria-label]="copy().management.operations.drawer.close"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="drawer-content">
+          <!-- Timings Banner -->
+          <div class="drawer-section drawer-section--timings">
+            <div class="timing-badge">
+              <span class="timing-label">{{ copy().management.operations.drawer.createdAt }}:</span>
+              <span class="timing-val"
+                >{{ formatTime(order.createdAtUtc) }} ({{
+                  formatElapsed(order.createdAtUtc)
+                }})</span
+              >
+            </div>
+            <div class="timing-badge">
+              <span class="timing-label"
+                >{{ copy().management.operations.activeQueue.colElapsedStatus }}:</span
+              >
+              <span class="timing-val">{{ formatInState(order.currentStatusSinceUtc) }}</span>
+            </div>
+          </div>
+
+          <!-- Customer & Fulfillment Section -->
+          <div class="drawer-section">
+            <h4 class="drawer-section__title">
+              {{ copy().management.operations.drawer.customerName }} &
+              {{ copy().management.operations.drawer.orderType }}
+            </h4>
+            <div class="drawer-info-grid">
+              <div class="info-item">
+                <span class="info-label">{{
+                  copy().management.operations.drawer.customerName
+                }}</span>
+                <span class="info-value">{{ order.customerName }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">{{
+                  copy().management.operations.drawer.customerPhone
+                }}</span>
+                <a [href]="'tel:' + order.customerPhone" class="info-link info-value" dir="ltr">
+                  📞 {{ order.customerPhone }}
+                </a>
+              </div>
+              <div class="info-item">
+                <span class="info-label">{{ copy().management.operations.drawer.orderType }}</span>
+                <span class="info-value">
+                  @if (order.orderType === 'Delivery') {
+                    🛵 {{ copy().management.operations.activeQueue.filterDelivery }}
+                  } @else {
+                    🛍️ {{ copy().management.operations.activeQueue.filterTakeaway }}
+                  }
+                </span>
+              </div>
+              @if (order.orderType === 'Delivery') {
+                @if (order.deliveryAreaNameAr || order.deliveryAreaNameEn) {
+                  <div class="info-item">
+                    <span class="info-label">{{
+                      copy().management.operations.drawer.deliveryArea
+                    }}</span>
+                    <span class="info-value">
+                      {{
+                        language.current() === 'ar'
+                          ? order.deliveryAreaNameAr
+                          : order.deliveryAreaNameEn
+                      }}
+                    </span>
+                  </div>
+                }
+                @if (order.address) {
+                  <div class="info-item info-item--full">
+                    <span class="info-label">{{
+                      copy().management.operations.drawer.address
+                    }}</span>
+                    <span class="info-value">{{ order.address }}</span>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+
+          <!-- Customer Note Box -->
+          @if (order.customerNote) {
+            <div class="drawer-section drawer-section--note">
+              <h4 class="drawer-section__title">
+                📝 {{ copy().management.operations.drawer.customerNote }}
+              </h4>
+              <div class="customer-note-box">
+                <p>{{ order.customerNote }}</p>
+              </div>
+            </div>
+          }
+
+          <!-- Items Breakdown -->
+          <div class="drawer-section">
+            <h4 class="drawer-section__title">
+              {{ copy().management.operations.drawer.itemsTitle }}
+            </h4>
+            <ul class="drawer-items-list">
+              @for (item of order.items; track $index) {
+                <li class="drawer-item-row">
+                  <span class="drawer-item-qty">{{ item.quantity }}x</span>
+                  <span class="drawer-item-name">
+                    {{ language.current() === 'ar' ? item.productNameAr : item.productNameEn }}
+                  </span>
+                </li>
+              }
+            </ul>
+
+            <!-- Financial Summary -->
+            <div class="drawer-financials">
+              <div class="financial-row">
+                <span>{{ copy().management.operations.drawer.subtotal }}</span>
+                <span>{{ formatCurrency(order.subtotal) }}</span>
+              </div>
+              @if (order.orderType === 'Delivery') {
+                <div class="financial-row">
+                  <span>{{ copy().management.operations.drawer.deliveryFee }}</span>
+                  <span>{{ formatCurrency(order.deliveryFee) }}</span>
+                </div>
+              }
+              <div class="financial-row financial-row--grand-total">
+                <span>{{ copy().management.operations.drawer.total }}</span>
+                <span class="grand-total-val">{{ formatCurrency(order.total) }}</span>
+              </div>
+              <div class="financial-row financial-row--payment">
+                <span>{{ copy().management.operations.drawer.paymentStatus }}</span>
+                <span
+                  class="payment-pill"
+                  [class.payment-pill--paid]="order.paymentStatus === 'Paid'"
+                  [class.payment-pill--pending]="order.paymentStatus === 'Pending'"
+                >
+                  @if (order.paymentStatus === 'Paid') {
+                    ✓ {{ copy().management.operations.drawer.paid }}
+                  } @else {
+                    ⏳ {{ copy().management.operations.drawer.pendingPayment }} ({{
+                      copy().management.operations.drawer.cashOnDelivery
+                    }})
+                  }
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Driver Information (For Delivery) -->
+          @if (order.orderType === 'Delivery') {
+            <div class="drawer-section">
+              <h4 class="drawer-section__title">
+                {{ copy().management.operations.drawer.driverInfo }}
+              </h4>
+              <div class="driver-status-card">
+                @if (order.driverId) {
+                  <div class="driver-card-assigned">
+                    <span class="driver-avatar">🛵</span>
+                    <div class="driver-meta">
+                      <span class="driver-name-text">{{ order.driverName }}</span>
+                      @if (order.driverAssignedAtUtc) {
+                        <span class="driver-time"
+                          >{{ copy().management.operations.drawer.assignedAt }}
+                          {{ formatTime(order.driverAssignedAtUtc) }}</span
+                        >
+                      }
+                    </div>
+                  </div>
+                } @else {
+                  <div class="driver-card-empty">
+                    <span>⚠️ {{ copy().management.operations.drawer.driverNotAssigned }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Status History Timeline -->
+          <div class="drawer-section">
+            <h4 class="drawer-section__title">
+              {{ copy().management.operations.drawer.historyTitle }}
+            </h4>
+            @if (order.statusHistory.length === 0) {
+              <p class="empty-history">{{ copy().management.operations.drawer.noHistory }}</p>
+            } @else {
+              <ol class="history-timeline">
+                @for (entry of order.statusHistory; track $index) {
+                  <li class="timeline-step">
+                    <div class="timeline-step__marker"></div>
+                    <div class="timeline-step__content">
+                      <div class="timeline-step__header">
+                        <span
+                          class="timeline-status-badge"
+                          [ngClass]="getStatusBadgeClass(entry.newStatus)"
+                        >
+                          {{ getStatusLabel(entry.newStatus) }}
+                        </span>
+                        <span class="timeline-time">{{ formatTime(entry.changedAtUtc) }}</span>
+                      </div>
+                      @if (entry.actorRole || entry.notes) {
+                        <div class="timeline-step__details">
+                          @if (entry.actorRole) {
+                            <span class="actor-tag">[{{ entry.actorRole }}]</span>
+                          }
+                          @if (entry.notes) {
+                            <span class="notes-text">{{ entry.notes }}</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </li>
+                }
+              </ol>
+            }
+          </div>
+        </div>
+      }
+    </aside>
+  }
+</div>

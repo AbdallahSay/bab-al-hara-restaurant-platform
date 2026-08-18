@@ -9,6 +9,7 @@ import {
   CreateCategoryRequest,
   CreateMenuItemRequest,
   MenuItemManagementDto,
+  OperationsCommandCenterResponse,
   RestaurantControlDto,
   ToggleActiveRequest,
   ToggleMenuItemAvailabilityRequest,
@@ -49,14 +50,18 @@ export class ManagementApiService {
   getCategories(): Observable<readonly CategoryManagementDto[]> {
     return this.http.get<readonly CategoryManagementDto[]>(
       `${this.apiBaseUrl}/management/categories`,
-      { withCredentials: true },
+      {
+        withCredentials: true,
+      },
     );
   }
 
   getCategory(id: string): Observable<CategoryManagementDto> {
     return this.http.get<CategoryManagementDto>(
       `${this.apiBaseUrl}/management/categories/${encodeURIComponent(id)}`,
-      { withCredentials: true },
+      {
+        withCredentials: true,
+      },
     );
   }
 
@@ -106,9 +111,11 @@ export class ManagementApiService {
 
   getMenuItems(categoryId?: string): Observable<readonly MenuItemManagementDto[]> {
     let params = new HttpParams();
+
     if (categoryId) {
       params = params.set('categoryId', categoryId);
     }
+
     return this.http.get<readonly MenuItemManagementDto[]>(
       `${this.apiBaseUrl}/management/menu-items`,
       {
@@ -121,7 +128,9 @@ export class ManagementApiService {
   getMenuItem(id: string): Observable<MenuItemManagementDto> {
     return this.http.get<MenuItemManagementDto>(
       `${this.apiBaseUrl}/management/menu-items/${encodeURIComponent(id)}`,
-      { withCredentials: true },
+      {
+        withCredentials: true,
+      },
     );
   }
 
@@ -184,6 +193,15 @@ export class ManagementApiService {
           },
         ),
       ),
+    );
+  }
+
+  getOperationsSnapshot(): Observable<OperationsCommandCenterResponse> {
+    return this.http.get<OperationsCommandCenterResponse>(
+      `${this.apiBaseUrl}/management/operations`,
+      {
+        withCredentials: true,
+      },
     );
   }
 

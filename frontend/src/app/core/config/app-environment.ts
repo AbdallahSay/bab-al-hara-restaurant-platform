@@ -6,6 +6,7 @@ export interface AppEnvironment {
   readonly kitchenHubUrl: string;
   readonly cashierHubUrl: string;
   readonly driverHubUrl: string;
+  readonly operationsHubUrl: string;
 }
 
 export const APP_ENVIRONMENT = new InjectionToken<AppEnvironment>('APP_ENVIRONMENT');
