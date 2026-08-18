@@ -104,7 +104,7 @@
   background: #141011;
 
   button {
-    min-block-size: 2.35rem;
+    min-block-size: 2.75rem;
     padding-inline: var(--space-3);
     border: 0;
     border-radius: 2rem;
@@ -643,6 +643,7 @@
 
 .modal-card {
   position: relative;
+  overscroll-behavior: contain;
   z-index: 1;
   inline-size: 100%;
   max-inline-size: 44rem;
@@ -673,8 +674,13 @@
 }
 
 .modal-close-button {
-  inline-size: 2.5rem;
-  block-size: 2.5rem;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1.5px solid #594a4e;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -699,7 +705,7 @@
 }
 
 .category-chip {
-  min-block-size: 2.25rem;
+  min-block-size: 2.75rem;
   padding: 0.35rem var(--space-3);
   border: 1px solid #594a4e;
   border-radius: 2rem;

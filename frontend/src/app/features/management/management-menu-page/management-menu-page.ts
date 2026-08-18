@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  HostListener,
   inject,
   OnInit,
   signal,
@@ -674,6 +675,17 @@ export class ManagementMenuPage implements OnInit {
 
   money(val: number): string {
     return formatMoney(val, this.language.current());
+  }
+
+  @HostListener('document:keydown.escape')
+  protected handleEscape(): void {
+    if (this.removeConfirmModalOpen()) {
+      this.cancelRemoveImage();
+    } else if (this.itemModalOpen()) {
+      this.closeItemModal();
+    } else if (this.categoryModalOpen()) {
+      this.closeCategoryModal();
+    }
   }
 
   signOut(): void {

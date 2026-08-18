@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  HostListener,
   inject,
   OnDestroy,
   OnInit,
@@ -124,6 +125,13 @@ export class DriverPage implements OnInit, OnDestroy {
           }
         },
       });
+  }
+
+  @HostListener('document:keydown.escape')
+  protected handleEscape(): void {
+    if (this.confirmingAction()) {
+      this.cancelConfirmation();
+    }
   }
 
   protected signOut(): void {

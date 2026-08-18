@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  HostListener,
   inject,
   OnDestroy,
   OnInit,
@@ -230,6 +231,16 @@ export class CashierPage implements OnInit, OnDestroy {
     this.audioContext ??= new AudioContext();
     void this.audioContext.resume();
     this.soundEnabled.set(true);
+  }
+
+  @HostListener('document:keydown.escape')
+  protected handleEscape(): void {
+    if (this.confirmingOrders().size > 0) {
+      this.confirmingOrders.set(new Set());
+    }
+    if (this.confirmingAssignments().size > 0) {
+      this.confirmingAssignments.set(new Set());
+    }
   }
 
   protected signOut(): void {
