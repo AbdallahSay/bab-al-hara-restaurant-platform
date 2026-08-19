@@ -103,6 +103,9 @@ Status: COMPLETE — 2026-08-18
 - device-local versioned fulfillment preferences (`Takeaway` vs `Delivery`)
 - saved delivery address with stale delivery area detection and recovery
 - privacy-preserving "Clear saved address" UX
+- customer My Orders page (`/orders` — طلباتي) grouping active vs previous orders
+- bounded device-local public order index (`bab-al-hara.recent-orders.v1`) with zero credential exposure
+- customer header "طلباتي" link and contextual "متابعة طلبك" indicator
 - comprehensive unit, integration, and security test suites
 
 ## Phase 5 — Cashier

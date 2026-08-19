@@ -33,6 +33,14 @@ export const routes: Routes = [
     title: 'Order confirmed | Bab Al Hara',
   },
   {
+    path: 'orders',
+    loadComponent: () =>
+      import('./features/customer-ordering/my-orders/my-orders-page').then(
+        (component) => component.MyOrdersPage,
+      ),
+    title: 'My Orders | طلباتي | Bab Al Hara',
+  },
+  {
     path: 'order/:publicCode/track',
     loadComponent: () =>
       import('./features/order-tracking/order-tracking-page').then((m) => m.OrderTrackingPage),
