@@ -9,6 +9,21 @@
     </a>
 
     <div class="customer-header__actions">
+      @if (activeOrderCode(); as code) {
+        <a
+          class="active-order-link"
+          [routerLink]="['/order', code, 'track']"
+          [attr.aria-label]="copy().brand.trackActiveOrder"
+        >
+          <span class="active-order-link__indicator" aria-hidden="true"></span>
+          <span>{{ copy().brand.trackActiveOrder }}</span>
+        </a>
+      }
+
+      <a class="orders-link" routerLink="/orders">
+        <span>{{ copy().brand.orders }}</span>
+      </a>
+
       <div class="language-switcher" role="group" [attr.aria-label]="copy().brand.languageLabel">
         <button
           type="button"

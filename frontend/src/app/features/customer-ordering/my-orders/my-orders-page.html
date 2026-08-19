@@ -1,0 +1,281 @@
+<app-customer-header />
+
+<main class="my-orders-page" id="main-content">
+  <div class="my-orders-page__container">
+    <div class="my-orders-page__header">
+      <div class="header-nav">
+        <a routerLink="/" class="back-link">
+          <span class="back-arrow" aria-hidden="true">←</span>
+          <span>{{ copy().common.backToMenu }}</span>
+        </a>
+      </div>
+      <h1 class="page-title">{{ copy().myOrders.title }}</h1>
+      <p class="page-subtitle">{{ copy().myOrders.subtitle }}</p>
+      <div class="privacy-notice" role="note">
+        <span class="privacy-icon" aria-hidden="true">🔒</span>
+        <span>{{ copy().myOrders.privacyNotice }}</span>
+      </div>
+    </div>
+
+    @if (reorderFeedback(); as feedback) {
+      <div
+        class="reorder-feedback"
+        [class.is-success]="feedback.type === 'success'"
+        [class.is-partial]="feedback.type === 'partial'"
+        [class.is-error]="feedback.type === 'error'"
+        role="status"
+        aria-live="polite"
+      >
+        <p>{{ feedback.message }}</p>
+        @if (feedback.type === 'success' || feedback.type === 'partial') {
+          <a routerLink="/cart" class="feedback-cart-btn">
+            {{ copy().orderTracking.reorder.viewCart }}
+          </a>
+        }
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="loading-state" role="status" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>{{ copy().myOrders.loading }}</p>
+      </div>
+    } @else if (!hasAnyOrders()) {
+      <div class="empty-state">
+        <div class="empty-icon" aria-hidden="true">📋</div>
+        <h2>{{ copy().myOrders.noOrdersTitle }}</h2>
+        <p>{{ copy().myOrders.noOrdersBody }}</p>
+        <a routerLink="/" class="btn-browse-menu">
+          {{ copy().myOrders.browseMenu }}
+        </a>
+      </div>
+    } @else {
+      @if (activeOrders().length > 0) {
+        <section class="orders-section active-section" aria-labelledby="active-orders-heading">
+          <div class="section-title-row">
+            <h2 id="active-orders-heading">{{ copy().myOrders.activeSectionTitle }}</h2>
+            <span class="count-badge active-badge">{{ activeOrders().length }}</span>
+          </div>
+
+          <div class="orders-grid">
+            @for (order of activeOrders(); track order.publicCode) {
+              <article class="order-card is-active">
+                <div class="order-card__top">
+                  <div class="order-card__meta">
+                    <span class="order-code">#{{ order.publicCode }}</span>
+                    <span class="order-type-badge">{{ orderTypeLabel(order.orderType) }}</span>
+                    <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+                  </div>
+                  <span class="status-pill status-{{ order.status.toLowerCase() }}">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>{{ statusBadgeLabel(order.status) }}</span>
+                  </span>
+                </div>
+
+                <div class="order-card__body">
+                  <div class="order-summary-row">
+                    <span class="items-summary">
+                      {{ order.items.length }} {{ copy().myOrders.items }}
+                    </span>
+                    <strong class="order-total">{{ formatMoney(order.total) }}</strong>
+                  </div>
+                  <div class="items-preview">
+                    @for (item of order.items; track item.productNameEn) {
+                      <span class="item-pill">
+                        {{ item.quantity }}×
+                        {{ localizedText(item.productNameAr, item.productNameEn) }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <div class="order-card__actions">
+                  <a [routerLink]="['/order', order.publicCode, 'track']" class="btn-track-primary">
+                    <span class="btn-icon" aria-hidden="true">📍</span>
+                    <span>{{ copy().myOrders.trackOrder }}</span>
+                  </a>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      @if (previousOrders().length > 0) {
+        <section class="orders-section previous-section" aria-labelledby="previous-orders-heading">
+          <div class="section-title-row">
+            <h2 id="previous-orders-heading">{{ copy().myOrders.previousSectionTitle }}</h2>
+            <span class="count-badge previous-badge">{{ previousOrders().length }}</span>
+          </div>
+
+          <div class="orders-grid">
+            @for (order of previousOrders(); track order.publicCode) {
+              <article class="order-card is-previous">
+                <div class="order-card__top">
+                  <div class="order-card__meta">
+                    <span class="order-code">#{{ order.publicCode }}</span>
+                    <span class="order-type-badge">{{ orderTypeLabel(order.orderType) }}</span>
+                    <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+                  </div>
+                  <span class="status-pill status-delivered">
+                    <span class="status-dot" aria-hidden="true">✓</span>
+                    <span>{{ copy().orderTracking.steps.delivered }}</span>
+                  </span>
+                </div>
+
+                <div class="order-card__body">
+                  <div class="order-summary-row">
+                    <span class="items-summary">
+                      {{ order.items.length }} {{ copy().myOrders.items }}
+                    </span>
+                    <strong class="order-total">{{ formatMoney(order.total) }}</strong>
+                  </div>
+                  <div class="items-preview">
+                    @for (item of order.items; track item.productNameEn) {
+                      <span class="item-pill">
+                        {{ item.quantity }}×
+                        {{ localizedText(item.productNameAr, item.productNameEn) }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <div class="order-card__actions actions-dual">
+                  <a
+                    [routerLink]="['/order', order.publicCode, 'track']"
+                    class="btn-details-secondary"
+                  >
+                    <span>{{ copy().myOrders.viewDetails }}</span>
+                  </a>
+                  <button
+                    type="button"
+                    class="btn-reorder-primary"
+                    [disabled]="reorderLoadingCode() === order.publicCode"
+                    (click)="onReorder(order.publicCode)"
+                  >
+                    @if (reorderLoadingCode() === order.publicCode) {
+                      <span class="btn-spinner" aria-hidden="true"></span>
+                      <span>{{ copy().orderTracking.reorder.loadingPreview }}</span>
+                    } @else {
+                      <span class="btn-icon" aria-hidden="true">🔄</span>
+                      <span>{{ copy().myOrders.orderAgain }}</span>
+                    }
+                  </button>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      @if (inaccessibleOrders().length > 0) {
+        <section class="inaccessible-section" aria-labelledby="inaccessible-orders-heading">
+          <h3 id="inaccessible-orders-heading" class="inaccessible-heading">
+            {{ copy().myOrders.error }}
+          </h3>
+          <div class="inaccessible-list">
+            @for (item of inaccessibleOrders(); track item.publicCode) {
+              <div class="inaccessible-card">
+                <span class="inaccessible-code">#{{ item.publicCode }}</span>
+                <button
+                  type="button"
+                  class="btn-remove-inaccessible"
+                  (click)="removeInaccessibleOrder(item.publicCode)"
+                >
+                  {{ copy().myOrders.removeFromList }}
+                </button>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    }
+  </div>
+
+  <!-- Reorder Merge / Replace Dialog Modal -->
+  @if (showMergeDialog()) {
+    <div
+      class="reorder-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="copy().orderTracking.reorder.mergeConfirmTitle"
+    >
+      <div class="reorder-modal">
+        <h2 class="reorder-modal__title">{{ copy().orderTracking.reorder.mergeConfirmTitle }}</h2>
+        <p class="reorder-modal__description">
+          {{ copy().orderTracking.reorder.mergeConfirmQuestion }}
+        </p>
+        <p class="reorder-modal__price-notice">
+          {{ copy().orderTracking.reorder.priceChangeNotice }}
+        </p>
+
+        @if (pendingReorderPreview(); as preview) {
+          @if (preview.unavailableItems.length > 0) {
+            <div class="reorder-modal__unavailable-notice" role="status">
+              <p>
+                <strong>{{ copy().orderTracking.reorder.partialSuccessNotice }}</strong>
+              </p>
+              <ul>
+                @for (item of preview.unavailableItems; track item.historicalNameEn) {
+                  <li>
+                    {{ localizedText(item.historicalNameAr, item.historicalNameEn) }}
+                    <span class="reason-tag">({{ getUnavailableReason(item.reason) }})</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        }
+
+        <div class="reorder-modal__actions">
+          <button type="button" class="btn-merge" (click)="onMergeConfirm()">
+            {{ copy().orderTracking.reorder.mergeAction }}
+          </button>
+          <button type="button" class="btn-replace" (click)="onReplaceConfirm()">
+            {{ copy().orderTracking.reorder.replaceAction }}
+          </button>
+          <button type="button" class="btn-cancel" (click)="closeMergeDialog()">
+            {{ copy().orderTracking.reorder.cancelAction }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- All Items Unavailable Modal -->
+  @if (showUnavailableDialog()) {
+    <div
+      class="reorder-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="copy().orderTracking.reorder.previewTitle"
+    >
+      <div class="reorder-modal">
+        <h2 class="reorder-modal__title">{{ copy().orderTracking.reorder.previewTitle }}</h2>
+        <p class="reorder-modal__description">
+          {{ copy().orderTracking.reorder.allUnavailableNotice }}
+        </p>
+
+        @if (unavailableDialogItems().length > 0) {
+          <ul class="reorder-modal__unavailable-list">
+            @for (item of unavailableDialogItems(); track item.historicalNameEn) {
+              <li>
+                {{ localizedText(item.historicalNameAr, item.historicalNameEn) }}
+                <span class="reason-tag">({{ getUnavailableReason(item.reason) }})</span>
+              </li>
+            }
+          </ul>
+        }
+
+        <div class="reorder-modal__actions">
+          <a routerLink="/" class="btn-merge" (click)="closeUnavailableDialog()">
+            {{ copy().common.backToMenu }}
+          </a>
+          <button type="button" class="btn-cancel" (click)="closeUnavailableDialog()">
+            {{ copy().orderTracking.reorder.cancelAction }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</main>
