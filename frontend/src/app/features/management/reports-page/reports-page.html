@@ -1,0 +1,652 @@
+<div class="mgmt-layout" [attr.dir]="language.current() === 'ar' ? 'rtl' : 'ltr'">
+  <!-- Management Header -->
+  <header class="mgmt-header">
+    <div class="mgmt-header__brand">
+      <h1 class="brand-title">{{ copy().brand.name }}</h1>
+      <span class="mgmt-badge">{{ copy().management.title }}</span>
+    </div>
+
+    <nav class="mgmt-header__nav" aria-label="Management Navigation">
+      <a routerLink="/management" class="nav-link">{{ copy().management.navHub }}</a>
+      <a routerLink="/management/operations" class="nav-link">{{
+        copy().management.navOperations
+      }}</a>
+      <a routerLink="/management/menu" class="nav-link">{{ copy().management.navMenu }}</a>
+      <a routerLink="/management/employees" class="nav-link">{{ copy().employees.title }}</a>
+      <a routerLink="/management/reports" class="nav-link is-active">{{
+        copy().management.navReports
+      }}</a>
+      <a routerLink="/" class="nav-link nav-link--customer" target="_blank" rel="noopener">
+        {{ copy().management.viewCustomerMenu }} ↗
+      </a>
+    </nav>
+
+    <div class="mgmt-header__actions">
+      <div class="lang-switch">
+        <button
+          type="button"
+          class="lang-btn"
+          [class.is-active]="language.current() === 'ar'"
+          (click)="setLanguage('ar')"
+        >
+          العربية
+        </button>
+        <button
+          type="button"
+          class="lang-btn"
+          [class.is-active]="language.current() === 'en'"
+          (click)="setLanguage('en')"
+        >
+          English
+        </button>
+      </div>
+
+      <button type="button" class="btn-signout" (click)="signOut()">
+        {{ copy().management.signOut }}
+      </button>
+    </div>
+  </header>
+
+  <main class="reports-container">
+    <!-- Page Header & Filters -->
+    <div class="page-title-section">
+      <div class="page-title-group">
+        <h2 class="page-title">{{ copy().reports.title }}</h2>
+        <p class="page-subtitle">{{ copy().reports.subtitle }}</p>
+      </div>
+
+      @if (lastUpdated()) {
+        <div class="last-updated-tag" [class.is-refreshing]="refreshing()">
+          <span class="pulse-dot"></span>
+          <span>{{ copy().reports.lastUpdated }}: {{ lastUpdated() | date: 'shortTime' }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Filter Control Bar -->
+    <section class="filters-bar" aria-label="Reports Filters">
+      <!-- Preset Pills -->
+      <div class="filter-group preset-group">
+        <span class="filter-label">{{ copy().reports.datePresetLabel }}</span>
+        <div class="pill-group" role="group" [attr.aria-label]="copy().reports.datePresetLabel">
+          <button
+            type="button"
+            class="pill-btn"
+            [class.is-active]="activePreset() === 'today'"
+            (click)="setPreset('today')"
+          >
+            {{ copy().reports.presetToday }}
+          </button>
+          <button
+            type="button"
+            class="pill-btn"
+            [class.is-active]="activePreset() === 'yesterday'"
+            (click)="setPreset('yesterday')"
+          >
+            {{ copy().reports.presetYesterday }}
+          </button>
+          <button
+            type="button"
+            class="pill-btn"
+            [class.is-active]="activePreset() === 'last7days'"
+            (click)="setPreset('last7days')"
+          >
+            {{ copy().reports.presetLast7Days }}
+          </button>
+          <button
+            type="button"
+            class="pill-btn"
+            [class.is-active]="activePreset() === 'last30days'"
+            (click)="setPreset('last30days')"
+          >
+            {{ copy().reports.presetLast30Days }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Custom Date Inputs -->
+      <div class="filter-group custom-dates-group">
+        <div class="date-input-field">
+          <label for="report-from-date" class="date-label">{{ copy().reports.fromDate }}</label>
+          <input
+            id="report-from-date"
+            type="date"
+            class="date-input"
+            [ngModel]="fromDate()"
+            (ngModelChange)="fromDate.set($event); onCustomDateChange()"
+          />
+        </div>
+        <div class="date-input-field">
+          <label for="report-to-date" class="date-label">{{ copy().reports.toDate }}</label>
+          <input
+            id="report-to-date"
+            type="date"
+            class="date-input"
+            [ngModel]="toDate()"
+            (ngModelChange)="toDate.set($event); onCustomDateChange()"
+          />
+        </div>
+      </div>
+
+      <!-- Fulfillment Channel Filter -->
+      <div class="filter-group fulfillment-group">
+        <span class="filter-label">{{ copy().reports.fulfillmentFilterLabel }}</span>
+        <div
+          class="segmented-control"
+          role="group"
+          [attr.aria-label]="copy().reports.fulfillmentFilterLabel"
+        >
+          <button
+            type="button"
+            class="segment-btn"
+            [class.is-active]="fulfillmentFilter() === 'All'"
+            (click)="setFulfillmentFilter('All')"
+          >
+            {{ copy().reports.fulfillmentAll }}
+          </button>
+          <button
+            type="button"
+            class="segment-btn"
+            [class.is-active]="fulfillmentFilter() === 'Delivery'"
+            (click)="setFulfillmentFilter('Delivery')"
+          >
+            {{ copy().reports.fulfillmentDelivery }}
+          </button>
+          <button
+            type="button"
+            class="segment-btn"
+            [class.is-active]="fulfillmentFilter() === 'Takeaway'"
+            (click)="setFulfillmentFilter('Takeaway')"
+          >
+            {{ copy().reports.fulfillmentTakeaway }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Refresh Action -->
+      <div class="filter-actions">
+        <button
+          type="button"
+          class="btn-refresh"
+          [disabled]="loading() || refreshing() || !!dateValidationError()"
+          (click)="loadReports(true)"
+          [attr.aria-label]="copy().reports.refresh"
+        >
+          <span class="refresh-icon" [class.is-spinning]="refreshing() || loading()">↻</span>
+          <span>{{ refreshing() ? copy().reports.refreshing : copy().reports.refresh }}</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Client Date Validation Error Alert -->
+    @if (dateValidationError()) {
+      <div class="alert alert-validation" role="alert">
+        <span class="alert-icon">⚠</span>
+        <span>{{ dateValidationError() }}</span>
+      </div>
+    }
+
+    <!-- Loading Skeleton State -->
+    @if (loading()) {
+      <div class="loading-container" role="status" [attr.aria-label]="copy().common.loading">
+        <div class="skeleton-grid">
+          <div class="skeleton-card skeleton"></div>
+          <div class="skeleton-card skeleton"></div>
+          <div class="skeleton-card skeleton"></div>
+          <div class="skeleton-card skeleton"></div>
+        </div>
+        <div class="skeleton-chart skeleton"></div>
+      </div>
+    }
+
+    <!-- Error State with Retry -->
+    @else if (error()) {
+      <div class="alert alert-error" role="alert">
+        <div class="error-content">
+          <span class="error-icon">✕</span>
+          <div class="error-text">
+            <h3>{{ copy().reports.errors.loadFailed }}</h3>
+            <p>{{ error() }}</p>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-retry" (click)="loadReports()">
+          {{ copy().reports.errors.retry }}
+        </button>
+      </div>
+    }
+
+    <!-- Honest Empty State -->
+    @else if (!hasData()) {
+      <div class="empty-state-card">
+        <div class="empty-state-icon">📊</div>
+        <h3 class="empty-state-title">{{ copy().reports.empty.title }}</h3>
+        <p class="empty-state-message">{{ copy().reports.empty.message }}</p>
+        <button type="button" class="btn btn-primary" (click)="setPreset('last30days')">
+          {{ copy().reports.empty.resetFilter }}
+        </button>
+      </div>
+    }
+
+    <!-- Reports Content Grid -->
+    @else {
+      <!-- Summary Cards Grid -->
+      <section class="summary-grid" aria-label="Key Performance Indicators">
+        <!-- 1. Completed Sales Revenue -->
+        <article class="kpi-card kpi-card--primary">
+          <div class="kpi-header">
+            <span class="kpi-title">{{ copy().reports.summary.completedSales }}</span>
+            <span class="kpi-badge kpi-badge--success">{{ copy().reports.fulfillmentAll }}</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-value">{{ formatCurrency(summary().completedSalesRevenue) }}</span>
+          </div>
+          <p class="kpi-hint">{{ copy().reports.summary.completedSalesHint }}</p>
+        </article>
+
+        <!-- 2. Completed Orders Count -->
+        <article class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">{{ copy().reports.summary.completedOrders }}</span>
+            <span class="kpi-badge kpi-badge--delivered">✓</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-value">{{ summary().completedOrdersCount }}</span>
+          </div>
+          <p class="kpi-hint">{{ copy().reports.summary.completedOrdersHint }}</p>
+        </article>
+
+        <!-- 3. Average Order Value (AOV) -->
+        <article class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">{{ copy().reports.summary.averageOrderValue }}</span>
+            <span class="kpi-badge">AOV</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-value">{{ formatCurrency(summary().averageOrderValue) }}</span>
+          </div>
+          <p class="kpi-hint">{{ copy().reports.summary.averageOrderValueHint }}</p>
+        </article>
+
+        <!-- 4. Total Orders Placed -->
+        <article class="kpi-card kpi-card--neutral">
+          <div class="kpi-header">
+            <span class="kpi-title">{{ copy().reports.summary.totalOrdersPlaced }}</span>
+            <span class="kpi-badge kpi-badge--placed">Σ</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-value">{{ summary().totalOrdersPlaced }}</span>
+          </div>
+          <p class="kpi-hint">{{ copy().reports.summary.totalOrdersPlacedHint }}</p>
+        </article>
+      </section>
+
+      <!-- Sales & Order Trend Section -->
+      <section class="report-section trends-section">
+        <div class="section-header">
+          <div class="section-header__text">
+            <h3 class="section-title">{{ copy().reports.trends.title }}</h3>
+            <p class="section-subtitle">{{ copy().reports.trends.subtitle }}</p>
+          </div>
+          <div class="section-header__actions">
+            <!-- View Mode Switch -->
+            <div class="view-toggle" role="group" aria-label="Trend View Mode">
+              <button
+                type="button"
+                class="view-toggle-btn"
+                [class.is-active]="viewMode() === 'chart'"
+                (click)="viewMode.set('chart')"
+              >
+                {{ copy().reports.trends.viewChartToggle }}
+              </button>
+              <button
+                type="button"
+                class="view-toggle-btn"
+                [class.is-active]="viewMode() === 'table'"
+                (click)="viewMode.set('table')"
+              >
+                {{ copy().reports.trends.viewTableToggle }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="chart-legend" aria-hidden="true">
+          <span class="legend-item">
+            <span class="legend-color legend-color--revenue"></span>
+            <span>{{ copy().reports.trends.revenueLegend }}</span>
+          </span>
+          <span class="legend-item">
+            <span class="legend-color legend-color--orders"></span>
+            <span>{{ copy().reports.trends.ordersLegend }}</span>
+          </span>
+        </div>
+
+        @if (dailyTrends().length === 0) {
+          <p class="no-data-notice">{{ copy().reports.trends.noTrendData }}</p>
+        } @else {
+          <!-- Visual SVG Chart -->
+          @if (viewMode() === 'chart') {
+            <div
+              class="chart-container"
+              role="region"
+              [attr.aria-label]="copy().reports.trends.title"
+            >
+              <div class="trend-bars-wrapper">
+                @for (point of dailyTrends(); track point.date) {
+                  <div
+                    class="trend-bar-col"
+                    tabindex="0"
+                    (mouseenter)="hoveredTrendPoint.set(point)"
+                    (mouseleave)="hoveredTrendPoint.set(null)"
+                    (focus)="hoveredTrendPoint.set(point)"
+                    (blur)="hoveredTrendPoint.set(null)"
+                    [attr.aria-label]="
+                      point.date +
+                      ': ' +
+                      formatCurrency(point.revenue) +
+                      ', ' +
+                      point.completedOrdersCount +
+                      ' orders'
+                    "
+                  >
+                    <!-- Bar Track -->
+                    <div class="bar-track">
+                      <div
+                        class="bar-fill"
+                        [style.height.%]="(point.revenue / maxDailyRevenue()) * 100"
+                      ></div>
+                    </div>
+
+                    <!-- Orders Badge -->
+                    <span class="bar-orders-count">{{ point.completedOrdersCount }}</span>
+
+                    <!-- Date Label -->
+                    <span class="bar-date-label">{{ point.date | date: 'dd/MM' }}</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Tooltip overlay -->
+              @if (hoveredTrendPoint(); as activePoint) {
+                <div class="chart-tooltip" role="tooltip">
+                  <strong>{{ activePoint.date | date: 'mediumDate' }}</strong>
+                  <div class="tooltip-row">
+                    <span>{{ copy().reports.trends.tableRevenue }}:</span>
+                    <span class="tooltip-val">{{ formatCurrency(activePoint.revenue) }}</span>
+                  </div>
+                  <div class="tooltip-row">
+                    <span>{{ copy().reports.trends.tableCompletedOrders }}:</span>
+                    <span class="tooltip-val">{{ activePoint.completedOrdersCount }}</span>
+                  </div>
+                  <div class="tooltip-row">
+                    <span>{{ copy().reports.trends.tableTotalOrders }}:</span>
+                    <span class="tooltip-val">{{ activePoint.totalOrdersCount }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Tabular Counterpart (Visible when toggled or screen-reader only) -->
+          <div
+            class="table-responsive"
+            [class.sr-only]="viewMode() === 'chart'"
+            role="region"
+            [attr.aria-label]="copy().reports.trends.tableAccessibleTitle"
+          >
+            <table class="report-table">
+              <caption class="sr-only">
+                {{
+                  copy().reports.trends.tableAccessibleTitle
+                }}
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">{{ copy().reports.trends.tableDate }}</th>
+                  <th scope="col">{{ copy().reports.trends.tableRevenue }}</th>
+                  <th scope="col">{{ copy().reports.trends.tableCompletedOrders }}</th>
+                  <th scope="col">{{ copy().reports.trends.tableTotalOrders }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of dailyTrends(); track row.date) {
+                  <tr>
+                    <td>{{ row.date | date: 'yyyy-MM-dd' }}</td>
+                    <td class="numeric-cell">{{ formatCurrency(row.revenue) }}</td>
+                    <td class="numeric-cell">{{ row.completedOrdersCount }}</td>
+                    <td class="numeric-cell">{{ row.totalOrdersCount }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+
+      <!-- Two-Column Breakdown & Timing Grid -->
+      <div class="analytics-subgrid">
+        <!-- Fulfillment Channel Breakdown -->
+        <section class="report-section breakdown-section">
+          <div class="section-header">
+            <div class="section-header__text">
+              <h3 class="section-title">{{ copy().reports.fulfillment.title }}</h3>
+              <p class="section-subtitle">{{ copy().reports.fulfillment.subtitle }}</p>
+            </div>
+          </div>
+
+          @if (fulfillmentBreakdown(); as fb) {
+            <!-- Comparison Progress Bar -->
+            <div class="fulfillment-progress" aria-hidden="true">
+              <div class="prog-segment prog-delivery" [style.width.%]="deliverySharePercent()">
+                @if (deliverySharePercent() > 15) {
+                  <span>{{ deliverySharePercent() }}%</span>
+                }
+              </div>
+              <div class="prog-segment prog-takeaway" [style.width.%]="takeawaySharePercent()">
+                @if (takeawaySharePercent() > 15) {
+                  <span>{{ takeawaySharePercent() }}%</span>
+                }
+              </div>
+            </div>
+
+            <div class="fulfillment-cards">
+              <!-- Delivery Card -->
+              <div class="fulfillment-card fulfillment-card--delivery">
+                <div class="fc-header">
+                  <h4>🛵 {{ copy().reports.fulfillment.deliveryTitle }}</h4>
+                  <span class="fc-share-badge">{{ deliverySharePercent() }}%</span>
+                </div>
+                <div class="fc-metrics">
+                  <div class="fc-metric">
+                    <span class="fc-metric-label">{{ copy().reports.fulfillment.orderCount }}</span>
+                    <span class="fc-metric-value">{{ fb.delivery.count }}</span>
+                  </div>
+                  <div class="fc-metric">
+                    <span class="fc-metric-label">{{ copy().reports.fulfillment.revenue }}</span>
+                    <span class="fc-metric-value">{{ formatCurrency(fb.delivery.revenue) }}</span>
+                  </div>
+                  <div class="fc-metric">
+                    <span class="fc-metric-label">{{
+                      copy().reports.fulfillment.deliveryFees
+                    }}</span>
+                    <span class="fc-metric-value">{{
+                      formatCurrency(fb.delivery.deliveryFees)
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Takeaway Card -->
+              <div class="fulfillment-card fulfillment-card--takeaway">
+                <div class="fc-header">
+                  <h4>🥡 {{ copy().reports.fulfillment.takeawayTitle }}</h4>
+                  <span class="fc-share-badge">{{ takeawaySharePercent() }}%</span>
+                </div>
+                <div class="fc-metrics">
+                  <div class="fc-metric">
+                    <span class="fc-metric-label">{{ copy().reports.fulfillment.orderCount }}</span>
+                    <span class="fc-metric-value">{{ fb.takeaway.count }}</span>
+                  </div>
+                  <div class="fc-metric">
+                    <span class="fc-metric-label">{{ copy().reports.fulfillment.revenue }}</span>
+                    <span class="fc-metric-value">{{ formatCurrency(fb.takeaway.revenue) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </section>
+
+        <!-- Operational Timing & Peak Hours -->
+        <section class="report-section timing-section">
+          <div class="section-header">
+            <div class="section-header__text">
+              <h3 class="section-title">{{ copy().reports.timing.title }}</h3>
+              <p class="section-subtitle">{{ copy().reports.timing.subtitle }}</p>
+            </div>
+          </div>
+
+          <!-- 3 Factual Metrics -->
+          @if (operationalTiming(); as timing) {
+            <div class="timing-tiles-grid">
+              <div class="timing-tile">
+                <span class="timing-label">{{ copy().reports.timing.avgPrepTime }}</span>
+                <span class="timing-value">{{
+                  formatMinutes(timing.averagePreparationMinutes)
+                }}</span>
+                <span class="timing-hint">{{ copy().reports.timing.avgPrepTimeHint }}</span>
+              </div>
+              <div class="timing-tile">
+                <span class="timing-label">{{ copy().reports.timing.avgDeliveryTime }}</span>
+                <span class="timing-value">{{ formatMinutes(timing.averageDeliveryMinutes) }}</span>
+                <span class="timing-hint">{{ copy().reports.timing.avgDeliveryTimeHint }}</span>
+              </div>
+              <div class="timing-tile">
+                <span class="timing-label">{{ copy().reports.timing.avgTotalTime }}</span>
+                <span class="timing-value">{{
+                  formatMinutes(timing.averageTotalFulfillmentMinutes)
+                }}</span>
+                <span class="timing-hint">{{ copy().reports.timing.avgTotalTimeHint }}</span>
+              </div>
+            </div>
+          }
+
+          <!-- Hourly Order Distribution -->
+          <div class="hourly-chart-wrapper">
+            <h4 class="hourly-chart-title">{{ copy().reports.timing.hourlyTitle }}</h4>
+            <div
+              class="hourly-bars"
+              role="region"
+              [attr.aria-label]="copy().reports.timing.hourlyTableTitle"
+            >
+              @for (hourItem of hourlyDistribution(); track hourItem.hour) {
+                <div
+                  class="hourly-bar-col"
+                  tabindex="0"
+                  [attr.aria-label]="
+                    hourItem.hourLabel +
+                    ': ' +
+                    hourItem.orderCount +
+                    ' orders, ' +
+                    formatCurrency(hourItem.revenue)
+                  "
+                >
+                  <div class="hourly-bar-track">
+                    <div
+                      class="hourly-bar-fill"
+                      [style.height.%]="
+                        maxHourlyOrders() > 0 ? (hourItem.orderCount / maxHourlyOrders()) * 100 : 0
+                      "
+                    ></div>
+                  </div>
+                  <span class="hourly-count">{{ hourItem.orderCount }}</span>
+                  <span class="hourly-label">{{ hourItem.hour }}:00</span>
+                </div>
+              }
+            </div>
+
+            <!-- Accessible Table Counterpart -->
+            <table class="sr-only">
+              <caption>
+                {{
+                  copy().reports.timing.hourlyTableTitle
+                }}
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">{{ copy().reports.timing.hourlyHour }}</th>
+                  <th scope="col">{{ copy().reports.timing.hourlyOrders }}</th>
+                  <th scope="col">{{ copy().reports.timing.hourlyRevenue }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (h of hourlyDistribution(); track h.hour) {
+                  <tr>
+                    <td>{{ h.hourLabel }}</td>
+                    <td>{{ h.orderCount }}</td>
+                    <td>{{ formatCurrency(h.revenue) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- Best-Selling Items Section -->
+      <section class="report-section best-sellers-section">
+        <div class="section-header">
+          <div class="section-header__text">
+            <h3 class="section-title">{{ copy().reports.bestSelling.title }}</h3>
+            <p class="section-subtitle">{{ copy().reports.bestSelling.subtitle }}</p>
+          </div>
+        </div>
+
+        @if (bestSellingItems().length === 0) {
+          <p class="no-data-notice">{{ copy().reports.bestSelling.emptyNotice }}</p>
+        } @else {
+          <div class="table-responsive">
+            <table class="report-table items-table">
+              <caption class="sr-only">
+                {{
+                  copy().reports.bestSelling.title
+                }}
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col" class="rank-col">{{ copy().reports.bestSelling.rank }}</th>
+                  <th scope="col">{{ copy().reports.bestSelling.itemName }}</th>
+                  <th scope="col" class="numeric-cell">
+                    {{ copy().reports.bestSelling.quantitySold }}
+                  </th>
+                  <th scope="col" class="numeric-cell">
+                    {{ copy().reports.bestSelling.totalRevenue }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of bestSellingItems(); track item.itemId) {
+                  <tr>
+                    <td class="rank-col">
+                      <span class="rank-badge" [class.rank-badge--top]="item.rank <= 3">{{
+                        item.rank
+                      }}</span>
+                    </td>
+                    <td class="item-name-cell">
+                      <span class="item-name">{{ localizedItemName(item) }}</span>
+                    </td>
+                    <td class="numeric-cell font-semibold">{{ item.quantitySold }}</td>
+                    <td class="numeric-cell font-semibold">
+                      {{ formatCurrency(item.totalRevenue) }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    }
+  </main>
+</div>

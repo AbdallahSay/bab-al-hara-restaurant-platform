@@ -449,6 +449,7 @@ export interface UiCopy {
     readonly navHub: string;
     readonly navMenu: string;
     readonly navOperations: string;
+    readonly navReports: string;
     readonly viewCustomerMenu: string;
     readonly operations: {
       readonly title: string;
@@ -737,6 +738,99 @@ export interface UiCopy {
     readonly forbiddenError: string;
     readonly validationError: string;
     readonly sessionExpired: string;
+  };
+  readonly reports: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly datePresetLabel: string;
+    readonly presetToday: string;
+    readonly presetYesterday: string;
+    readonly presetLast7Days: string;
+    readonly presetLast30Days: string;
+    readonly presetCustom: string;
+    readonly fromDate: string;
+    readonly toDate: string;
+    readonly invalidDateRange: string;
+    readonly applyFilter: string;
+    readonly fulfillmentFilterLabel: string;
+    readonly fulfillmentAll: string;
+    readonly fulfillmentDelivery: string;
+    readonly fulfillmentTakeaway: string;
+    readonly refresh: string;
+    readonly refreshing: string;
+    readonly lastUpdated: string;
+    readonly summary: {
+      readonly completedSales: string;
+      readonly completedSalesHint: string;
+      readonly completedOrders: string;
+      readonly completedOrdersHint: string;
+      readonly averageOrderValue: string;
+      readonly averageOrderValueHint: string;
+      readonly totalOrdersPlaced: string;
+      readonly totalOrdersPlacedHint: string;
+    };
+    readonly trends: {
+      readonly title: string;
+      readonly subtitle: string;
+      readonly revenueLegend: string;
+      readonly ordersLegend: string;
+      readonly viewTableToggle: string;
+      readonly viewChartToggle: string;
+      readonly tableAccessibleTitle: string;
+      readonly tableDate: string;
+      readonly tableRevenue: string;
+      readonly tableCompletedOrders: string;
+      readonly tableTotalOrders: string;
+      readonly noTrendData: string;
+    };
+    readonly fulfillment: {
+      readonly title: string;
+      readonly subtitle: string;
+      readonly deliveryTitle: string;
+      readonly takeawayTitle: string;
+      readonly orderCount: string;
+      readonly revenue: string;
+      readonly deliveryFees: string;
+      readonly share: string;
+      readonly totalVolume: string;
+    };
+    readonly bestSelling: {
+      readonly title: string;
+      readonly subtitle: string;
+      readonly rank: string;
+      readonly itemName: string;
+      readonly quantitySold: string;
+      readonly totalRevenue: string;
+      readonly emptyNotice: string;
+    };
+    readonly timing: {
+      readonly title: string;
+      readonly subtitle: string;
+      readonly avgPrepTime: string;
+      readonly avgPrepTimeHint: string;
+      readonly avgDeliveryTime: string;
+      readonly avgDeliveryTimeHint: string;
+      readonly avgTotalTime: string;
+      readonly avgTotalTimeHint: string;
+      readonly minutesUnit: string;
+      readonly notAvailable: string;
+      readonly hourlyTitle: string;
+      readonly hourlySubtitle: string;
+      readonly hourlyTableTitle: string;
+      readonly hourlyHour: string;
+      readonly hourlyOrders: string;
+      readonly hourlyRevenue: string;
+      readonly noTimingData: string;
+    };
+    readonly empty: {
+      readonly title: string;
+      readonly message: string;
+      readonly resetFilter: string;
+    };
+    readonly errors: {
+      readonly loadFailed: string;
+      readonly retry: string;
+    };
   };
 }
 
@@ -1208,6 +1302,7 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       navHub: 'مركز الإدارة',
       navMenu: 'إدارة القائمة والأصناف',
       navOperations: 'مركز العمليات',
+      navReports: 'التقارير والإحصائيات',
       viewCustomerMenu: 'عرض قائمة العملاء',
       operations: {
         title: 'مركز قيادة العمليات',
@@ -1498,6 +1593,100 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       forbiddenError: 'لا تملك صلاحية لهذا الإجراء.',
       validationError: 'تحقق من البيانات المدخلة.',
       sessionExpired: 'انتهت الجلسة. سجّل الدخول مجدداً.',
+    },
+    reports: {
+      title: 'تقارير المبيعات والأداء التشغيلي',
+      subtitle: 'مؤشرات دقيقة لأداء المبيعات، قنوات التوصيل، وسرعة التنفيذ بالمطعم',
+      datePresetLabel: 'الفترة الزمنية',
+      presetToday: 'اليوم',
+      presetYesterday: 'أمس',
+      presetLast7Days: 'آخر 7 أيام',
+      presetLast30Days: 'آخر 30 يوماً',
+      presetCustom: 'نطاق مخصص',
+      fromDate: 'من تاريخ',
+      toDate: 'إلى تاريخ',
+      invalidDateRange: 'تاريخ البدء يجب أن يكون قبل أو يساوي تاريخ الانتهاء',
+      applyFilter: 'تطبيق الفلتر',
+      fulfillmentFilterLabel: 'نوع الطلب',
+      fulfillmentAll: 'جميع القنوات',
+      fulfillmentDelivery: 'توصيل فقط',
+      fulfillmentTakeaway: 'استلام فقط',
+      refresh: 'تحديث البيانات',
+      refreshing: 'جارٍ التحديث...',
+      lastUpdated: 'آخر تحديث',
+      summary: {
+        completedSales: 'إجمالي المبيعات المكتملة',
+        completedSalesHint: 'صافي مبيعات الطلبات المسلمة بنجاح',
+        completedOrders: 'الطلبات المكتملة',
+        completedOrdersHint: 'عدد الطلبات التي تم تسليمها للعميل',
+        averageOrderValue: 'متوسط قيمة الطلب (AOV)',
+        averageOrderValueHint: 'متوسط إيراد كل طلب مكتمل',
+        totalOrdersPlaced: 'إجمالي الطلبات المستلمة',
+        totalOrdersPlacedHint: 'يشمل جميع الطلبات المنشأة في هذه الفترة',
+      },
+      trends: {
+        title: 'مؤشر المبيعات وحجم الطلبات اليومي',
+        subtitle: 'توزيع الإيرادات وأعداد الطلبات على مدار الفترة المحددة',
+        revenueLegend: 'الإيرادات اليومية (ج.م)',
+        ordersLegend: 'عدد الطلبات المكتملة',
+        viewTableToggle: 'عرض الجدول',
+        viewChartToggle: 'عرض الرسم البياني',
+        tableAccessibleTitle: 'جدول بيانات المبيعات اليومية التفصيلية',
+        tableDate: 'التاريخ',
+        tableRevenue: 'الإيرادات',
+        tableCompletedOrders: 'الطلبات المكتملة',
+        tableTotalOrders: 'إجمالي الطلبات',
+        noTrendData: 'لا توجد بيانات حركة مبيعات كافية في هذا النطاق',
+      },
+      fulfillment: {
+        title: 'توزيع قنوات التنفيذ',
+        subtitle: 'مقارنة الأداء وحصة المبيعات بين طلبات التوصيل والاستلام',
+        deliveryTitle: 'طلبات التوصيل',
+        takeawayTitle: 'طلبات الاستلام من الفرع',
+        orderCount: 'عدد الطلبات',
+        revenue: 'إيراد المبيعات',
+        deliveryFees: 'رسوم التوصيل المحصلة',
+        share: 'النسبة من الإجمالي',
+        totalVolume: 'إجمالي حجم المبيعات',
+      },
+      bestSelling: {
+        title: 'الأصناف الأكثر مبيعاً',
+        subtitle: 'ترتيب الأصناف حسب الكميات المباعة وإجمالي مساهمتها المالية',
+        rank: '#',
+        itemName: 'اسم الصنف',
+        quantitySold: 'الكمية المباعة',
+        totalRevenue: 'إجمالي الإيرادات',
+        emptyNotice: 'لا توجد مبيعات أصناف مسجلة في هذا النطاق الزمني',
+      },
+      timing: {
+        title: 'أوقات التشغيل وساعات الذروة',
+        subtitle: 'المعدلات الفعلية للتحضير والتوصيل وتوزيع أوقات الذروة اليومية',
+        avgPrepTime: 'متوسط وقت التحضير',
+        avgPrepTimeHint: 'من وقت التأكيد حتى اكتمال التحضير في المطبخ',
+        avgDeliveryTime: 'متوسط وقت التوصيل',
+        avgDeliveryTimeHint: 'من بدء التوصيل حتى التسليم للعميل',
+        avgTotalTime: 'متوسط دورة الطلب الكاملة',
+        avgTotalTimeHint: 'من إنشاء الطلب حتى التسليم النهائي',
+        minutesUnit: 'دقيقة',
+        notAvailable: 'غير متوفر',
+        hourlyTitle: 'توزيع الطلبات حسب ساعات اليوم',
+        hourlySubtitle: 'كثافة الطلبات والإيراد التراكمي على مدار الـ 24 ساعة',
+        hourlyTableTitle: 'جدول توزيع ساعات الذروة',
+        hourlyHour: 'الساعة',
+        hourlyOrders: 'عدد الطلبات',
+        hourlyRevenue: 'الإيرادات',
+        noTimingData: 'لا توجد بيانات تشغيل كافية لحساب أوقات التنفيذ',
+      },
+      empty: {
+        title: 'لا توجد بيانات مسجلة في هذه الفترة',
+        message:
+          'لم تسجل أي طلبات أو مبيعات تطابق الفلاتر المحددة. جرب تغيير النطاق الزمني أو فلاتر التوصيل.',
+        resetFilter: 'إعادة ضبط الفلاتر',
+      },
+      errors: {
+        loadFailed: 'تعذر تحميل بيانات التقارير والإحصائيات.',
+        retry: 'إعادة المحاولة',
+      },
     },
   },
   en: {
@@ -1977,6 +2166,7 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       navHub: 'Management Hub',
       navMenu: 'Menu & Catalog',
       navOperations: 'Operations Center',
+      navReports: 'Reports & Analytics',
       viewCustomerMenu: 'View Customer Menu',
       operations: {
         title: 'Operations Command Center',
@@ -2269,6 +2459,100 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       forbiddenError: 'You are not authorized for this action.',
       validationError: 'Check the entered data.',
       sessionExpired: 'Session expired. Sign in again.',
+    },
+    reports: {
+      title: 'Sales & Operational Reports',
+      subtitle: 'Accurate metrics for sales revenue, fulfillment channels, and kitchen timing',
+      datePresetLabel: 'Time Period',
+      presetToday: 'Today',
+      presetYesterday: 'Yesterday',
+      presetLast7Days: 'Last 7 Days',
+      presetLast30Days: 'Last 30 Days',
+      presetCustom: 'Custom Range',
+      fromDate: 'From Date',
+      toDate: 'To Date',
+      invalidDateRange: 'Start date must be before or equal to end date',
+      applyFilter: 'Apply Filter',
+      fulfillmentFilterLabel: 'Fulfillment Type',
+      fulfillmentAll: 'All Channels',
+      fulfillmentDelivery: 'Delivery Only',
+      fulfillmentTakeaway: 'Takeaway Only',
+      refresh: 'Refresh Data',
+      refreshing: 'Updating...',
+      lastUpdated: 'Last Updated',
+      summary: {
+        completedSales: 'Completed Sales Revenue',
+        completedSalesHint: 'Net sales from successfully delivered orders',
+        completedOrders: 'Completed Orders',
+        completedOrdersHint: 'Number of orders successfully delivered',
+        averageOrderValue: 'Average Order Value (AOV)',
+        averageOrderValueHint: 'Average revenue per completed order',
+        totalOrdersPlaced: 'Total Orders Placed',
+        totalOrdersPlacedHint: 'Includes all orders created in this timeframe',
+      },
+      trends: {
+        title: 'Daily Sales & Order Volume Trend',
+        subtitle: 'Revenue distribution and order counts over the selected timeframe',
+        revenueLegend: 'Daily Revenue (EGP)',
+        ordersLegend: 'Completed Orders',
+        viewTableToggle: 'View Table',
+        viewChartToggle: 'View Chart',
+        tableAccessibleTitle: 'Daily Sales & Orders Breakdown Table',
+        tableDate: 'Date',
+        tableRevenue: 'Revenue',
+        tableCompletedOrders: 'Completed Orders',
+        tableTotalOrders: 'Total Orders Placed',
+        noTrendData: 'No sales activity recorded in this date range',
+      },
+      fulfillment: {
+        title: 'Fulfillment Channel Breakdown',
+        subtitle: 'Sales volume and revenue share between delivery and takeaway',
+        deliveryTitle: 'Delivery Orders',
+        takeawayTitle: 'Takeaway Orders',
+        orderCount: 'Orders Count',
+        revenue: 'Sales Revenue',
+        deliveryFees: 'Delivery Fees Collected',
+        share: 'Share of Total',
+        totalVolume: 'Total Sales Volume',
+      },
+      bestSelling: {
+        title: 'Best-Selling Items',
+        subtitle: 'Menu items ranked by quantity sold and revenue contribution',
+        rank: '#',
+        itemName: 'Item Name',
+        quantitySold: 'Qty Sold',
+        totalRevenue: 'Revenue Contribution',
+        emptyNotice: 'No item sales recorded in this date range',
+      },
+      timing: {
+        title: 'Operational Timing & Peak Hours',
+        subtitle: 'Factual kitchen preparation, delivery transit, and hourly order distribution',
+        avgPrepTime: 'Avg Prep Time',
+        avgPrepTimeHint: 'From confirmation to ready for pickup in kitchen',
+        avgDeliveryTime: 'Avg Delivery Time',
+        avgDeliveryTimeHint: 'From dispatch to delivered by driver',
+        avgTotalTime: 'Avg Total Fulfillment Time',
+        avgTotalTimeHint: 'From order placement to final delivery',
+        minutesUnit: 'min',
+        notAvailable: 'N/A',
+        hourlyTitle: 'Hourly Order Distribution',
+        hourlySubtitle: 'Order volume and revenue distribution across 24 hours',
+        hourlyTableTitle: 'Hourly Peak Distribution Table',
+        hourlyHour: 'Hour',
+        hourlyOrders: 'Orders Count',
+        hourlyRevenue: 'Revenue',
+        noTimingData: 'Not enough order timing records for fulfillment calculations',
+      },
+      empty: {
+        title: 'No Data for Selected Period',
+        message:
+          'No orders or sales were found matching the selected timeframe and fulfillment filter.',
+        resetFilter: 'Reset Filters',
+      },
+      errors: {
+        loadFailed: 'Failed to load reporting and analytics data.',
+        retry: 'Retry',
+      },
     },
   },
 };

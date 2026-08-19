@@ -130,5 +130,12 @@ export const routes: Routes = [
       import('./features/management/employees-page/employees-page').then((m) => m.EmployeesPage),
     title: 'Employees | Bab Al Hara',
   },
+  {
+    path: 'management/reports',
+    canActivate: [managementAuthGuard],
+    loadComponent: () =>
+      import('./features/management/reports-page/reports-page').then((m) => m.ReportsPage),
+    title: 'Reports & Analytics | Bab Al Hara',
+  },
   { path: '**', redirectTo: '' },
 ];

@@ -9,7 +9,9 @@ import {
   CreateCategoryRequest,
   CreateMenuItemRequest,
   MenuItemManagementDto,
+  ManagementReportResponse,
   OperationsCommandCenterResponse,
+  ReportQueryParams,
   RestaurantControlDto,
   ToggleActiveRequest,
   ToggleMenuItemAvailabilityRequest,
@@ -235,5 +237,17 @@ export class ManagementApiService {
         ),
       ),
     );
+  }
+  getReports(params: ReportQueryParams): Observable<ManagementReportResponse> {
+    let httpParams = new HttpParams().set('from', params.from).set('to', params.to);
+
+    if (params.fulfillment && params.fulfillment !== 'All') {
+      httpParams = httpParams.set('fulfillment', params.fulfillment);
+    }
+
+    return this.http.get<ManagementReportResponse>(`${this.apiBaseUrl}/management/reports`, {
+      params: httpParams,
+      withCredentials: true,
+    });
   }
 }

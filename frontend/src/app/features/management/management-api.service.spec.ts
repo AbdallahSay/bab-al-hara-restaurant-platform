@@ -345,4 +345,77 @@ describe('ManagementApiService', () => {
     expect(req.request.withCredentials).toBe(true);
     req.flush(updatedItem);
   });
+
+  it('should fetch reports data with date range and default fulfillment filter', () => {
+    const mockReport = {
+      fromDate: '2026-08-01',
+      toDate: '2026-08-20',
+      fulfillmentFilter: 'All',
+      generatedAtUtc: '2026-08-20T12:00:00Z',
+      summary: {
+        completedSalesRevenue: 15400,
+        completedOrdersCount: 45,
+        averageOrderValue: 342.22,
+        totalOrdersPlaced: 50,
+      },
+      dailyTrends: [
+        { date: '2026-08-19', revenue: 7500, completedOrdersCount: 22, totalOrdersCount: 25 },
+        { date: '2026-08-20', revenue: 7900, completedOrdersCount: 23, totalOrdersCount: 25 },
+      ],
+      fulfillmentBreakdown: {
+        delivery: {
+          orderType: 'Delivery',
+          count: 30,
+          revenue: 10200,
+          deliveryFees: 600,
+          percentageOfTotal: 60,
+        },
+        takeaway: {
+          orderType: 'Takeaway',
+          count: 20,
+          revenue: 5200,
+          deliveryFees: 0,
+          percentageOfTotal: 40,
+        },
+      },
+      bestSellingItems: [
+        {
+          rank: 1,
+          itemId: 'item-1',
+          itemNameAr: 'شاورما',
+          itemNameEn: 'Shawarma',
+          quantitySold: 40,
+          totalRevenue: 4000,
+        },
+      ],
+      operationalTiming: {
+        averagePreparationMinutes: 15,
+        averageDeliveryMinutes: 25,
+        averageTotalFulfillmentMinutes: 40,
+      },
+      hourlyDistribution: [{ hour: 14, hourLabel: '2:00 PM', orderCount: 12, revenue: 4200 }],
+    };
+
+    service.getReports({ from: '2026-08-01', to: '2026-08-20' }).subscribe((res) => {
+      expect(res).toEqual(mockReport);
+    });
+
+    const req = httpMock.expectOne((r) => r.url === `${baseUrl}/management/reports`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('from')).toBe('2026-08-01');
+    expect(req.request.params.get('to')).toBe('2026-08-20');
+    expect(req.request.params.has('fulfillment')).toBe(false);
+    expect(req.request.withCredentials).toBe(true);
+    req.flush(mockReport);
+  });
+
+  it('should pass fulfillment filter parameter when specified', () => {
+    service
+      .getReports({ from: '2026-08-01', to: '2026-08-20', fulfillment: 'Delivery' })
+      .subscribe();
+
+    const req = httpMock.expectOne((r) => r.url === `${baseUrl}/management/reports`);
+    expect(req.request.params.get('fulfillment')).toBe('Delivery');
+    req.flush({});
+  });
 });
