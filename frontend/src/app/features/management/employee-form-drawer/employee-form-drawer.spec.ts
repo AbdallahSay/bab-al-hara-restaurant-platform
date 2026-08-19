@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EmployeeFormDrawer } from './employee-form-drawer';
+import { provideHttpClient } from '@angular/common/http';
+import { APP_ENVIRONMENT } from '../../../core/config/app-environment';
 
 describe('EmployeeFormDrawer', () => {
   let component: EmployeeFormDrawer;
@@ -7,11 +9,16 @@ describe('EmployeeFormDrawer', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EmployeeFormDrawer]
+      imports: [EmployeeFormDrawer],
+      providers: [
+        provideHttpClient(),
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '' } }
+      ]
     }).compileComponents();
     
     fixture = TestBed.createComponent(EmployeeFormDrawer);
     component = fixture.componentInstance;
+    component.mode = 'create';
     fixture.detectChanges();
   });
 

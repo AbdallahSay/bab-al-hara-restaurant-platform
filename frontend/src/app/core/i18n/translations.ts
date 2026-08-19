@@ -1484,11 +1484,13 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       roleManager: 'المدير',
       roleAdmin: 'المشرف',
       disableTitle: 'إيقاف حساب {name}؟',
-      disableBody: 'لن يتمكن الموظف من تسجيل الدخول أو استخدام الشاشات الخاصة بدوره حتى يتم إعادة تفعيل الحساب.',
+      disableBody:
+        'لن يتمكن الموظف من تسجيل الدخول أو استخدام الشاشات الخاصة بدوره حتى يتم إعادة تفعيل الحساب.',
       enableTitle: 'تفعيل حساب {name}؟',
       enableBody: 'سيتمكن الموظف من تسجيل الدخول واستخدام النظام مجدداً.',
       roleChangeTitle: 'تغيير دور الموظف؟',
-      roleChangeBody: 'تغيير الدور سيؤدي إلى إنهاء الجلسة النشطة للموظف ليتم تطبيق الصلاحيات الجديدة.',
+      roleChangeBody:
+        'تغيير الدور سيؤدي إلى إنهاء الجلسة النشطة للموظف ليتم تطبيق الصلاحيات الجديدة.',
       resetPasswordTitle: 'إعادة تعيين كلمة مرور {name}',
       resetPasswordBody: 'قم بإدخال كلمة مرور جديدة. يجب إرسالها للموظف ليتمكن من تسجيل الدخول.',
       confirmAction: 'تأكيد',
@@ -2252,13 +2254,16 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       roleManager: 'Manager',
       roleAdmin: 'Admin',
       disableTitle: 'Disable {name}?',
-      disableBody: 'This employee will not be able to sign in or use their role screens until the account is reactivated.',
+      disableBody:
+        'This employee will not be able to sign in or use their role screens until the account is reactivated.',
       enableTitle: 'Enable {name}?',
       enableBody: 'This employee will be able to sign in and use the system again.',
       roleChangeTitle: 'Change employee role?',
-      roleChangeBody: 'Changing the role will end the employee\'s active session so new permissions can be applied.',
+      roleChangeBody:
+        "Changing the role will end the employee's active session so new permissions can be applied.",
       resetPasswordTitle: 'Reset password for {name}',
-      resetPasswordBody: 'Enter a new password. You must provide it to the employee so they can sign in.',
+      resetPasswordBody:
+        'Enter a new password. You must provide it to the employee so they can sign in.',
       confirmAction: 'Confirm',
       conflictError: 'The employee data was modified by another user. Refresh and try again.',
       forbiddenError: 'You are not authorized for this action.',

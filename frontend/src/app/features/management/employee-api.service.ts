@@ -19,12 +19,9 @@ export class EmployeeApiService {
   private readonly apiBaseUrl = inject(APP_ENVIRONMENT).apiBaseUrl;
 
   getEmployees(): Observable<EmployeeManagementDto[]> {
-    return this.http.get<EmployeeManagementDto[]>(
-      `${this.apiBaseUrl}/management/employees`,
-      {
-        withCredentials: true,
-      },
-    );
+    return this.http.get<EmployeeManagementDto[]>(`${this.apiBaseUrl}/management/employees`, {
+      withCredentials: true,
+    });
   }
 
   getEmployee(id: string): Observable<EmployeeManagementDto> {

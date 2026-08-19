@@ -127,9 +127,7 @@ export const routes: Routes = [
     path: 'management/employees',
     canActivate: [managementAuthGuard],
     loadComponent: () =>
-      import('./features/management/employees-page/employees-page').then(
-        (m) => m.EmployeesPage,
-      ),
+      import('./features/management/employees-page/employees-page').then((m) => m.EmployeesPage),
     title: 'Employees | Bab Al Hara',
   },
   { path: '**', redirectTo: '' },
