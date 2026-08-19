@@ -14,10 +14,10 @@ describe('EmployeesPage', () => {
       providers: [
         provideHttpClient(),
         provideRouter([]),
-        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '' } }
-      ]
+        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '' } },
+      ],
     }).compileComponents();
-    
+
     fixture = TestBed.createComponent(EmployeesPage);
     component = fixture.componentInstance;
     fixture.detectChanges();

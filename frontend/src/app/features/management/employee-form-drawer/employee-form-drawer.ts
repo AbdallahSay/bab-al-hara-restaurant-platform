@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject, signal, computed } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  inject,
+  signal,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { EmployeeApiService } from '../employee-api.service';
@@ -13,32 +23,32 @@ import { EmployeeManagementDto, EmployeeRole } from '../employee.models';
   styleUrl: './employee-form-drawer.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EmployeeFormDrawer {
+export class EmployeeFormDrawer implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly employeeApi = inject(EmployeeApiService);
   readonly language = inject(LanguageService);
 
   @Input({ required: true }) mode!: 'create' | 'edit';
   @Input() employee?: EmployeeManagementDto;
-  @Input() callerRole: string = 'Admin';
-  
+  @Input() callerRole = 'Admin';
+
   @Output() saved = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 
   readonly copy = this.language.copy;
-  
+
   readonly form = this.fb.group({
     displayName: ['', [Validators.required, Validators.maxLength(120)]],
     email: ['', [Validators.required, Validators.email]],
     role: ['' as EmployeeRole, [Validators.required]],
-    temporaryPassword: ['']
+    temporaryPassword: [''],
   });
 
   readonly isSaving = signal(false);
   readonly errorMsg = signal<string | null>(null);
   readonly showPassword = signal(false);
   readonly passwordCopied = signal(false);
-  
+
   readonly availableRoles = computed(() => {
     if (this.callerRole === 'Admin') return ['Kitchen', 'Cashier', 'Driver', 'Manager', 'Admin'];
     if (this.callerRole === 'Manager') return ['Kitchen', 'Cashier', 'Driver'];
@@ -61,7 +71,8 @@ export class EmployeeFormDrawer {
   }
 
   generatePassword() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=';
+    const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=';
     const randomArray = new Uint32Array(16);
     crypto.getRandomValues(randomArray);
     let pass = '';
@@ -72,7 +83,7 @@ export class EmployeeFormDrawer {
   }
 
   togglePasswordVisibility() {
-    this.showPassword.update(v => !v);
+    this.showPassword.update((v) => !v);
   }
 
   async copyPassword() {
@@ -90,26 +101,30 @@ export class EmployeeFormDrawer {
     this.errorMsg.set(null);
 
     const val = this.form.getRawValue();
-    
+
     if (this.mode === 'create') {
-      this.employeeApi.createEmployee({
-        displayName: val.displayName!,
-        email: val.email!,
-        role: val.role as EmployeeRole,
-        temporaryPassword: val.temporaryPassword!
-      }).subscribe({
-        next: () => this.onSuccess(),
-        error: (err) => this.handleError(err)
-      });
+      this.employeeApi
+        .createEmployee({
+          displayName: val.displayName!,
+          email: val.email!,
+          role: val.role as EmployeeRole,
+          temporaryPassword: val.temporaryPassword!,
+        })
+        .subscribe({
+          next: () => this.onSuccess(),
+          error: (err) => this.handleError(err),
+        });
     } else if (this.employee) {
-      this.employeeApi.updateEmployee(this.employee.id, {
-        displayName: val.displayName!,
-        role: val.role as EmployeeRole,
-        concurrencyToken: this.employee.concurrencyToken
-      }).subscribe({
-        next: () => this.onSuccess(),
-        error: (err) => this.handleError(err)
-      });
+      this.employeeApi
+        .updateEmployee(this.employee.id, {
+          displayName: val.displayName!,
+          role: val.role as EmployeeRole,
+          concurrencyToken: this.employee.concurrencyToken,
+        })
+        .subscribe({
+          next: () => this.onSuccess(),
+          error: (err) => this.handleError(err),
+        });
     }
   }
 
@@ -119,15 +134,16 @@ export class EmployeeFormDrawer {
     this.saved.emit();
   }
 
-  handleError(err: any) {
+  handleError(err: { status?: number; error?: { message?: string } }) {
     this.isSaving.set(false);
     if (err.status === 409) {
       this.errorMsg.set(this.copy().employees.conflictError);
     } else if (err.status === 422) {
-      this.errorMsg.set(this.copy().employees.validationError);
+      this.errorMsg.set(err.error?.message ?? this.copy().employees.validationError);
+    } else if (err.status === 403) {
+      this.errorMsg.set(this.copy().employees.forbiddenError);
     } else {
       this.errorMsg.set(this.copy().employees.errorBody);
     }
   }
 }
-

@@ -1,10 +1,22 @@
-<div class="drawer-backdrop" (click)="cancelled.emit()"></div>
+<div
+  class="drawer-backdrop"
+  (click)="cancelled.emit()"
+  (keydown.escape)="cancelled.emit()"
+  tabindex="-1"
+  aria-hidden="true"
+></div>
 <div class="drawer-panel" role="dialog" aria-modal="true" [attr.aria-labelledby]="'drawer-title'">
   <header class="drawer-header">
     <h2 id="drawer-title">
       {{ mode === 'create' ? copy().employees.createTitle : copy().employees.editTitle }}
     </h2>
-    <button class="btn-close" (click)="cancelled.emit()" [attr.aria-label]="copy().employees.cancel">×</button>
+    <button
+      class="btn-close"
+      (click)="cancelled.emit()"
+      [attr.aria-label]="copy().employees.cancel"
+    >
+      ×
+    </button>
   </header>
 
   <div class="drawer-body">
@@ -17,7 +29,7 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <section class="form-section">
         <h3>{{ copy().employees.basicInfo }}</h3>
-        
+
         <div class="form-group">
           <label for="displayName">{{ copy().employees.displayNameLabel }}</label>
           <input id="displayName" type="text" class="form-control" formControlName="displayName" />
@@ -31,18 +43,28 @@
 
       <section class="form-section">
         <h3>{{ copy().employees.roleSection }}</h3>
-        
+
         <div class="role-selector">
           @for (r of availableRoles(); track r) {
             <label class="radio-label">
               <input type="radio" formControlName="role" [value]="r" />
               <span>
                 @switch (r) {
-                  @case ('Kitchen') { {{ copy().employees.roleKitchen }} }
-                  @case ('Cashier') { {{ copy().employees.roleCashier }} }
-                  @case ('Driver') { {{ copy().employees.roleDriver }} }
-                  @case ('Manager') { {{ copy().employees.roleManager }} }
-                  @case ('Admin') { {{ copy().employees.roleAdmin }} }
+                  @case ('Kitchen') {
+                    {{ copy().employees.roleKitchen }}
+                  }
+                  @case ('Cashier') {
+                    {{ copy().employees.roleCashier }}
+                  }
+                  @case ('Driver') {
+                    {{ copy().employees.roleDriver }}
+                  }
+                  @case ('Manager') {
+                    {{ copy().employees.roleManager }}
+                  }
+                  @case ('Admin') {
+                    {{ copy().employees.roleAdmin }}
+                  }
                 }
               </span>
             </label>
@@ -53,17 +75,21 @@
       @if (mode === 'create') {
         <section class="form-section">
           <h3>{{ copy().employees.passwordSection }}</h3>
-          
+
           <div class="form-group password-group">
             <label for="temporaryPassword">{{ copy().employees.temporaryPasswordLabel }}</label>
             <div class="input-with-button">
-              <input 
-                id="temporaryPassword" 
-                [type]="showPassword() ? 'text' : 'password'" 
-                class="form-control" 
-                formControlName="temporaryPassword" 
+              <input
+                id="temporaryPassword"
+                [type]="showPassword() ? 'text' : 'password'"
+                class="form-control"
+                formControlName="temporaryPassword"
               />
-              <button type="button" class="btn btn-outline btn-sm" (click)="togglePasswordVisibility()">
+              <button
+                type="button"
+                class="btn btn-outline btn-sm"
+                (click)="togglePasswordVisibility()"
+              >
                 {{ showPassword() ? copy().employees.hidePassword : copy().employees.showPassword }}
               </button>
             </div>
@@ -72,7 +98,9 @@
                 {{ copy().employees.generatePassword }}
               </button>
               <button type="button" class="btn btn-outline btn-sm" (click)="copyPassword()">
-                {{ passwordCopied() ? copy().employees.copiedPassword : copy().employees.copyPassword }}
+                {{
+                  passwordCopied() ? copy().employees.copiedPassword : copy().employees.copyPassword
+                }}
               </button>
             </div>
           </div>

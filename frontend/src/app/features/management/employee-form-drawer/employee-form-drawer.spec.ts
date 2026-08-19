@@ -10,12 +10,9 @@ describe('EmployeeFormDrawer', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [EmployeeFormDrawer],
-      providers: [
-        provideHttpClient(),
-        { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '' } }
-      ]
+      providers: [provideHttpClient(), { provide: APP_ENVIRONMENT, useValue: { apiBaseUrl: '' } }],
     }).compileComponents();
-    
+
     fixture = TestBed.createComponent(EmployeeFormDrawer);
     component = fixture.componentInstance;
     component.mode = 'create';
