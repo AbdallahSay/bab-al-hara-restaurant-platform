@@ -203,6 +203,7 @@ void ConfigureStaffCookieOptions(
 
             return Task.CompletedTask;
         },
+        OnValidatePrincipal = BabAlHara.Infrastructure.Identity.StaffPrincipalValidator.ValidateAsync,
     };
 }
 

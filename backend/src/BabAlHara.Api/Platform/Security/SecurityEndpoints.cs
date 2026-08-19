@@ -89,6 +89,14 @@ public static class SecurityEndpoints
                             detail: "The email or password is incorrect.");
                     }
 
+                    if (!user.IsActive)
+                    {
+                        return Results.Problem(
+                            statusCode: StatusCodes.Status401Unauthorized,
+                            title: "Sign-in failed.",
+                            detail: "The email or password is incorrect.");
+                    }
+
                     var passwordValid = await userManager.CheckPasswordAsync(user, request.Password);
                     if (!passwordValid)
                     {
@@ -211,6 +219,14 @@ public static class SecurityEndpoints
                         ? null
                         : await userManager.FindByEmailAsync(request.Email.Trim());
                     if (user is null || !user.IsActive)
+                    {
+                        return Results.Problem(
+                            statusCode: StatusCodes.Status401Unauthorized,
+                            title: "Sign-in failed.",
+                            detail: "The email or password is incorrect.");
+                    }
+
+                    if (!user.IsActive)
                     {
                         return Results.Problem(
                             statusCode: StatusCodes.Status401Unauthorized,
