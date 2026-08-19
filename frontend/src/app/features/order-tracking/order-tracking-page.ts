@@ -16,6 +16,7 @@ import { formatMoney, localizedText } from '../../core/i18n/formatters';
 import { LanguageService } from '../../core/i18n/language.service';
 import { CustomerHeader } from '../../shared/customer-header/customer-header';
 import { CartService } from '../customer-ordering/cart/cart.service';
+import { RecentOrdersService } from '../customer-ordering/recent-orders.service';
 import {
   CustomerOrderTracking,
   OrderStatus,
@@ -51,6 +52,7 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(TrackingApiService);
   protected readonly cart = inject(CartService);
+  private readonly recentOrders = inject(RecentOrdersService);
   protected readonly hub = inject(TrackingHubService);
   protected readonly HubConnectionState = HubConnectionState;
   private readonly destroyRef = inject(DestroyRef);
@@ -132,6 +134,9 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
     // Set up hub event listeners once
     this.hub.trackingUpdate$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
       this.tracking.set(data);
+      if (data.status === 'Delivered' && this.recentOrders.activeOrderCode() === this.publicCode) {
+        this.recentOrders.setActiveOrderCode(null);
+      }
     });
 
     this.hub.reconnected$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
@@ -139,7 +144,15 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
         .getTracking(this.publicCode)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
-          next: (data) => this.tracking.set(data),
+          next: (data) => {
+            this.tracking.set(data);
+            if (
+              data.status === 'Delivered' &&
+              this.recentOrders.activeOrderCode() === this.publicCode
+            ) {
+              this.recentOrders.setActiveOrderCode(null);
+            }
+          },
           error: () => undefined,
         });
     });
@@ -160,6 +173,12 @@ export class OrderTrackingPage implements OnInit, OnDestroy {
         next: (data) => {
           this.tracking.set(data);
           this.state.set('loaded');
+          this.recentOrders.registerOrder(this.publicCode);
+          if (data.status !== 'Delivered') {
+            this.recentOrders.setActiveOrderCode(this.publicCode);
+          } else if (this.recentOrders.activeOrderCode() === this.publicCode) {
+            this.recentOrders.setActiveOrderCode(null);
+          }
           void this.hub.startConnection(this.publicCode).catch(() => undefined);
         },
         error: () => {

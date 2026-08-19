@@ -9,6 +9,8 @@ export interface UiCopy {
     readonly arabic: string;
     readonly english: string;
     readonly cart: string;
+    readonly orders: string;
+    readonly trackActiveOrder: string;
   };
   readonly common: {
     readonly retry: string;
@@ -405,6 +407,33 @@ export interface UiCopy {
       readonly errorToast: string;
     };
   };
+  readonly myOrders: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly privacyNotice: string;
+    readonly activeSectionTitle: string;
+    readonly previousSectionTitle: string;
+    readonly noOrdersTitle: string;
+    readonly noOrdersBody: string;
+    readonly browseMenu: string;
+    readonly trackOrder: string;
+    readonly viewDetails: string;
+    readonly orderAgain: string;
+    readonly removeFromList: string;
+    readonly loading: string;
+    readonly error: string;
+    readonly retry: string;
+    readonly orderCode: string;
+    readonly elapsed: string;
+    readonly minute: string;
+    readonly minutes: string;
+    readonly items: string;
+    readonly takeaway: string;
+    readonly delivery: string;
+    readonly cash: string;
+    readonly activeBadge: string;
+    readonly previousBadge: string;
+  };
   readonly management: {
     readonly title: string;
     readonly menuTitle: string;
@@ -662,6 +691,8 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       arabic: 'العربية',
       english: 'English',
       cart: 'السلة',
+      orders: 'طلباتي',
+      trackActiveOrder: 'متابعة طلبك',
     },
     common: {
       retry: 'حاول مرة أخرى',
@@ -1076,6 +1107,33 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         errorToast: 'تعذر تجهيز إعادة الطلب. يرجى المحاولة مرة أخرى.',
       },
     },
+    myOrders: {
+      title: 'طلباتي',
+      subtitle: 'متابعة وإعادة طلب الوجبات التي طلبتها على هذا الجهاز',
+      privacyNotice: 'تظهر هنا الطلبات التي أنشأتها أو تابعتها على هذا الجهاز.',
+      activeSectionTitle: 'الطلبات النشطة',
+      previousSectionTitle: 'الطلبات السابقة',
+      noOrdersTitle: 'لا توجد طلبات محفوظة',
+      noOrdersBody: 'تظهر هنا الطلبات التي أنشأتها أو تابعتها على هذا الجهاز.',
+      browseMenu: 'تصفح القائمة',
+      trackOrder: 'متابعة الطلب',
+      viewDetails: 'عرض التفاصيل',
+      orderAgain: 'اطلب مرة أخرى',
+      removeFromList: 'إزالة من القائمة',
+      loading: 'جاري تحميل تفاصيل طلباتك...',
+      error: 'تعذر تحميل بعض تفاصيل الطلبات',
+      retry: 'إعادة المحاولة',
+      orderCode: 'رقم الطلب',
+      elapsed: 'منذ',
+      minute: 'دقيقة',
+      minutes: 'دقائق',
+      items: 'أصناف',
+      takeaway: 'استلام من المطعم',
+      delivery: 'توصيل طلبات',
+      cash: 'كاش عند الاستلام',
+      activeBadge: 'نشط',
+      previousBadge: 'سابق',
+    },
     management: {
       title: 'لوحة تحكم الإدارة',
       menuTitle: 'إدارة قائمة الطعام والأصناف',
@@ -1331,6 +1389,8 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       arabic: 'العربية',
       english: 'English',
       cart: 'Cart',
+      orders: 'My Orders',
+      trackActiveOrder: 'Track your order',
     },
     common: {
       retry: 'Try again',
@@ -1754,6 +1814,33 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         },
         errorToast: 'Could not prepare reorder. Please try again.',
       },
+    },
+    myOrders: {
+      title: 'My Orders',
+      subtitle: 'Track and reorder meals you placed on this device',
+      privacyNotice: 'Orders created or tracked on this device appear here.',
+      activeSectionTitle: 'Active Orders',
+      previousSectionTitle: 'Previous Orders',
+      noOrdersTitle: 'No saved orders',
+      noOrdersBody: 'Orders created or tracked on this device appear here.',
+      browseMenu: 'Browse Menu',
+      trackOrder: 'Track Order',
+      viewDetails: 'View Details',
+      orderAgain: 'Order again',
+      removeFromList: 'Remove from list',
+      loading: 'Loading your orders…',
+      error: 'Unable to load some order details',
+      retry: 'Retry',
+      orderCode: 'Order Code',
+      elapsed: 'ago',
+      minute: 'min',
+      minutes: 'mins',
+      items: 'items',
+      takeaway: 'Takeaway',
+      delivery: 'Delivery',
+      cash: 'Cash on Delivery',
+      activeBadge: 'Active',
+      previousBadge: 'Delivered',
     },
     management: {
       title: 'Management Dashboard',

@@ -21,6 +21,7 @@ import { CustomerApiService } from '../customer-api.service';
 import { CustomerContactProfileService } from '../customer-contact-profile.service';
 import { CustomerPreferencesService } from '../customer-preferences.service';
 import { CreateOrderRequest, DeliveryArea, OrderType, ProblemDetails } from '../order.models';
+import { RecentOrdersService } from '../recent-orders.service';
 import { RestaurantStatusService } from '../restaurant-status.service';
 import { OrderReceiptService } from '../success/order-receipt.service';
 
@@ -39,6 +40,7 @@ export class CheckoutPage implements OnInit {
   private readonly receipt = inject(OrderReceiptService);
   private readonly contactProfile = inject(CustomerContactProfileService);
   private readonly preferencesService = inject(CustomerPreferencesService);
+  private readonly recentOrders = inject(RecentOrdersService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly language = inject(LanguageService);
@@ -276,6 +278,9 @@ export class CheckoutPage implements OnInit {
               address: existing?.address ?? null,
             });
           }
+
+          this.recentOrders.registerOrder(order.publicCode);
+          this.recentOrders.setActiveOrderCode(order.publicCode);
 
           this.receipt.save({
             order,
