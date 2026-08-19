@@ -1,0 +1,131 @@
+<div class="page-container">
+  <header class="page-header">
+    <h1>{{ copy().employees.title }}</h1>
+    <button class="btn btn-primary" (click)="openCreateDrawer()">
+      {{ copy().employees.addEmployee }}
+    </button>
+  </header>
+
+  <div class="filters-bar">
+    <input
+      type="text"
+      class="form-control search-input"
+      [placeholder]="copy().employees.searchPlaceholder"
+      [ngModel]="searchQuery()"
+      (ngModelChange)="searchQuery.set($event)"
+    />
+
+    <div class="filter-group">
+      <select class="form-select" [ngModel]="roleFilter()" (ngModelChange)="roleFilter.set($event)">
+        <option value="All">{{ copy().employees.filterAll }}</option>
+        <option value="Kitchen">{{ copy().employees.roleKitchen }}</option>
+        <option value="Cashier">{{ copy().employees.roleCashier }}</option>
+        <option value="Driver">{{ copy().employees.roleDriver }}</option>
+        <option value="Manager">{{ copy().employees.roleManager }}</option>
+        <option value="Admin">{{ copy().employees.roleAdmin }}</option>
+      </select>
+
+      <select
+        class="form-select"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event)"
+      >
+        <option value="All">{{ copy().employees.filterAll }}</option>
+        <option value="Active">{{ copy().employees.active }}</option>
+        <option value="Disabled">{{ copy().employees.disabled }}</option>
+      </select>
+    </div>
+  </div>
+
+  @if (state() === 'loading') {
+    <div class="loading-state">
+      <p>{{ copy().employees.loading }}</p>
+    </div>
+  } @else if (state() === 'error') {
+    <div class="error-state">
+      <h2>{{ copy().employees.errorTitle }}</h2>
+      <p>{{ copy().employees.errorBody }}</p>
+      <button class="btn btn-secondary" (click)="loadEmployees()">{{ copy().common.retry }}</button>
+    </div>
+  } @else if (employees().length === 0) {
+    <div class="empty-state">
+      <h2>{{ copy().employees.emptyTitle }}</h2>
+      <p>{{ copy().employees.emptyBody }}</p>
+    </div>
+  } @else if (filteredEmployees().length === 0) {
+    <div class="empty-state">
+      <p>{{ copy().employees.noResults }}</p>
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="employees-table">
+        <thead>
+          <tr>
+            <th scope="col">{{ copy().employees.displayName }}</th>
+            <th scope="col">{{ copy().employees.email }}</th>
+            <th scope="col">{{ copy().employees.role }}</th>
+            <th scope="col">{{ copy().employees.status }}</th>
+            <th scope="col">{{ copy().employees.actions }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (emp of filteredEmployees(); track emp.id) {
+            <tr>
+              <td>
+                {{ emp.displayName }}
+                @if (emp.isCurrentUser) {
+                  <span class="badge self-badge">{{ copy().employees.you }}</span>
+                }
+              </td>
+              <td>{{ emp.email }}</td>
+              <td>
+                @switch (emp.role) {
+                  @case ('Kitchen') {
+                    {{ copy().employees.roleKitchen }}
+                  }
+                  @case ('Cashier') {
+                    {{ copy().employees.roleCashier }}
+                  }
+                  @case ('Driver') {
+                    {{ copy().employees.roleDriver }}
+                  }
+                  @case ('Manager') {
+                    {{ copy().employees.roleManager }}
+                  }
+                  @case ('Admin') {
+                    {{ copy().employees.roleAdmin }}
+                  }
+                }
+              </td>
+              <td>
+                @if (emp.isActive) {
+                  <span class="badge status-active">{{ copy().employees.active }}</span>
+                } @else {
+                  <span class="badge status-disabled">{{ copy().employees.disabled }}</span>
+                }
+              </td>
+              <td class="actions-cell">
+                <button
+                  class="btn btn-sm btn-outline"
+                  (click)="openEditDrawer(emp)"
+                  [attr.aria-label]="copy().employees.edit + ' ' + emp.displayName"
+                >
+                  {{ copy().employees.edit }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (isDrawerOpen()) {
+    <app-employee-form-drawer
+      [mode]="drawerMode()"
+      [employee]="selectedEmployee()"
+      (saved)="onDrawerSaved()"
+      (cancelled)="closeDrawer()"
+    />
+  }
+</div>

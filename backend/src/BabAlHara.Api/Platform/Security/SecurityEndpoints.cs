@@ -81,7 +81,15 @@ public static class SecurityEndpoints
                     }
 
                     var user = await userManager.FindByEmailAsync(request.Email.Trim());
-                    if (user is null)
+                    if (user is null || !user.IsActive)
+                    {
+                        return Results.Problem(
+                            statusCode: StatusCodes.Status401Unauthorized,
+                            title: "Sign-in failed.",
+                            detail: "The email or password is incorrect.");
+                    }
+
+                    if (!user.IsActive)
                     {
                         return Results.Problem(
                             statusCode: StatusCodes.Status401Unauthorized,
@@ -210,7 +218,15 @@ public static class SecurityEndpoints
                     var user = string.IsNullOrWhiteSpace(request.Email)
                         ? null
                         : await userManager.FindByEmailAsync(request.Email.Trim());
-                    if (user is null)
+                    if (user is null || !user.IsActive)
+                    {
+                        return Results.Problem(
+                            statusCode: StatusCodes.Status401Unauthorized,
+                            title: "Sign-in failed.",
+                            detail: "The email or password is incorrect.");
+                    }
+
+                    if (!user.IsActive)
                     {
                         return Results.Problem(
                             statusCode: StatusCodes.Status401Unauthorized,

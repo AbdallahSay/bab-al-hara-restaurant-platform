@@ -679,6 +679,65 @@ export interface UiCopy {
       readonly forbidden: string;
     };
   };
+  readonly employees: {
+    readonly title: string;
+    readonly addEmployee: string;
+    readonly searchPlaceholder: string;
+    readonly filterAll: string;
+    readonly displayName: string;
+    readonly email: string;
+    readonly role: string;
+    readonly status: string;
+    readonly active: string;
+    readonly disabled: string;
+    readonly you: string;
+    readonly actions: string;
+    readonly edit: string;
+    readonly enable: string;
+    readonly disable: string;
+    readonly resetPassword: string;
+    readonly loading: string;
+    readonly emptyTitle: string;
+    readonly emptyBody: string;
+    readonly noResults: string;
+    readonly errorTitle: string;
+    readonly errorBody: string;
+    readonly createTitle: string;
+    readonly editTitle: string;
+    readonly basicInfo: string;
+    readonly roleSection: string;
+    readonly passwordSection: string;
+    readonly displayNameLabel: string;
+    readonly emailLabel: string;
+    readonly temporaryPasswordLabel: string;
+    readonly newPasswordLabel: string;
+    readonly showPassword: string;
+    readonly hidePassword: string;
+    readonly generatePassword: string;
+    readonly copyPassword: string;
+    readonly copiedPassword: string;
+    readonly save: string;
+    readonly saving: string;
+    readonly cancel: string;
+    readonly roleKitchen: string;
+    readonly roleCashier: string;
+    readonly roleDriver: string;
+    readonly roleManager: string;
+    readonly roleAdmin: string;
+    readonly disableTitle: string;
+    readonly disableBody: string;
+    readonly enableTitle: string;
+    readonly enableBody: string;
+    readonly roleChangeTitle: string;
+    readonly roleChangeBody: string;
+    readonly resetPasswordTitle: string;
+    readonly resetPasswordBody: string;
+    readonly confirmAction: string;
+    readonly conflictError: string;
+    readonly forbiddenError: string;
+    readonly validationError: string;
+    readonly sessionExpired: string;
+  };
 }
 
 export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
@@ -1378,6 +1437,67 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         unauthorized: 'يرجى تسجيل الدخول بحساب مدير للمتابعة.',
         forbidden: 'غير مصرح لك بالوصول إلى لوحة الإدارة.',
       },
+    },
+    employees: {
+      title: 'الموظفون',
+      addEmployee: 'إضافة موظف',
+      searchPlaceholder: 'ابحث بالاسم أو البريد',
+      filterAll: 'الكل',
+      displayName: 'الاسم',
+      email: 'البريد الإلكتروني',
+      role: 'الدور',
+      status: 'الحالة',
+      active: 'نشط',
+      disabled: 'موقوف',
+      you: 'أنت',
+      actions: 'الإجراءات',
+      edit: 'تعديل',
+      enable: 'تفعيل',
+      disable: 'إيقاف',
+      resetPassword: 'إعادة تعيين كلمة المرور',
+      loading: 'جاري التحميل…',
+      emptyTitle: 'لا يوجد موظفون',
+      emptyBody: 'أضف أول موظف للبدء.',
+      noResults: 'لا توجد نتائج مطابقة',
+      errorTitle: 'تعذر تحميل الموظفين',
+      errorBody: 'تحقق من الاتصال وأعد المحاولة.',
+      createTitle: 'إضافة موظف جديد',
+      editTitle: 'تعديل الموظف',
+      basicInfo: 'البيانات الأساسية',
+      roleSection: 'الدور الوظيفي',
+      passwordSection: 'كلمة المرور المؤقتة',
+      displayNameLabel: 'الاسم الكامل',
+      emailLabel: 'البريد الإلكتروني',
+      temporaryPasswordLabel: 'كلمة المرور المؤقتة',
+      newPasswordLabel: 'كلمة المرور الجديدة',
+      showPassword: 'إظهار',
+      hidePassword: 'إخفاء',
+      generatePassword: 'توليد كلمة مرور',
+      copyPassword: 'نسخ',
+      copiedPassword: 'تم النسخ',
+      save: 'حفظ',
+      saving: 'جاري الحفظ…',
+      cancel: 'إلغاء',
+      roleKitchen: 'المطبخ',
+      roleCashier: 'الكاشير',
+      roleDriver: 'السائق',
+      roleManager: 'المدير',
+      roleAdmin: 'المشرف',
+      disableTitle: 'إيقاف حساب {name}؟',
+      disableBody:
+        'لن يتمكن الموظف من تسجيل الدخول أو استخدام الشاشات الخاصة بدوره حتى يتم إعادة تفعيل الحساب.',
+      enableTitle: 'تفعيل حساب {name}؟',
+      enableBody: 'سيتمكن الموظف من تسجيل الدخول واستخدام النظام مجدداً.',
+      roleChangeTitle: 'تغيير دور الموظف؟',
+      roleChangeBody:
+        'تغيير الدور سيؤدي إلى إنهاء الجلسة النشطة للموظف ليتم تطبيق الصلاحيات الجديدة.',
+      resetPasswordTitle: 'إعادة تعيين كلمة مرور {name}',
+      resetPasswordBody: 'قم بإدخال كلمة مرور جديدة. يجب إرسالها للموظف ليتمكن من تسجيل الدخول.',
+      confirmAction: 'تأكيد',
+      conflictError: 'تم تعديل بيانات الموظف بواسطة مستخدم آخر. حدّث البيانات وأعد المحاولة.',
+      forbiddenError: 'لا تملك صلاحية لهذا الإجراء.',
+      validationError: 'تحقق من البيانات المدخلة.',
+      sessionExpired: 'انتهت الجلسة. سجّل الدخول مجدداً.',
     },
   },
   en: {
@@ -2087,6 +2207,68 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         unauthorized: 'Please sign in with a manager account to proceed.',
         forbidden: 'You do not have permission to access management.',
       },
+    },
+    employees: {
+      title: 'Employees',
+      addEmployee: 'Add employee',
+      searchPlaceholder: 'Search by name or email',
+      filterAll: 'All',
+      displayName: 'Name',
+      email: 'Email',
+      role: 'Role',
+      status: 'Status',
+      active: 'Active',
+      disabled: 'Disabled',
+      you: 'You',
+      actions: 'Actions',
+      edit: 'Edit',
+      enable: 'Enable',
+      disable: 'Disable',
+      resetPassword: 'Reset password',
+      loading: 'Loading…',
+      emptyTitle: 'No employees',
+      emptyBody: 'Add the first employee to get started.',
+      noResults: 'No matching results',
+      errorTitle: 'Could not load employees',
+      errorBody: 'Check your connection and try again.',
+      createTitle: 'Add new employee',
+      editTitle: 'Edit employee',
+      basicInfo: 'Basic information',
+      roleSection: 'Role',
+      passwordSection: 'Temporary password',
+      displayNameLabel: 'Full name',
+      emailLabel: 'Email',
+      temporaryPasswordLabel: 'Temporary password',
+      newPasswordLabel: 'New password',
+      showPassword: 'Show',
+      hidePassword: 'Hide',
+      generatePassword: 'Generate password',
+      copyPassword: 'Copy',
+      copiedPassword: 'Copied',
+      save: 'Save',
+      saving: 'Saving…',
+      cancel: 'Cancel',
+      roleKitchen: 'Kitchen',
+      roleCashier: 'Cashier',
+      roleDriver: 'Driver',
+      roleManager: 'Manager',
+      roleAdmin: 'Admin',
+      disableTitle: 'Disable {name}?',
+      disableBody:
+        'This employee will not be able to sign in or use their role screens until the account is reactivated.',
+      enableTitle: 'Enable {name}?',
+      enableBody: 'This employee will be able to sign in and use the system again.',
+      roleChangeTitle: 'Change employee role?',
+      roleChangeBody:
+        "Changing the role will end the employee's active session so new permissions can be applied.",
+      resetPasswordTitle: 'Reset password for {name}',
+      resetPasswordBody:
+        'Enter a new password. You must provide it to the employee so they can sign in.',
+      confirmAction: 'Confirm',
+      conflictError: 'The employee data was modified by another user. Refresh and try again.',
+      forbiddenError: 'You are not authorized for this action.',
+      validationError: 'Check the entered data.',
+      sessionExpired: 'Session expired. Sign in again.',
     },
   },
 };

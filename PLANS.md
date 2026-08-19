@@ -155,9 +155,33 @@ Delivered:
   - Management Hub with live catalog statistics (active categories, available/sold-out/archived items) and quick links
   - Menu Management screen with tabs for Categories and Menu Items, category pills filter, live search, 1-click availability toggle, 1-click active/archived toggle, create/edit modals with validation
   - Full bilingual Arabic RTL & English LTR support, responsive touch-first design, comprehensive Vitest specs
+### Vertical Slice: Employee Accounts Lifecycle & Session Revocation Security
+Status: COMPLETE — 2026-08-20
+
+Delivered:
+- **Employee Management Backend Slice:**
+  - Full CRUD endpoints (`/api/management/employees`) for staff accounts across all 5 operational roles (`Kitchen`, `Cashier`, `Driver`, `Manager`, `Admin`)
+  - Server-enforced role authorization matrix: Manager can manage only Kitchen, Cashier, and Driver; Admin can manage all roles
+  - Self-protection & last-active-management-account guardrails (cannot disable self or final active manager/admin)
+  - EF Core migration `AddEmployeeIsActiveField` adding non-destructive `IsActive` column to `StaffUsers` (default `true`)
+  - Optimistic concurrency control using `ConcurrencyStamp` (returning 409 Conflict with `stale_conflict`)
+  - Zero exposure of internal credentials, PasswordHash, SecurityStamp, or Normalized fields in API contracts
+  - All mutating endpoints protected by `X-XSRF-TOKEN` antiforgery tokens
+- **Staff Session Revocation & Security Validation Slice:**
+  - Per-user session revocation: updating SecurityStamp on account disable, role change, or password reset immediately invalidates that user's sessions without global cookie rotation or affecting other users
+  - Multi-portal principal validation: `StaffPrincipalValidator` wired into `OnValidatePrincipal` across all 4 custom cookie schemes (`Kitchen`, `Cashier`, `Driver`, `Management`) and legacy scheme
+  - Real-time and API authorization gates: inactive accounts and stale principals rejected across all portals and SignalR hubs (`/hubs/kitchen`, `/hubs/cashier`, `/hubs/driver`, `/hubs/operations`)
+  - Comprehensive integration test suite covering role matrix, self-protection, last-account protection, concurrency, password reset, and multi-user isolation
+- **Employee Management Frontend:**
+  - Route `/management/employees` protected by `managementAuthGuard` and linked in Management Hub navigation
+  - Responsive desktop table and mobile card layout with search by name/email, role filter pills, and active/disabled status filter
+  - Slide-out create/edit drawer with client-side validation, cryptographic temporary password generation (`crypto.getRandomValues`), 1-click clipboard copy, and show/hide toggle
+  - Dedicated confirmation modals for account disable/re-enable and role change
+  - Complete Arabic RTL and English LTR translations with accessibility roles and keyboard navigation
+  - 100% passing Vitest unit test suite
+
 - **Remaining Management Scope (Future phases):**
   - Delivery areas management
-  - Employee accounts and roles management
   - Order history/filtering and advanced audit views
 
 ## Phase 8 — Paymob

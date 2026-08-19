@@ -72,6 +72,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
             user.Property(account => account.PasswordHash).HasMaxLength(1024);
             user.Property(account => account.SecurityStamp).HasMaxLength(128);
             user.Property(account => account.ConcurrencyStamp).HasMaxLength(128);
+            user.Property(account => account.IsActive).IsRequired().HasDefaultValue(true);
         });
         builder.Entity<IdentityRole<Guid>>().ToTable("StaffRoles");
         builder.Entity<IdentityUserRole<Guid>>().ToTable("StaffUserRoles");

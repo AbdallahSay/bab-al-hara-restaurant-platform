@@ -82,6 +82,7 @@ public static class DependencyInjection
         services.AddScoped<ICustomerOrderTrackingService, CustomerOrderTrackingService>();
         services.AddScoped<IRestaurantControlService, RestaurantControlService>();
         services.AddScoped<IOperationsQueryService, OperationsQueryService>();
+        services.AddScoped<BabAlHara.Application.Employees.IEmployeeManagementService, BabAlHara.Infrastructure.Employees.EmployeeManagementService>();
         services.AddScoped<DevelopmentDataSeeder>();
 
         return services;
