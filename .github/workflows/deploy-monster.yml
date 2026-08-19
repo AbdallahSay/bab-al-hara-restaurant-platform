@@ -1,6 +1,10 @@
 name: Deploy Bab Al Hara to MonsterASP.NET
 
 on:
+  push:
+    branches:
+      - main
+
   workflow_dispatch:
 
 permissions:
@@ -15,6 +19,10 @@ jobs:
     name: Build, migrate and deploy
     runs-on: windows-latest
 
+    # Production must only deploy from main.
+    # This also prevents an accidental manual deployment from a feature branch.
+    if: github.ref == 'refs/heads/main'
+
     steps:
       # ============================================================
       # SOURCE
@@ -22,16 +30,23 @@ jobs:
 
       - name: Checkout application
         uses: actions/checkout@v4
-        with:
-          ref: main
 
       - name: Show deployment source
         shell: pwsh
         run: |
           Write-Host "============================================"
           Write-Host "Deployment source"
-          Write-Host "Branch: main"
-          Write-Host "Commit:"
+          Write-Host ""
+          Write-Host "Event:"
+          Write-Host "${{ github.event_name }}"
+          Write-Host ""
+          Write-Host "GitHub ref:"
+          Write-Host "${{ github.ref }}"
+          Write-Host ""
+          Write-Host "Triggered commit:"
+          Write-Host "${{ github.sha }}"
+          Write-Host ""
+          Write-Host "Checked out commit:"
           git rev-parse HEAD
           Write-Host "============================================"
 
@@ -267,8 +282,10 @@ jobs:
 
           Write-Host "============================================"
           Write-Host "Deployment package verified."
+          Write-Host ""
           Write-Host "API DLL:"
           Write-Host $dll.FullName
+          Write-Host ""
           Write-Host "Angular index:"
           Write-Host "$publishPath\wwwroot\index.html"
           Write-Host "============================================"
@@ -307,6 +324,9 @@ jobs:
           Write-Host ""
           Write-Host "Commit deployed:"
           Write-Host $commit
+          Write-Host ""
+          Write-Host "Triggered SHA:"
+          Write-Host "${{ github.sha }}"
           Write-Host ""
           Write-Host "SQL Server migrations: applied"
           Write-Host "Angular: deployed"
