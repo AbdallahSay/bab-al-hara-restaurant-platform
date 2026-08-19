@@ -449,6 +449,7 @@ export interface UiCopy {
     readonly navHub: string;
     readonly navMenu: string;
     readonly navOperations: string;
+    readonly navEmployees: string;
     readonly viewCustomerMenu: string;
     readonly operations: {
       readonly title: string;
@@ -1208,6 +1209,7 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       navHub: 'مركز الإدارة',
       navMenu: 'إدارة القائمة والأصناف',
       navOperations: 'مركز العمليات',
+      navEmployees: 'إدارة الموظفين',
       viewCustomerMenu: 'عرض قائمة العملاء',
       operations: {
         title: 'مركز قيادة العمليات',
@@ -1977,6 +1979,7 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       navHub: 'Management Hub',
       navMenu: 'Menu & Catalog',
       navOperations: 'Operations Center',
+      navEmployees: 'Employees',
       viewCustomerMenu: 'View Customer Menu',
       operations: {
         title: 'Operations Command Center',
