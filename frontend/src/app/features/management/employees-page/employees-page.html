@@ -1,125 +1,379 @@
-<div class="page-container">
-  <header class="page-header">
-    <h1>{{ copy().employees.title }}</h1>
-    <button class="btn btn-primary" (click)="openCreateDrawer()">
-      {{ copy().employees.addEmployee }}
-    </button>
+<div class="mgmt-layout">
+  <!-- Management Header Bar -->
+  <header class="mgmt-header">
+    <div class="mgmt-header__brand">
+      <h1 class="brand-title">{{ copy().brand.name }}</h1>
+      <span class="mgmt-badge">{{ copy().management.title }}</span>
+    </div>
+
+    <nav class="mgmt-header__nav" aria-label="Management Navigation">
+      <a routerLink="/management" class="nav-link">{{ copy().management.navHub }}</a>
+      <a routerLink="/management/operations" class="nav-link">{{
+        copy().management.navOperations
+      }}</a>
+      <a routerLink="/management/menu" class="nav-link">{{ copy().management.navMenu }}</a>
+      <a routerLink="/management/employees" class="nav-link is-active">{{
+        copy().management.navEmployees
+      }}</a>
+      <a routerLink="/management/reports" class="nav-link">{{ copy().management.navReports }}</a>
+      <a routerLink="/" class="nav-link nav-link--customer" target="_blank">
+        {{ copy().management.viewCustomerMenu }} ↗
+      </a>
+    </nav>
+
+    <div class="mgmt-header__actions">
+      <div class="lang-switch">
+        <button
+          type="button"
+          class="lang-btn"
+          [class.is-active]="language.current() === 'ar'"
+          (click)="setLanguage('ar')"
+        >
+          العربية
+        </button>
+        <button
+          type="button"
+          class="lang-btn"
+          [class.is-active]="language.current() === 'en'"
+          (click)="setLanguage('en')"
+        >
+          English
+        </button>
+      </div>
+      <button type="button" class="btn-signout" (click)="signOut()">
+        {{ copy().management.signOut }}
+      </button>
+    </div>
   </header>
 
-  <div class="filters-bar">
-    <input
-      type="text"
-      class="form-control search-input"
-      [placeholder]="copy().employees.searchPlaceholder"
-      [ngModel]="searchQuery()"
-      (ngModelChange)="searchQuery.set($event)"
-    />
-
-    <div class="filter-group">
-      <select class="form-select" [ngModel]="roleFilter()" (ngModelChange)="roleFilter.set($event)">
-        <option value="All">{{ copy().employees.filterAll }}</option>
-        <option value="Kitchen">{{ copy().employees.roleKitchen }}</option>
-        <option value="Cashier">{{ copy().employees.roleCashier }}</option>
-        <option value="Driver">{{ copy().employees.roleDriver }}</option>
-        <option value="Manager">{{ copy().employees.roleManager }}</option>
-        <option value="Admin">{{ copy().employees.roleAdmin }}</option>
-      </select>
-
-      <select
-        class="form-select"
-        [ngModel]="statusFilter()"
-        (ngModelChange)="statusFilter.set($event)"
-      >
-        <option value="All">{{ copy().employees.filterAll }}</option>
-        <option value="Active">{{ copy().employees.active }}</option>
-        <option value="Disabled">{{ copy().employees.disabled }}</option>
-      </select>
-    </div>
-  </div>
-
-  @if (state() === 'loading') {
-    <div class="loading-state">
-      <p>{{ copy().employees.loading }}</p>
-    </div>
-  } @else if (state() === 'error') {
-    <div class="error-state">
-      <h2>{{ copy().employees.errorTitle }}</h2>
-      <p>{{ copy().employees.errorBody }}</p>
-      <button class="btn btn-secondary" (click)="loadEmployees()">{{ copy().common.retry }}</button>
-    </div>
-  } @else if (employees().length === 0) {
-    <div class="empty-state">
-      <h2>{{ copy().employees.emptyTitle }}</h2>
-      <p>{{ copy().employees.emptyBody }}</p>
-    </div>
-  } @else if (filteredEmployees().length === 0) {
-    <div class="empty-state">
-      <p>{{ copy().employees.noResults }}</p>
-    </div>
-  } @else {
-    <div class="table-responsive">
-      <table class="employees-table">
-        <thead>
-          <tr>
-            <th scope="col">{{ copy().employees.displayName }}</th>
-            <th scope="col">{{ copy().employees.email }}</th>
-            <th scope="col">{{ copy().employees.role }}</th>
-            <th scope="col">{{ copy().employees.status }}</th>
-            <th scope="col">{{ copy().employees.actions }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (emp of filteredEmployees(); track emp.id) {
-            <tr>
-              <td>
-                {{ emp.displayName }}
-                @if (emp.isCurrentUser) {
-                  <span class="badge self-badge">{{ copy().employees.you }}</span>
-                }
-              </td>
-              <td>{{ emp.email }}</td>
-              <td>
-                @switch (emp.role) {
-                  @case ('Kitchen') {
-                    {{ copy().employees.roleKitchen }}
-                  }
-                  @case ('Cashier') {
-                    {{ copy().employees.roleCashier }}
-                  }
-                  @case ('Driver') {
-                    {{ copy().employees.roleDriver }}
-                  }
-                  @case ('Manager') {
-                    {{ copy().employees.roleManager }}
-                  }
-                  @case ('Admin') {
-                    {{ copy().employees.roleAdmin }}
-                  }
-                }
-              </td>
-              <td>
-                @if (emp.isActive) {
-                  <span class="badge status-active">{{ copy().employees.active }}</span>
-                } @else {
-                  <span class="badge status-disabled">{{ copy().employees.disabled }}</span>
-                }
-              </td>
-              <td class="actions-cell">
-                <button
-                  class="btn btn-sm btn-outline"
-                  (click)="openEditDrawer(emp)"
-                  [attr.aria-label]="copy().employees.edit + ' ' + emp.displayName"
-                >
-                  {{ copy().employees.edit }}
-                </button>
-              </td>
-            </tr>
+  <main class="mgmt-content">
+    <!-- Page Title & Primary Action -->
+    <div class="page-title-row">
+      <div class="page-title-group">
+        <div class="title-with-badge">
+          <h2 class="page-title">{{ copy().employees.title }}</h2>
+          @if (state() === 'ready') {
+            <span class="count-badge" aria-label="Total employees count">
+              {{ filteredCount() }} / {{ totalCount() }}
+            </span>
           }
-        </tbody>
-      </table>
-    </div>
-  }
+        </div>
+        <p class="page-subtitle">
+          @if (language.current() === 'ar') {
+            إدارة حسابات طاقم العمل والصلاحيات وحالة التشغيل
+          } @else {
+            Manage staff accounts, operational roles, and access status
+          }
+        </p>
+      </div>
 
+      <button type="button" class="btn btn-primary btn-add" (click)="openCreateDrawer()">
+        <span class="btn-icon" aria-hidden="true">+</span>
+        <span>{{ copy().employees.addEmployee }}</span>
+      </button>
+    </div>
+
+    <!-- Filters & Search Toolbar -->
+    <div class="toolbar-card">
+      <div class="search-box">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          [placeholder]="copy().employees.searchPlaceholder"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          aria-label="Search employees"
+        />
+        @if (searchQuery()) {
+          <button
+            type="button"
+            class="clear-search-btn"
+            (click)="searchQuery.set('')"
+            aria-label="Clear search"
+          >
+            ×
+          </button>
+        }
+      </div>
+
+      <div class="filter-groups">
+        <!-- Role Chips -->
+        <div class="chip-group" role="radiogroup" aria-label="Filter by role">
+          <button
+            type="button"
+            class="filter-chip"
+            [class.is-active]="roleFilter() === 'All'"
+            (click)="setRoleFilter('All')"
+          >
+            {{ copy().employees.filterAll }}
+          </button>
+          <button
+            type="button"
+            class="filter-chip"
+            [class.is-active]="roleFilter() === 'Kitchen'"
+            (click)="setRoleFilter('Kitchen')"
+          >
+            {{ copy().employees.roleKitchen }}
+          </button>
+          <button
+            type="button"
+            class="filter-chip"
+            [class.is-active]="roleFilter() === 'Cashier'"
+            (click)="setRoleFilter('Cashier')"
+          >
+            {{ copy().employees.roleCashier }}
+          </button>
+          <button
+            type="button"
+            class="filter-chip"
+            [class.is-active]="roleFilter() === 'Driver'"
+            (click)="setRoleFilter('Driver')"
+          >
+            {{ copy().employees.roleDriver }}
+          </button>
+          <button
+            type="button"
+            class="filter-chip"
+            [class.is-active]="roleFilter() === 'Manager'"
+            (click)="setRoleFilter('Manager')"
+          >
+            {{ copy().employees.roleManager }}
+          </button>
+          <button
+            type="button"
+            class="filter-chip"
+            [class.is-active]="roleFilter() === 'Admin'"
+            (click)="setRoleFilter('Admin')"
+          >
+            {{ copy().employees.roleAdmin }}
+          </button>
+        </div>
+
+        <!-- Status Chips -->
+        <div class="chip-group" role="radiogroup" aria-label="Filter by status">
+          <button
+            type="button"
+            class="filter-chip"
+            [class.is-active]="statusFilter() === 'All'"
+            (click)="setStatusFilter('All')"
+          >
+            {{ copy().employees.filterAll }}
+          </button>
+          <button
+            type="button"
+            class="filter-chip"
+            [class.is-active]="statusFilter() === 'Active'"
+            (click)="setStatusFilter('Active')"
+          >
+            <span class="status-dot dot-active" aria-hidden="true"></span>
+            {{ copy().employees.active }}
+          </button>
+          <button
+            type="button"
+            class="filter-chip"
+            [class.is-active]="statusFilter() === 'Disabled'"
+            (click)="setStatusFilter('Disabled')"
+          >
+            <span class="status-dot dot-disabled" aria-hidden="true"></span>
+            {{ copy().employees.disabled }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data States -->
+    @if (state() === 'loading') {
+      <div class="state-card loading-state">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>{{ copy().employees.loading }}</p>
+      </div>
+    } @else if (state() === 'error') {
+      <div class="state-card error-state">
+        <span class="state-icon" aria-hidden="true">⚠️</span>
+        <h3 class="state-title">{{ copy().employees.errorTitle }}</h3>
+        <p class="state-body">{{ copy().employees.errorBody }}</p>
+        <button type="button" class="btn btn-secondary" (click)="loadEmployees()">
+          {{ copy().common.retry }}
+        </button>
+      </div>
+    } @else if (employees().length === 0) {
+      <div class="state-card empty-state">
+        <span class="state-icon" aria-hidden="true">👥</span>
+        <h3 class="state-title">{{ copy().employees.emptyTitle }}</h3>
+        <p class="state-body">{{ copy().employees.emptyBody }}</p>
+        <button type="button" class="btn btn-primary" (click)="openCreateDrawer()">
+          + {{ copy().employees.addEmployee }}
+        </button>
+      </div>
+    } @else if (filteredEmployees().length === 0) {
+      <div class="state-card empty-state">
+        <span class="state-icon" aria-hidden="true">🔍</span>
+        <h3 class="state-title">{{ copy().employees.noResults }}</h3>
+        <p class="state-body">
+          @if (language.current() === 'ar') {
+            جرب تعديل نص البحث أو تصفية الدور والحالة.
+          } @else {
+            Try adjusting your search query or role/status filters.
+          }
+        </p>
+        <button type="button" class="btn btn-secondary" (click)="clearFilters()">
+          @if (language.current() === 'ar') {
+            إعادة تعيين الفلاتر
+          } @else {
+            Reset Filters
+          }
+        </button>
+      </div>
+    } @else {
+      <!-- Desktop Data Table (≥ 768px) -->
+      <div class="table-container desktop-only">
+        <table class="employees-table">
+          <thead>
+            <tr>
+              <th scope="col" class="col-name">{{ copy().employees.displayName }}</th>
+              <th scope="col" class="col-email">{{ copy().employees.email }}</th>
+              <th scope="col" class="col-role">{{ copy().employees.role }}</th>
+              <th scope="col" class="col-status">{{ copy().employees.status }}</th>
+              <th scope="col" class="col-actions">{{ copy().employees.actions }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (emp of filteredEmployees(); track emp.id) {
+              <tr class="employee-row" [class.is-current-user]="emp.isCurrentUser">
+                <td class="col-name">
+                  <div class="name-cell">
+                    <span class="employee-name">{{ emp.displayName }}</span>
+                    @if (emp.isCurrentUser) {
+                      <span class="self-badge">{{ copy().employees.you }}</span>
+                    }
+                  </div>
+                </td>
+                <td class="col-email">
+                  <span class="employee-email" dir="ltr">{{ emp.email }}</span>
+                </td>
+                <td class="col-role">
+                  <span class="role-badge role-badge--{{ emp.role.toLowerCase() }}">
+                    @switch (emp.role) {
+                      @case ('Kitchen') {
+                        {{ copy().employees.roleKitchen }}
+                      }
+                      @case ('Cashier') {
+                        {{ copy().employees.roleCashier }}
+                      }
+                      @case ('Driver') {
+                        {{ copy().employees.roleDriver }}
+                      }
+                      @case ('Manager') {
+                        {{ copy().employees.roleManager }}
+                      }
+                      @case ('Admin') {
+                        {{ copy().employees.roleAdmin }}
+                      }
+                    }
+                  </span>
+                </td>
+                <td class="col-status">
+                  @if (emp.isActive) {
+                    <span class="status-badge status-badge--active">
+                      <span class="status-dot dot-active" aria-hidden="true"></span>
+                      <span>{{ copy().employees.active }}</span>
+                    </span>
+                  } @else {
+                    <span class="status-badge status-badge--disabled">
+                      <span class="status-dot dot-disabled" aria-hidden="true"></span>
+                      <span>{{ copy().employees.disabled }}</span>
+                    </span>
+                  }
+                </td>
+                <td class="col-actions">
+                  <button
+                    type="button"
+                    class="btn-action-edit"
+                    (click)="openEditDrawer(emp)"
+                    [attr.aria-label]="copy().employees.edit + ' ' + emp.displayName"
+                  >
+                    <span class="action-icon" aria-hidden="true">✏️</span>
+                    <span>{{ copy().employees.edit }}</span>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile Card List (< 768px) -->
+      <div class="mobile-card-list mobile-only" role="list">
+        @for (emp of filteredEmployees(); track emp.id) {
+          <div class="employee-card" role="listitem" [class.is-current-user]="emp.isCurrentUser">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="employee-name">{{ emp.displayName }}</span>
+                @if (emp.isCurrentUser) {
+                  <span class="self-badge">{{ copy().employees.you }}</span>
+                }
+              </div>
+              @if (emp.isActive) {
+                <span class="status-badge status-badge--active">
+                  <span class="status-dot dot-active" aria-hidden="true"></span>
+                  <span>{{ copy().employees.active }}</span>
+                </span>
+              } @else {
+                <span class="status-badge status-badge--disabled">
+                  <span class="status-dot dot-disabled" aria-hidden="true"></span>
+                  <span>{{ copy().employees.disabled }}</span>
+                </span>
+              }
+            </div>
+
+            <div class="card-body">
+              <div class="card-field">
+                <span class="field-label">{{ copy().employees.email }}:</span>
+                <span class="field-value email-value" dir="ltr">{{ emp.email }}</span>
+              </div>
+              <div class="card-field">
+                <span class="field-label">{{ copy().employees.role }}:</span>
+                <span class="role-badge role-badge--{{ emp.role.toLowerCase() }}">
+                  @switch (emp.role) {
+                    @case ('Kitchen') {
+                      {{ copy().employees.roleKitchen }}
+                    }
+                    @case ('Cashier') {
+                      {{ copy().employees.roleCashier }}
+                    }
+                    @case ('Driver') {
+                      {{ copy().employees.roleDriver }}
+                    }
+                    @case ('Manager') {
+                      {{ copy().employees.roleManager }}
+                    }
+                    @case ('Admin') {
+                      {{ copy().employees.roleAdmin }}
+                    }
+                  }
+                </span>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button
+                type="button"
+                class="btn-card-edit"
+                (click)="openEditDrawer(emp)"
+                [attr.aria-label]="copy().employees.edit + ' ' + emp.displayName"
+              >
+                <span class="action-icon" aria-hidden="true">✏️</span>
+                <span>{{ copy().employees.edit }}</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </main>
+
+  <!-- Create/Edit Slide-out Drawer -->
   @if (isDrawerOpen()) {
     <app-employee-form-drawer
       [mode]="drawerMode()"
