@@ -1,4 +1,4 @@
-<div class="mgmt-layout">
+﻿<div class="mgmt-layout">
   <header class="mgmt-header">
     <div class="mgmt-header__brand">
       <h1 class="brand-title">{{ copy().brand.name }}</h1>
@@ -15,8 +15,9 @@
       <a routerLink="/management/employees" class="nav-link">{{
         copy().management.navEmployees
       }}</a>
+      <a routerLink="/management/reports" class="nav-link">{{ copy().management.navReports }}</a>
       <a routerLink="/" class="nav-link nav-link--customer" target="_blank">
-        {{ copy().management.viewCustomerMenu }} ↗
+        {{ copy().management.viewCustomerMenu }} â†—
       </a>
     </div>
     <div class="mgmt-header__actions">
@@ -27,7 +28,7 @@
           [class.is-active]="language.current() === 'ar'"
           (click)="setLanguage('ar')"
         >
-          العربية
+          Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©
         </button>
         <button
           type="button"
@@ -68,7 +69,7 @@
     @if (feedbackMessage()) {
       <div class="alert alert-info" role="status">
         <p>{{ feedbackMessage() }}</p>
-        <button type="button" class="btn-close" (click)="feedbackMessage.set(null)">✕</button>
+        <button type="button" class="btn-close" (click)="feedbackMessage.set(null)">âœ•</button>
       </div>
     }
 
@@ -371,7 +372,7 @@
             (click)="closeCategoryModal()"
             [attr.aria-label]="copy().management.categories.cancel"
           >
-            ✕
+            âœ•
           </button>
         </header>
 
@@ -448,7 +449,7 @@
             (click)="closeItemModal()"
             [attr.aria-label]="copy().management.menuItems.cancel"
           >
-            ✕
+            âœ•
           </button>
         </header>
 
@@ -707,7 +708,7 @@
             (click)="cancelRemoveImage()"
             [attr.aria-label]="copy().management.menuItems.removeImageConfirmNo"
           >
-            ✕
+            âœ•
           </button>
         </header>
         <div class="confirm-body">

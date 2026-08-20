@@ -463,6 +463,7 @@ app.MapCatalogEndpoints();
 app.MapManagementCatalogEndpoints();
 app.MapMenuImageEndpoints();
 app.MapManagementEmployeeEndpoints();
+app.MapManagementReportsEndpoints();
 
 app.MapOrderEndpoints();
 

@@ -163,3 +163,74 @@ export interface OperationsCommandCenterResponse {
   readonly attentionItems: readonly OperationsAttentionItemDto[];
   readonly activeOrders: readonly OperationsActiveOrderDto[];
 }
+
+export type FulfillmentFilterType = 'All' | 'Delivery' | 'Takeaway';
+export type DatePreset = 'today' | 'yesterday' | 'last7days' | 'last30days' | 'custom';
+
+export interface ReportSummaryDto {
+  readonly completedSalesRevenue: number;
+  readonly completedOrdersCount: number;
+  readonly averageOrderValue: number;
+  readonly totalOrdersPlaced: number;
+}
+
+export interface DailySalesTrendDto {
+  readonly date: string;
+  readonly revenue: number;
+  readonly completedOrdersCount: number;
+  readonly totalOrdersCount: number;
+}
+
+export interface FulfillmentMetricDto {
+  readonly orderType: 'Delivery' | 'Takeaway';
+  readonly count: number;
+  readonly revenue: number;
+  readonly deliveryFees: number;
+  readonly percentageOfTotal: number;
+}
+
+export interface FulfillmentBreakdownDto {
+  readonly delivery: FulfillmentMetricDto;
+  readonly takeaway: FulfillmentMetricDto;
+}
+
+export interface BestSellingItemDto {
+  readonly rank: number;
+  readonly itemId: string;
+  readonly itemNameAr: string;
+  readonly itemNameEn: string;
+  readonly quantitySold: number;
+  readonly totalRevenue: number;
+}
+
+export interface OperationalTimingDto {
+  readonly averagePreparationMinutes: number | null;
+  readonly averageDeliveryMinutes: number | null;
+  readonly averageTotalFulfillmentMinutes: number | null;
+}
+
+export interface HourlyDistributionDto {
+  readonly hour: number;
+  readonly hourLabel: string;
+  readonly orderCount: number;
+  readonly revenue: number;
+}
+
+export interface ManagementReportResponse {
+  readonly fromDate: string;
+  readonly toDate: string;
+  readonly fulfillmentFilter: FulfillmentFilterType;
+  readonly generatedAtUtc: string;
+  readonly summary: ReportSummaryDto;
+  readonly dailyTrends: readonly DailySalesTrendDto[];
+  readonly fulfillmentBreakdown: FulfillmentBreakdownDto;
+  readonly bestSellingItems: readonly BestSellingItemDto[];
+  readonly operationalTiming: OperationalTimingDto;
+  readonly hourlyDistribution: readonly HourlyDistributionDto[];
+}
+
+export interface ReportQueryParams {
+  readonly from: string;
+  readonly to: string;
+  readonly fulfillment?: FulfillmentFilterType;
+}
