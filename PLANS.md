@@ -1,12 +1,12 @@
-# PLANS.md — Delivery Plan
+﻿# PLANS.md â€” Delivery Plan
 
 ## Operating rule
 
 Build production-grade vertical slices. Do not create dozens of disconnected screens first.
 
-## Phase 0 — Repository and engineering foundation
+## Phase 0 â€” Repository and engineering foundation
 
-Status: COMPLETE — 2026-08-13
+Status: COMPLETE â€” 2026-08-13
 
 Delivered:
 
@@ -21,9 +21,9 @@ Acceptance evidence is recorded in the `chore/project-foundation` implementation
 
 The database provider was permanently re-baselined to SQL Server on 2026-08-13 before Phase 2. No product entities, business features, or dual-provider paths were introduced.
 
-## Phase 1 — Shared design system + bilingual shell
+## Phase 1 â€” Shared design system + bilingual shell
 
-Status: COMPLETE AS PART OF THE FIRST VERTICAL SLICE — 2026-08-13
+Status: COMPLETE AS PART OF THE FIRST VERTICAL SLICE â€” 2026-08-13
 
 Deliverables:
 
@@ -42,9 +42,9 @@ Acceptance:
 
 Delivered by the customer and kitchen surfaces: responsive customer header, operational kitchen shell, form/error/loading/empty patterns, Arabic/English runtime switching, direction-safe logical CSS, accessible status announcements, touch-sized actions, and production menu imagery.
 
-## Phase 2 — Menu + customer ordering vertical slice
+## Phase 2 â€” Menu + customer ordering vertical slice
 
-Status: COMPLETE — 2026-08-13
+Status: COMPLETE â€” 2026-08-13
 
 Deliverables end-to-end:
 
@@ -65,9 +65,9 @@ A real order submitted in Angular exists in the database and can be queried serv
 
 Delivered with SQL Server authoritative pricing/fees/availability, order-item snapshots, guest Cash checkout, deterministic Development seed data, and required automated/live verification.
 
-## Phase 3 — Kitchen real-time vertical slice
+## Phase 3 â€” Kitchen real-time vertical slice
 
-Status: BACKEND COMPLETE — 2026-08-16
+Status: BACKEND COMPLETE â€” 2026-08-16
 
 - Kitchen active orders screen
 - SignalR new-order event
@@ -90,9 +90,9 @@ Delivered Backend Slice:
 - Comprehensive domain unit tests and API integration test suite covering all transitions, concurrency conflicts, audit logs, and security
 - EF Core migration `KitchenOperations`
 
-## Phase 4 — Customer live tracking, notifications & repeat ordering
+## Phase 4 â€” Customer live tracking, notifications & repeat ordering
 
-Status: COMPLETE — 2026-08-18
+Status: COMPLETE â€” 2026-08-18
 
 - tracking page with SignalR status updates
 - resilient reconnect/re-fetch with HttpOnly tracking capability cookie
@@ -103,12 +103,12 @@ Status: COMPLETE — 2026-08-18
 - device-local versioned fulfillment preferences (`Takeaway` vs `Delivery`)
 - saved delivery address with stale delivery area detection and recovery
 - privacy-preserving "Clear saved address" UX
-- customer My Orders page (`/orders` — طلباتي) grouping active vs previous orders
+- customer My Orders page (`/orders` â€” Ø·Ù„Ø¨Ø§ØªÙŠ) grouping active vs previous orders
 - bounded device-local public order index (`bab-al-hara.recent-orders.v1`) with zero credential exposure
-- customer header "طلباتي" link and contextual "متابعة طلبك" indicator
+- customer header "Ø·Ù„Ø¨Ø§ØªÙŠ" link and contextual "Ù…ØªØ§Ø¨Ø¹Ø© Ø·Ù„Ø¨Ùƒ" indicator
 - comprehensive unit, integration, and security test suites
 
-## Phase 5 — Cashier
+## Phase 5 â€” Cashier
 
 - ready/current queues
 - cash confirmation
@@ -117,7 +117,7 @@ Status: COMPLETE — 2026-08-18
 - driver assignment
 - tests and permission enforcement
 
-## Phase 6 — Driver
+## Phase 6 â€” Driver
 
 - assigned orders mobile UI
 - call/map actions
@@ -126,10 +126,10 @@ Status: COMPLETE — 2026-08-18
 - customer status update
 - tests
 
-## Phase 7 — Management/Admin
+## Phase 7 â€” Management/Admin
 
 ### Vertical Slice: Management Menu & Restaurant Control
-Status: COMPLETE — 2026-08-17
+Status: COMPLETE â€” 2026-08-17
 
 Delivered:
 - **Management Catalog Backend Slice:**
@@ -156,7 +156,7 @@ Delivered:
   - Menu Management screen with tabs for Categories and Menu Items, category pills filter, live search, 1-click availability toggle, 1-click active/archived toggle, create/edit modals with validation
   - Full bilingual Arabic RTL & English LTR support, responsive touch-first design, comprehensive Vitest specs
 ### Vertical Slice: Employee Accounts Lifecycle & Session Revocation Security
-Status: COMPLETE — 2026-08-20
+Status: COMPLETE â€” 2026-08-20
 
 Delivered:
 - **Employee Management Backend Slice:**
@@ -184,7 +184,7 @@ Delivered:
   - Delivery areas management
   - Order history/filtering and advanced audit views
 
-## Phase 8 — Paymob
+## Phase 8 â€” Paymob
 
 - provider integration
 - server-side payment workflow
@@ -193,7 +193,7 @@ Delivered:
 - failed payment handling
 - refund flow with authorization/audit
 
-## Phase 9 — Reports
+## Phase 9 â€” Reports
 
 - daily/monthly sales
 - best-selling items
@@ -202,7 +202,7 @@ Delivered:
 - Excel export
 - query performance review
 
-## Phase 10 — Production hardening
+## Phase 10 â€” Production hardening
 
 - security review
 - accessibility review
@@ -214,6 +214,6 @@ Delivered:
 - deployment runbook
 - release checklist
 
-## Phase 11 — Future branch-readiness review
+## Phase 11 â€” Future branch-readiness review
 
 Verify the architecture does not block future multi-branch support. Do not add branch UX/features unless approved.
