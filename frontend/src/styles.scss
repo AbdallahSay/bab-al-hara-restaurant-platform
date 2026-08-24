@@ -2,22 +2,33 @@
   color-scheme: light;
   --font-family: 'Noto Sans Arabic Variable', 'Segoe UI', Tahoma, Arial, sans-serif;
   --color-canvas: #f5f0ea;
+  --color-background: var(--color-canvas);
   --color-surface: #fffdf9;
   --color-surface-subtle: #f9f5f0;
+  --color-surface-muted: #f8fafc;
   --color-ink: #241b1d;
+  --color-text: #0f172a;
   --color-ink-muted: #665a5d;
+  --color-text-muted: #64748b;
   --color-border: #d9cdcc;
-  --color-primary: #7a2838;
-  --color-primary-hover: #641e2c;
-  --color-primary-soft: #f4e8ea;
+  --color-border-subtle: #e2e8f0;
+  --color-border-strong: #94a3b8;
+  --color-primary: #ea580c;
+  --color-primary-hover: #c2410c;
+  --color-primary-soft: #fff1e8;
   --color-danger: #a12c2a;
   --color-danger-hover: #84201f;
   --color-danger-soft: #f9e9e7;
   --color-success: #276442;
   --color-success-soft: #e9f4ed;
+  --color-info: #3b82f6;
+  --color-info-soft: #eff6ff;
   --color-warning: #7a5517;
   --color-warning-soft: #fbf1d9;
-  --color-focus: #c55b6d;
+  --color-focus: #f97316;
+  --color-auth-background: #131313;
+  --color-auth-surface: #ffffff;
+  --color-auth-glow: rgb(254 215 170 / 46%);
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -27,7 +38,9 @@
   --space-7: 3rem;
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
+  --radius-lg: 0.9375rem;
   --shadow-subtle: 0 0.5rem 1.5rem rgb(54 31 36 / 8%);
+  --shadow-auth-card: 0 1.5625rem 0.125rem rgb(0 0 0 / 25%);
   --content-width: 70rem;
 }
 

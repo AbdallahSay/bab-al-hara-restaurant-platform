@@ -24,6 +24,7 @@ export class ManagementSignInPage {
   protected readonly copy = this.language.copy;
 
   protected readonly loading = signal(false);
+  protected readonly submitted = signal(false);
   protected readonly error = signal<string | null>(null);
 
   protected readonly form = new FormGroup({
@@ -38,7 +39,13 @@ export class ManagementSignInPage {
   });
 
   signIn(): void {
-    if (this.loading() || this.form.invalid) return;
+    if (this.loading()) return;
+
+    this.submitted.set(true);
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     this.loading.set(true);
     this.error.set(null);

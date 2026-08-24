@@ -443,6 +443,7 @@ export interface UiCopy {
     readonly signIn: string;
     readonly signingIn: string;
     readonly email: string;
+    readonly invalidEmail: string;
     readonly password: string;
     readonly signOut: string;
     readonly overview: string;
@@ -1297,6 +1298,7 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       signIn: 'تسجيل الدخول',
       signingIn: 'جاري تسجيل الدخول…',
       email: 'البريد الإلكتروني',
+      invalidEmail: 'أدخل بريدًا إلكترونيًا صحيحًا.',
       password: 'كلمة المرور',
       signOut: 'تسجيل الخروج',
       overview: 'نظرة عامة',
@@ -2162,6 +2164,7 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       signIn: 'Sign In',
       signingIn: 'Signing in…',
       email: 'Email',
+      invalidEmail: 'Enter a valid email address.',
       password: 'Password',
       signOut: 'Sign Out',
       overview: 'Overview',
