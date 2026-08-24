@@ -42,6 +42,17 @@ Acceptance:
 
 Delivered by the customer and kitchen surfaces: responsive customer header, operational kitchen shell, form/error/loading/empty patterns, Arabic/English runtime switching, direction-safe logical CSS, accessible status announcements, touch-sized actions, and production menu imagery.
 
+### Figma page-by-page visual calibration — management sign-in
+
+Status: COMPLETE FOR VISUAL REVIEW — 2026-08-24
+
+- audited the connected Figma screen families without deep-loading future pages
+- established Figma node `101:2371` as the management authentication calibration reference
+- extended the existing semantic token layer with the observed orange primary, information, neutral alias, auth background, radius, glow, and elevation values
+- migrated only `/management/sign-in` to the dark split auth composition with the exact downloaded Figma food artwork and Bab Al Hara branding
+- preserved the existing management cookie session, antiforgery request, route return, validation, error, loading, and language-switch behavior
+- verified Arabic RTL and English LTR at 1280px, 1024px, 768px, and 390px; future screen families remain intentionally unchanged
+
 ## Phase 2 â€” Menu + customer ordering vertical slice
 
 Status: COMPLETE â€” 2026-08-13
