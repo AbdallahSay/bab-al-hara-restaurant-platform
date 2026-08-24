@@ -133,7 +133,12 @@ export interface UiCopy {
   };
   readonly kitchen: {
     readonly title: string;
+    readonly subtitle: string;
     readonly currentOrders: string;
+    readonly filtersLabel: string;
+    readonly searchOrders: string;
+    readonly staffFallback: string;
+    readonly refreshing: string;
     readonly connectionLabel: string;
     readonly queueLabel: string;
     readonly signOut: string;
@@ -970,8 +975,13 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       customerMenu: 'فتح قائمة العملاء',
     },
     kitchen: {
-      title: 'شاشة المطبخ',
+      title: 'إدارة طلبات المطبخ',
+      subtitle: 'راقب الطلبات وحضّرها وحدّث حالتها لحظياً.',
       currentOrders: 'الطلبات الحالية',
+      filtersLabel: 'تصفية طلبات المطبخ',
+      searchOrders: 'ابحث برقم الطلب أو اسم العميل…',
+      staffFallback: 'فريق المطبخ',
+      refreshing: 'جاري تحديث الطلبات…',
       connectionLabel: 'حالة اتصال شاشة المطبخ',
       queueLabel: 'قائمة طلبات المطبخ الحالية',
       signOut: 'تسجيل الخروج',
@@ -1829,8 +1839,13 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       customerMenu: 'Open customer menu',
     },
     kitchen: {
-      title: 'Kitchen Screen',
+      title: 'Manage Kitchen Orders',
+      subtitle: 'Monitor, prepare, and manage incoming kitchen orders in real time.',
       currentOrders: 'Active Orders',
+      filtersLabel: 'Filter kitchen orders',
+      searchOrders: 'Search by order code or customer…',
+      staffFallback: 'Kitchen team',
+      refreshing: 'Refreshing orders…',
       connectionLabel: 'Kitchen connection status',
       queueLabel: 'Current kitchen orders',
       signOut: 'Sign out',

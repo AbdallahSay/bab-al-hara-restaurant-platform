@@ -53,6 +53,16 @@ Status: COMPLETE FOR VISUAL REVIEW — 2026-08-24
 - preserved the existing management cookie session, antiforgery request, route return, validation, error, loading, and language-switch behavior
 - verified Arabic RTL and English LTR at 1280px, 1024px, 768px, and 390px; future screen families remain intentionally unchanged
 
+### Figma page-by-page visual calibration — kitchen operations
+
+Status: COMPLETE FOR VISUAL REVIEW — 2026-08-24
+
+- established Figma node `6:33` (`Kitchen Page`, 1280 × 1923) as the kitchen visual reference
+- migrated only `/kitchen` to the light operational header, filter deck, responsive status-card grid, and Figma-derived status hierarchy
+- preserved the authenticated staff session, active-order API, exact lifecycle transitions, optimistic-concurrency recovery, SignalR reconciliation, sound alert, fulfillment context, notes, and menu availability controls
+- used only repository-owned Bab Al Hara branding and exact eligible Figma utility assets; excluded the reference's third-party FreshBite identity and fictional data
+- retained all five real queue states and adapted the reference's three-column composition to two columns on tablet and one column on mobile with direction-safe Arabic RTL and English LTR behavior
+
 ## Phase 2 â€” Menu + customer ordering vertical slice
 
 Status: COMPLETE â€” 2026-08-13
