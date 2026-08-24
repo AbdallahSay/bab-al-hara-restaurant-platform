@@ -64,10 +64,32 @@ describe('KitchenPage', () => {
   it('renders the persisted initial queue and displays order details', async () => {
     const { fixture } = await createFixture([INITIAL_ORDER_PENDING]);
 
+    expect(fixture.nativeElement.textContent).toContain('Chef');
     expect(fixture.nativeElement.textContent).toContain('BH-PENDING');
     expect(fixture.nativeElement.textContent).toContain('2×');
     expect(fixture.nativeElement.textContent).toContain('بدون بصل');
     expect(fixture.nativeElement.textContent).toContain('Ahmed');
+  });
+
+  it('keeps the visible queue when a background refresh fails', async () => {
+    let getActiveOrdersCalls = 0;
+    const { fixture, component } = await createFixture([INITIAL_ORDER_PENDING], {
+      getActiveOrders: () => {
+        getActiveOrdersCalls += 1;
+        return getActiveOrdersCalls === 1
+          ? of([INITIAL_ORDER_PENDING])
+          : throwError(() => ({ status: 500 }));
+      },
+    });
+
+    component['loadOrders']();
+    fixture.detectChanges();
+
+    expect(component['state']()).toBe('ready');
+    expect(component['orders']()).toEqual([INITIAL_ORDER_PENDING]);
+    expect(component['isRefreshing']()).toBe(false);
+    expect(component['toastMessage']()).toContain('تعذر تحميل');
+    expect(fixture.nativeElement.textContent).toContain('BH-PENDING');
   });
 
   it('filters orders by status tab and search query', async () => {

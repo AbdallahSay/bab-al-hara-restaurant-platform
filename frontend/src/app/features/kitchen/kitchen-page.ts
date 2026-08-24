@@ -57,6 +57,8 @@ export class KitchenPage implements OnInit, OnDestroy {
   protected readonly activeFilter = signal<FilterStatus>('ALL');
   protected readonly searchQuery = signal('');
   protected readonly submittingCodes = signal<readonly string[]>([]);
+  protected readonly staffDisplayName = signal<string | null>(null);
+  protected readonly isRefreshing = signal(false);
   protected readonly toastMessage = signal<string | null>(null);
   protected readonly toastType = signal<'success' | 'warning' | 'error'>('success');
   protected readonly soundEnabled = signal(false);
@@ -134,6 +136,7 @@ export class KitchenPage implements OnInit, OnDestroy {
             void this.router.navigate(['/kitchen/sign-in']);
             return;
           }
+          this.staffDisplayName.set(session.displayName);
           this.startQueue();
           this.loadCatalog();
         },
@@ -162,8 +165,11 @@ export class KitchenPage implements OnInit, OnDestroy {
   }
 
   protected loadOrders(): void {
-    if (this.orders().length === 0) {
+    const hasPersistedOrders = this.orders().length > 0;
+    if (!hasPersistedOrders) {
       this.state.set('loading');
+    } else {
+      this.isRefreshing.set(true);
     }
     this.api
       .getActiveOrders()
@@ -171,11 +177,15 @@ export class KitchenPage implements OnInit, OnDestroy {
       .subscribe({
         next: (orders) => {
           this.orders.set(this.deduplicateOrders(orders));
+          this.isRefreshing.set(false);
           this.state.set('ready');
         },
         error: (error: { readonly status?: number }) => {
+          this.isRefreshing.set(false);
           if (error.status === 401 || error.status === 403) {
             void this.router.navigate(['/kitchen/sign-in']);
+          } else if (hasPersistedOrders) {
+            this.showToast(this.copy().kitchen.queueError, 'error');
           } else {
             this.state.set('error');
           }
@@ -358,6 +368,21 @@ export class KitchenPage implements OnInit, OnDestroy {
   protected elapsedLabel(value: string): string {
     const minutes = this.elapsedMinutes(value);
     return `${minutes} ${minutes === 1 ? this.copy().kitchen.minute : this.copy().kitchen.minutes}`;
+  }
+
+  protected currentTime(): string {
+    return new Intl.DateTimeFormat(this.language.current() === 'ar' ? 'ar-EG' : 'en-EG', {
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(this.now());
+  }
+
+  protected currentDate(): string {
+    return new Intl.DateTimeFormat(this.language.current() === 'ar' ? 'ar-EG' : 'en-EG', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(this.now());
   }
 
   protected realtimeLabel(): string {
