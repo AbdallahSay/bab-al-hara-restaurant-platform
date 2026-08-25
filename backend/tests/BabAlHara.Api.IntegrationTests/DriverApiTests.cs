@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using BabAlHara.Application.Driver;
 using BabAlHara.Domain.Ordering;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BabAlHara.Api.IntegrationTests;
 
@@ -77,6 +78,72 @@ public sealed class DriverApiTests(OrderingApiFactory factory) : IClassFixture<O
         Assert.Equal("BH-DELIV-001", evt.PublicCode);
         Assert.Equal(driver.Id, evt.DriverId);
         Assert.Equal("Driver Samer", evt.DriverName);
+    }
+
+    [Fact]
+    public async Task AssignDriverPersistsInSqlAndCashierGetPreservesDriverOnRefresh()
+    {
+        await factory.ResetAsync();
+        var driver = await factory.EnsureStaffUserAsync("driver.persist@bab-al-hara.local", "Driver", "Driver Tarek");
+        var order = await CreateSampleOrderInDbAsync("BH-DELIV-REFRESH-001", OrderType.Delivery, OrderStatus.Ready);
+
+        var cashierClient = await factory.CreateAuthenticatedStaffClientAsync(
+            "cashier@bab-al-hara.local",
+            "Cashier",
+            "Cashier User");
+
+        // 1. Initial Cashier GET before assignment
+        var getBeforeResp = await cashierClient.GetAsync("/api/cashier/orders");
+        Assert.Equal(HttpStatusCode.OK, getBeforeResp.StatusCode);
+        var ordersBefore = await getBeforeResp.Content.ReadFromJsonAsync<List<BabAlHara.Application.Cashier.CashierOrderDto>>(JsonOptions);
+        Assert.NotNull(ordersBefore);
+        var orderBefore = ordersBefore.First(o => o.PublicCode == "BH-DELIV-REFRESH-001");
+        Assert.Null(orderBefore.DriverId);
+        Assert.Null(orderBefore.DriverName);
+
+        // 2. Assign driver via API
+        var assignResp = await cashierClient.PostAsJsonAsync(
+            $"/api/orders/{order.PublicCode}/assign-driver",
+            new { driverId = driver.Id });
+        Assert.Equal(HttpStatusCode.OK, assignResp.StatusCode);
+
+        // 3. Verify persistence directly via fresh isolated DbContext scope
+        using (var scope = factory.Services.CreateScope())
+        {
+            var freshDb = scope.ServiceProvider.GetRequiredService<BabAlHara.Infrastructure.Persistence.AppDbContext>();
+            var persistedOrder = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(
+                freshDb.Orders,
+                o => o.PublicCode == "BH-DELIV-REFRESH-001");
+
+            Assert.NotNull(persistedOrder);
+            Assert.Equal(driver.Id, persistedOrder.DriverId);
+            Assert.Equal("Driver Tarek", persistedOrder.DriverName);
+            Assert.NotNull(persistedOrder.DriverAssignedAtUtc);
+            Assert.Equal(OrderStatus.Ready, persistedOrder.Status);
+        }
+
+        // 4. Cashier GET after assignment (authoritative refresh simulation)
+        var getAfterResp = await cashierClient.GetAsync("/api/cashier/orders");
+        Assert.Equal(HttpStatusCode.OK, getAfterResp.StatusCode);
+        var ordersAfter = await getAfterResp.Content.ReadFromJsonAsync<List<BabAlHara.Application.Cashier.CashierOrderDto>>(JsonOptions);
+        Assert.NotNull(ordersAfter);
+        var orderAfter = ordersAfter.First(o => o.PublicCode == "BH-DELIV-REFRESH-001");
+
+        Assert.Equal(driver.Id, orderAfter.DriverId);
+        Assert.Equal("Driver Tarek", orderAfter.DriverName);
+        Assert.NotNull(orderAfter.DriverAssignedAtUtc);
+        Assert.Equal(OrderStatus.Ready, orderAfter.Status);
+
+        // 5. Driver portal GET /api/driver/orders/assigned cross-check
+        var driverClient = await factory.CreateAuthenticatedStaffClientAsync(
+            "driver.persist@bab-al-hara.local",
+            "Driver",
+            "Driver Tarek");
+        var driverOrdersResp = await driverClient.GetAsync("/api/driver/orders/assigned");
+        Assert.Equal(HttpStatusCode.OK, driverOrdersResp.StatusCode);
+        var driverOrders = await driverOrdersResp.Content.ReadFromJsonAsync<List<DriverOrderDto>>(JsonOptions);
+        Assert.NotNull(driverOrders);
+        Assert.Contains(driverOrders, o => o.PublicCode == "BH-DELIV-REFRESH-001");
     }
 
     [Fact]

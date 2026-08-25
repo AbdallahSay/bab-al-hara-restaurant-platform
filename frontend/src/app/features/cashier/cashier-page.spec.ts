@@ -185,6 +185,33 @@ describe('CashierPage', () => {
     expect(fixture.nativeElement.querySelector('.driver-select')).toBeFalsy();
   });
 
+  it('preserves assigned driver state after authoritative REST refresh', async () => {
+    let callCount = 0;
+    const { fixture } = await createFixture([INITIAL_ORDER_DELIVERY_UNASSIGNED], MOCK_DRIVERS, {
+      getReadyOrders: () => {
+        callCount++;
+        // First call unassigned, second call (refresh) returns assigned order from backend
+        return of(
+          callCount > 1 ? [INITIAL_ORDER_DELIVERY_ASSIGNED] : [INITIAL_ORDER_DELIVERY_UNASSIGNED],
+        );
+      },
+    });
+
+    expect(fixture.nativeElement.querySelector('.driver-select')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.assigned-driver-card')).toBeFalsy();
+
+    // Trigger refresh button (authoritative REST refetch)
+    const refreshBtn = (fixture.nativeElement.querySelector('.refresh-btn') ||
+      fixture.nativeElement.querySelector('.refresh-button')) as HTMLButtonElement;
+    refreshBtn.click();
+    fixture.detectChanges();
+
+    // After refresh, the assigned driver card is prominently displayed and not turned back to unassigned UI
+    expect(fixture.nativeElement.querySelector('.assigned-driver-card')).toBeTruthy();
+    expect(fixture.nativeElement.textContent).toContain('أحمد السائق');
+    expect(fixture.nativeElement.querySelector('.driver-select')).toBeFalsy();
+  });
+
   it('filters queue by filter pills', async () => {
     const { fixture } = await createFixture([
       INITIAL_ORDER_TAKEAWAY,

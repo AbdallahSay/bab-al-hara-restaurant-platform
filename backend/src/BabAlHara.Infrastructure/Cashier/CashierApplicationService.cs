@@ -36,6 +36,9 @@ public sealed class CashierApplicationService(
             o.Total,
             o.PaymentMethod,
             o.PaymentStatus,
+            o.DriverId,
+            o.DriverName,
+            o.DriverAssignedAtUtc,
             o.RowVersion,
             o.Items.Select(i => new CashierOrderItemDto(i.ProductNameAr, i.ProductNameEn, i.Quantity)).ToList()
         )).ToList();
@@ -107,9 +110,11 @@ public sealed class CashierApplicationService(
             order.Total,
             order.PaymentMethod,
             order.PaymentStatus,
+            order.DriverId,
+            order.DriverName,
+            order.DriverAssignedAtUtc,
             order.RowVersion,
-            order.Items.Select(i => new CashierOrderItemDto(i.ProductNameAr, i.ProductNameEn, i.Quantity)).ToList()
-        );
+            order.Items.Select(i => new CashierOrderItemDto(i.ProductNameAr, i.ProductNameEn, i.Quantity)).ToList());
 
         await notifier.NotifyAsync(dto, cancellationToken);
 
