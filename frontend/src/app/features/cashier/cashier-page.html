@@ -1,75 +1,133 @@
 <div class="cashier-shell">
-  <!-- Top Header with Brand & Staff Session -->
+  <!-- Side Navigation Drawer (Matches Cashier Page-4) -->
+  @if (isNavOpen()) {
+    <div class="nav-drawer-backdrop" (click)="closeNav()" aria-hidden="true"></div>
+  }
+  <aside class="nav-drawer" [class.is-open]="isNavOpen()" aria-label="Navigation Drawer">
+    <div class="nav-drawer__header">
+      <div class="nav-brand">
+        <span class="nav-brand-mark" aria-hidden="true">ب</span>
+        <span class="nav-brand-text">
+          <strong>{{ copy().brand.name }}</strong>
+          <span>{{ copy().cashier.title }}</span>
+        </span>
+      </div>
+      <button type="button" class="nav-close-btn" (click)="closeNav()" aria-label="Close menu">
+        ✕
+      </button>
+    </div>
+    <nav class="nav-drawer__links">
+      <a routerLink="/cashier" class="nav-link is-active" (click)="closeNav()">
+        <img src="/icons/cashier/bag.svg" alt="" aria-hidden="true" class="nav-link-icon" />
+        <span>{{ copy().cashier.readyOrders }}</span>
+      </a>
+      <a routerLink="/management/operations" class="nav-link" (click)="closeNav()">
+        <img src="/icons/cashier/driver.svg" alt="" aria-hidden="true" class="nav-link-icon" />
+        <span>{{ copy().cashier.deliveryQueue }}</span>
+      </a>
+      <a routerLink="/management/reports" class="nav-link" (click)="closeNav()">
+        <img src="/icons/cashier/money.svg" alt="" aria-hidden="true" class="nav-link-icon" />
+        <span>{{ copy().cashier.totalToCollect }}</span>
+      </a>
+      <a routerLink="/orders" class="nav-link" (click)="closeNav()">
+        <img src="/icons/cashier/note.svg" alt="" aria-hidden="true" class="nav-link-icon" />
+        <span>{{ copy().cashier.all }}</span>
+      </a>
+    </nav>
+    <div class="nav-drawer__footer">
+      <button type="button" class="nav-signout-btn" (click)="signOut()">
+        {{ copy().cashier.signOut }}
+      </button>
+    </div>
+  </aside>
+
+  <!-- Top Header (Matches Cashier Page-3) -->
   <header class="cashier-header">
     <div class="cashier-header__inner">
-      <div class="cashier-heading">
-        <span class="brand-mark" aria-hidden="true">ب</span>
-        <div>
-          <p class="brand-name">{{ copy().brand.name }}</p>
-          <h1>{{ copy().cashier.title }}</h1>
-          <p class="cashier-subtitle">{{ copy().cashier.readyOrders }}</p>
+      <div class="cashier-header__left">
+        <button
+          type="button"
+          class="hamburger-btn"
+          (click)="toggleNav()"
+          aria-label="Toggle navigation menu"
+          [attr.aria-expanded]="isNavOpen()"
+        >
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+
+        <div class="brand-lockup">
+          <span class="brand-badge-circle" aria-hidden="true">ب</span>
+          <div class="header-titles">
+            <h1 class="header-main-title">{{ copy().cashier.title }}</h1>
+            <p class="header-subtitle">{{ copy().cashier.readyOrders }}</p>
+          </div>
         </div>
       </div>
 
-      <div class="cashier-account">
-        <div class="staff-summary">
-          <strong>{{ staffDisplayName() || copy().kitchen.staffFallback }}</strong>
-          <div class="staff-meta">
-            <span>
-              <img src="/icons/cashier/clock.svg" alt="" aria-hidden="true" />
-              <span dir="auto">{{ currentTime() }}</span>
-            </span>
-            <span class="meta-separator" aria-hidden="true">•</span>
-            <span>
-              <img src="/icons/kitchen/calendar.svg" alt="" aria-hidden="true" />
-              <span dir="auto">{{ currentDate() }}</span>
-            </span>
+      <div class="cashier-header__right">
+        <div class="header-datetime-group">
+          <div class="datetime-chip">
+            <img src="/icons/cashier/clock.svg" alt="" aria-hidden="true" class="chip-icon" />
+            <span dir="auto">{{ currentTime() }}</span>
           </div>
-          <div
-            class="connection-status"
-            [class.is-connected]="realtime.status() === 'connected'"
-            [class.is-reconnecting]="realtime.status() === 'reconnecting'"
-            [class.is-disconnected]="realtime.status() === 'disconnected'"
-            role="status"
-            aria-live="polite"
-          >
-            <span class="status-dot" aria-hidden="true"></span>
-            <span>{{ realtimeLabel() }}</span>
+          <div class="datetime-chip">
+            <img src="/icons/kitchen/calendar.svg" alt="" aria-hidden="true" class="chip-icon" />
+            <span dir="auto">{{ currentDate() }}</span>
           </div>
         </div>
 
-        <div class="language-control">
-          <img src="/icons/cashier/language.svg" alt="" aria-hidden="true" />
-          <div
-            class="language-switcher"
-            role="group"
-            [attr.aria-label]="copy().brand.languageLabel"
-          >
-            <button
-              type="button"
-              [class.is-active]="language.current() === 'ar'"
-              [attr.aria-pressed]="language.current() === 'ar'"
-              (click)="setLanguage('ar')"
-            >
-              {{ copy().brand.arabic }}
-            </button>
-            <button
-              type="button"
-              [class.is-active]="language.current() === 'en'"
-              [attr.aria-pressed]="language.current() === 'en'"
-              (click)="setLanguage('en')"
-            >
-              {{ copy().brand.english }}
-            </button>
-          </div>
-        </div>
-
-        <button
-          class="sign-out signout-btn"
-          type="button"
-          (click)="signOut()"
-          [attr.aria-label]="copy().cashier.signOut"
+        <div
+          class="connection-status-capsule"
+          [class.is-connected]="realtime.status() === 'connected'"
+          [class.is-reconnecting]="realtime.status() === 'reconnecting'"
+          [class.is-disconnected]="realtime.status() === 'disconnected'"
+          role="status"
+          aria-live="polite"
         >
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>{{ realtimeLabel() }}</span>
+        </div>
+
+        <div
+          class="language-switcher-pill language-switcher"
+          role="group"
+          [attr.aria-label]="copy().brand.languageLabel"
+        >
+          <button
+            type="button"
+            class="lang-btn"
+            [class.is-active]="language.current() === 'ar'"
+            [attr.aria-pressed]="language.current() === 'ar'"
+            (click)="setLanguage('ar')"
+          >
+            {{ copy().brand.arabic }}
+          </button>
+          <button
+            type="button"
+            class="lang-btn"
+            [class.is-active]="language.current() === 'en'"
+            [attr.aria-pressed]="language.current() === 'en'"
+            (click)="setLanguage('en')"
+          >
+            {{ copy().brand.english }}
+          </button>
+        </div>
+
+        <div class="staff-profile-capsule">
+          <div class="staff-avatar-circle" aria-hidden="true">
+            {{ (staffDisplayName() || 'C')[0] }}
+          </div>
+          <div class="staff-text-meta">
+            <strong class="staff-name">{{
+              staffDisplayName() || copy().kitchen.staffFallback
+            }}</strong>
+            <span class="staff-role">{{ copy().cashier.title }}</span>
+          </div>
+        </div>
+
+        <button class="logout-btn sign-out signout-btn" type="button" (click)="signOut()">
           {{ copy().cashier.signOut }}
         </button>
       </div>
@@ -84,553 +142,590 @@
     </aside>
   }
 
-  <!-- Queue Controls & Filters Toolbar -->
-  <section class="cashier-controls" aria-label="Order Queue Controls">
-    <div class="cashier-controls__inner">
-      <div class="filter-row">
-        <div
-          class="filter-pills filter-tabs"
-          role="tablist"
-          [attr.aria-label]="copy().cashier.readyOrders"
-        >
+  <!-- Main Content Container -->
+  <div class="cashier-content-wrapper">
+    <!-- Search Bar & Operations Bar (Matches Cashier Page-3 top search row) -->
+    <section class="cashier-search-section">
+      <div class="search-input-container search-box">
+        <img src="/icons/cashier/search.svg" alt="" aria-hidden="true" class="search-icon" />
+        <input
+          type="search"
+          class="main-search-input search-input"
+          [placeholder]="copy().cashier.searchPlaceholder"
+          [value]="searchQuery()"
+          (input)="setSearch($event)"
+          [attr.aria-label]="copy().cashier.searchPlaceholder"
+        />
+        @if (searchQuery()) {
           <button
             type="button"
-            role="tab"
-            class="filter-pill filter-tab"
-            [class.is-active]="selectedFilter() === 'all'"
-            [attr.aria-selected]="selectedFilter() === 'all'"
-            (click)="setFilter('all')"
+            class="clear-search-btn"
+            (click)="clearSearch()"
+            [attr.aria-label]="copy().cashier.clearSearch"
           >
-            <span>{{ copy().cashier.filterAll }}</span>
-            <span class="count-badge tab-count">{{ totalCount() }}</span>
+            ✕
           </button>
-
-          <button
-            type="button"
-            role="tab"
-            class="filter-pill filter-tab"
-            [class.is-active]="selectedFilter() === 'takeaway'"
-            [attr.aria-selected]="selectedFilter() === 'takeaway'"
-            (click)="setFilter('takeaway')"
-          >
-            <img src="/icons/cashier/bag.svg" alt="" aria-hidden="true" class="pill-icon" />
-            <span>{{ copy().cashier.takeawayQueue }}</span>
-            <span class="count-badge tab-count">{{ takeawayCount() }}</span>
-          </button>
-
-          <button
-            type="button"
-            role="tab"
-            class="filter-pill filter-tab"
-            [class.is-active]="selectedFilter() === 'delivery'"
-            [attr.aria-selected]="selectedFilter() === 'delivery'"
-            (click)="setFilter('delivery')"
-          >
-            <img src="/icons/cashier/driver.svg" alt="" aria-hidden="true" class="pill-icon" />
-            <span>{{ copy().cashier.deliveryQueue }}</span>
-            <span class="count-badge tab-count">{{ deliveryCount() }}</span>
-          </button>
-
-          <button
-            type="button"
-            role="tab"
-            class="filter-pill filter-tab"
-            [class.is-active]="selectedFilter() === 'unpaid'"
-            [attr.aria-selected]="selectedFilter() === 'unpaid'"
-            (click)="setFilter('unpaid')"
-          >
-            <img src="/icons/cashier/money.svg" alt="" aria-hidden="true" class="pill-icon" />
-            <span>{{ copy().cashier.collect }}</span>
-            <span class="count-badge count-badge--unpaid tab-count tab-count--pending">{{
-              unpaidCount()
-            }}</span>
-          </button>
-        </div>
-
-        <!-- Search Input -->
-        <label class="search-box">
-          <span class="visually-hidden">{{ copy().cashier.searchPlaceholder }}</span>
-          <img src="/icons/cashier/search.svg" alt="" aria-hidden="true" class="search-icon" />
-          <input
-            type="search"
-            class="search-input"
-            [placeholder]="copy().cashier.searchPlaceholder"
-            [value]="searchQuery()"
-            (input)="setSearch($event)"
-            [attr.aria-label]="copy().cashier.searchPlaceholder"
-          />
-          @if (searchQuery()) {
-            <button
-              type="button"
-              class="clear-search-btn"
-              (click)="clearSearch()"
-              [attr.aria-label]="copy().cashier.clearSearch"
-            >
-              ✕
-            </button>
-          }
-        </label>
+        }
       </div>
 
-      <div class="operations-row">
-        <div class="operations-actions">
-          <!-- Sound Alert Toggle -->
-          <button
-            type="button"
-            class="sound-button sound-toggle-btn"
-            [class.is-active]="soundEnabled()"
-            [class.is-enabled]="soundEnabled()"
-            (click)="enableSound()"
-            [attr.aria-pressed]="soundEnabled()"
-            [title]="soundEnabled() ? copy().cashier.soundEnabled : copy().cashier.soundEnable"
-          >
-            <img
-              [src]="
-                soundEnabled() ? '/icons/cashier/sound-on.svg' : '/icons/cashier/sound-off.svg'
-              "
-              alt=""
-              aria-hidden="true"
-              class="btn-svg-icon"
-            />
-            <span class="btn-label">{{
-              soundEnabled() ? copy().cashier.soundEnabled : copy().cashier.soundEnable
-            }}</span>
-          </button>
-
-          <!-- Refresh Queue -->
-          <button
-            type="button"
-            class="refresh-button refresh-btn"
-            (click)="loadOrders()"
-            [attr.aria-label]="copy().cashier.refresh"
-            [title]="copy().cashier.refresh"
-          >
-            <img src="/icons/cashier/refresh.svg" alt="" aria-hidden="true" class="btn-svg-icon" />
-            <span>{{ copy().cashier.refresh }}</span>
-          </button>
-
-          <!-- Expand/Collapse All -->
-          @if (filteredOrders().length > 0) {
-            <button
-              type="button"
-              class="action-toggle-btn"
-              (click)="toggleAllDetails()"
-              [attr.aria-label]="
-                allExpanded() ? copy().cashier.collapseAll : copy().cashier.expandAll
-              "
-            >
-              <span class="toggle-indicator" aria-hidden="true">{{
-                allExpanded() ? '▲' : '▼'
-              }}</span>
-              <span>{{
-                allExpanded() ? copy().cashier.collapseAll : copy().cashier.expandAll
-              }}</span>
-            </button>
-          }
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Main Queue Area -->
-  <main class="cashier-queue queue">
-    <h2 class="visually-hidden">{{ copy().cashier.readyOrders }}</h2>
-    @if (state() === 'loading') {
-      <section class="queue-state queue-state--loading" role="status">
-        <div class="loading-spinner spinner" aria-hidden="true"></div>
-        <p>{{ copy().cashier.loading }}</p>
-      </section>
-    } @else if (state() === 'error') {
-      <section class="queue-state queue-state--error" role="alert">
-        <span class="error-icon" aria-hidden="true">⚠️</span>
-        <h3>{{ copy().cashier.loadError }}</h3>
-        <button class="retry-button button button--primary" type="button" (click)="loadOrders()">
-          {{ copy().common.retry }}
-        </button>
-      </section>
-    } @else if (orders().length === 0) {
-      <section class="queue-state queue-state--empty" role="status">
-        <span class="empty-icon" aria-hidden="true">🎉</span>
-        <h3>{{ copy().cashier.noReadyOrders }}</h3>
-      </section>
-    } @else if (filteredOrders().length === 0) {
-      <section class="queue-state queue-state--empty" role="status">
-        <span class="empty-icon" aria-hidden="true">🔍</span>
-        <h3>{{ copy().cashier.noFilteredOrders }}</h3>
+      <div class="quick-operations-group">
         <button
           type="button"
-          class="retry-button button button--primary"
-          (click)="clearSearch(); setFilter('all')"
+          class="op-action-btn sound-button sound-toggle-btn"
+          [class.is-active]="soundEnabled()"
+          [class.is-enabled]="soundEnabled()"
+          (click)="enableSound()"
+          [attr.aria-pressed]="soundEnabled()"
+          [title]="soundEnabled() ? copy().cashier.soundEnabled : copy().cashier.soundEnable"
         >
-          {{ copy().cashier.clearSearch }}
+          <img
+            [src]="soundEnabled() ? '/icons/cashier/sound-on.svg' : '/icons/cashier/sound-off.svg'"
+            alt=""
+            aria-hidden="true"
+            class="op-icon"
+          />
+          <span>{{
+            soundEnabled() ? copy().cashier.soundEnabled : copy().cashier.soundEnable
+          }}</span>
         </button>
-      </section>
-    } @else {
-      <!-- Orders List Grid -->
-      <section
-        class="orders-viewport-grid order-grid"
+
+        <button
+          type="button"
+          class="op-action-btn refresh-button refresh-btn"
+          (click)="loadOrders()"
+          [attr.aria-label]="copy().cashier.refresh"
+        >
+          <img src="/icons/cashier/refresh.svg" alt="" aria-hidden="true" class="op-icon" />
+          <span>{{ copy().cashier.refresh }}</span>
+        </button>
+
+        @if (filteredOrders().length > 0) {
+          <button
+            type="button"
+            class="op-action-btn action-toggle-btn"
+            (click)="toggleAllDetails()"
+            [attr.aria-label]="
+              allExpanded() ? copy().cashier.collapseAll : copy().cashier.expandAll
+            "
+          >
+            <span>{{ allExpanded() ? copy().cashier.collapseAll : copy().cashier.expandAll }}</span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- Filters & Order Type Segmented Toolbar (Matches Cashier Page-3 Filter Row) -->
+    <section class="cashier-toolbar-section">
+      <div
+        class="status-filters-group filter-pills filter-tabs"
+        role="tablist"
         [attr.aria-label]="copy().cashier.readyOrders"
       >
-        @for (order of filteredOrders(); track order.id) {
-          <article
-            class="order-ticket"
-            [class.order-ticket--takeaway]="order.orderType === 'Takeaway'"
-            [class.order-ticket--delivery]="order.orderType === 'Delivery'"
+        <button
+          type="button"
+          role="tab"
+          class="toolbar-filter-pill filter-pill filter-tab"
+          [class.is-active]="selectedFilter() === 'all'"
+          [attr.aria-selected]="selectedFilter() === 'all'"
+          (click)="setFilter('all')"
+        >
+          <span>{{ copy().cashier.filterAll }}</span>
+          <span class="filter-count count-badge tab-count">{{ totalCount() }}</span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          class="toolbar-filter-pill filter-pill filter-tab"
+          [class.is-active]="selectedFilter() === 'takeaway'"
+          [attr.aria-selected]="selectedFilter() === 'takeaway'"
+          (click)="setFilter('takeaway')"
+        >
+          <img src="/icons/cashier/bag.svg" alt="" aria-hidden="true" class="pill-svg" />
+          <span>{{ copy().cashier.takeawayQueue }}</span>
+          <span class="filter-count count-badge tab-count">{{ takeawayCount() }}</span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          class="toolbar-filter-pill filter-pill filter-tab"
+          [class.is-active]="selectedFilter() === 'delivery'"
+          [attr.aria-selected]="selectedFilter() === 'delivery'"
+          (click)="setFilter('delivery')"
+        >
+          <img src="/icons/cashier/driver.svg" alt="" aria-hidden="true" class="pill-svg" />
+          <span>{{ copy().cashier.deliveryQueue }}</span>
+          <span class="filter-count count-badge tab-count">{{ deliveryCount() }}</span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          class="toolbar-filter-pill filter-pill filter-tab"
+          [class.is-active]="selectedFilter() === 'unpaid'"
+          [attr.aria-selected]="selectedFilter() === 'unpaid'"
+          (click)="setFilter('unpaid')"
+        >
+          <img src="/icons/cashier/money.svg" alt="" aria-hidden="true" class="pill-svg" />
+          <span>{{ copy().cashier.collect }}</span>
+          <span
+            class="filter-count filter-count--unpaid count-badge count-badge--unpaid tab-count tab-count--pending"
+            >{{ unpaidCount() }}</span
           >
-            <!-- Card Header: Badges, Code, Elapsed Time -->
-            <header class="order-ticket__header">
-              <div class="ticket-type-group order-ticket__identity">
-                <div class="order-badges">
+        </button>
+      </div>
+
+      <!-- Right Order Type Segmented Control -->
+      <div class="order-type-segment-wrapper">
+        <span class="order-type-label">{{
+          language.current() === 'ar' ? 'نوع الطلب:' : 'ORDER TYPE:'
+        }}</span>
+        <div class="order-type-segments">
+          <button
+            type="button"
+            class="segment-btn"
+            [class.is-selected]="selectedFilter() === 'all'"
+            (click)="setFilter('all')"
+          >
+            {{ copy().cashier.all }}
+          </button>
+          <button
+            type="button"
+            class="segment-btn"
+            [class.is-selected]="selectedFilter() === 'delivery'"
+            (click)="setFilter('delivery')"
+          >
+            <img src="/icons/cashier/driver.svg" alt="" aria-hidden="true" class="segment-icon" />
+            <span>{{ copy().cashier.delivery }}</span>
+          </button>
+          <button
+            type="button"
+            class="segment-btn"
+            [class.is-selected]="selectedFilter() === 'takeaway'"
+            (click)="setFilter('takeaway')"
+          >
+            <img src="/icons/cashier/bag.svg" alt="" aria-hidden="true" class="segment-icon" />
+            <span>{{ copy().cashier.takeaway }}</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Orders Main Queue (Matches 3-column card grid in Cashier Page-3) -->
+    <main class="cashier-queue queue">
+      <h2 class="visually-hidden">{{ copy().cashier.readyOrders }}</h2>
+      @if (state() === 'loading') {
+        <section class="queue-state queue-state--loading" role="status">
+          <div class="loading-spinner spinner" aria-hidden="true"></div>
+          <p>{{ copy().cashier.loading }}</p>
+        </section>
+      } @else if (state() === 'error') {
+        <section class="queue-state queue-state--error" role="alert">
+          <span class="error-icon" aria-hidden="true">⚠️</span>
+          <h3>{{ copy().cashier.loadError }}</h3>
+          <button class="retry-button button button--primary" type="button" (click)="loadOrders()">
+            {{ copy().common.retry }}
+          </button>
+        </section>
+      } @else if (orders().length === 0) {
+        <section class="queue-state queue-state--empty" role="status">
+          <span class="empty-icon" aria-hidden="true">🎉</span>
+          <h3>{{ copy().cashier.noReadyOrders }}</h3>
+        </section>
+      } @else if (filteredOrders().length === 0) {
+        <section class="queue-state queue-state--empty" role="status">
+          <span class="empty-icon" aria-hidden="true">🔍</span>
+          <h3>{{ copy().cashier.noFilteredOrders }}</h3>
+          <button
+            type="button"
+            class="retry-button button button--primary"
+            (click)="clearSearch(); setFilter('all')"
+          >
+            {{ copy().cashier.clearSearch }}
+          </button>
+        </section>
+      } @else {
+        <!-- 3-Column Orders Cards Grid -->
+        <section
+          class="orders-3col-grid orders-viewport-grid order-grid"
+          [attr.aria-label]="copy().cashier.readyOrders"
+        >
+          @for (order of filteredOrders(); track order.id) {
+            <article
+              class="figma-order-card order-ticket"
+              [class.card--takeaway]="order.orderType === 'Takeaway'"
+              [class.card--delivery]="order.orderType === 'Delivery'"
+              [class.order-ticket--takeaway]="order.orderType === 'Takeaway'"
+              [class.order-ticket--delivery]="order.orderType === 'Delivery'"
+            >
+              <!-- Card Top Row: Status Dot + Type Pill -->
+              <div class="card-status-row order-ticket__header">
+                <div class="card-status-left order-badges order-ticket__identity">
                   <span
-                    class="type-badge order-type-badge"
+                    class="status-indicator-tag"
+                    [class.status--ready]="order.status === 'Ready'"
+                    [class.status--ontheway]="order.status === 'OnTheWay'"
+                    [class.status--delivered]="order.status === 'Delivered'"
+                  >
+                    <span class="status-indicator-dot" aria-hidden="true"></span>
+                    <strong>{{ statusLabel(order.status) }}</strong>
+                  </span>
+                </div>
+
+                <div class="card-type-right">
+                  <span
+                    class="type-pill-badge type-badge order-type-badge"
+                    [class.type-pill--pickup]="order.orderType === 'Takeaway'"
+                    [class.type-pill--delivery]="order.orderType === 'Delivery'"
                     [class.type-badge--takeaway]="order.orderType === 'Takeaway'"
                     [class.type-badge--delivery]="order.orderType === 'Delivery'"
                     [class.is-delivery]="order.orderType === 'Delivery'"
                   >
-                    <img
-                      [src]="
-                        order.orderType === 'Takeaway'
-                          ? '/icons/cashier/bag.svg'
-                          : '/icons/cashier/driver.svg'
-                      "
-                      alt=""
-                      aria-hidden="true"
-                      class="badge-icon"
-                    />
-                    <span>{{ orderType(order) }}</span>
+                    {{ order.orderType === 'Takeaway' ? 'PICKUP' : 'DELIVERY' }}
                   </span>
+                </div>
+              </div>
 
-                  <span
-                    class="payment-summary-badge"
+              <!-- Card Identity & Price Row -->
+              <div class="card-identity-price-row">
+                <div class="identity-col">
+                  <h3 class="order-public-code ticket-code order-code" dir="ltr">
+                    #{{ order.publicCode }}
+                  </h3>
+                  <p
+                    class="customer-name-line customer-name summary-customer order-ticket__customer"
+                  >
+                    {{ order.customerName }}
+                  </p>
+                  <div class="order-time-line order-ticket__time">
+                    <div
+                      class="aging-badge"
+                      [class.aging-badge--long-wait]="isLongWait(order.createdAt)"
+                    >
+                      <img
+                        src="/icons/cashier/clock.svg"
+                        alt=""
+                        aria-hidden="true"
+                        class="clock-icon"
+                      />
+                      <strong class="time-elapsed" [class.is-urgent]="isLongWait(order.createdAt)">
+                        {{ elapsedLabel(order.createdAt) }}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="price-col">
+                  <strong class="order-total-amount" dir="ltr"
+                    >{{ order.total }} {{ copy().common.currency }}</strong
+                  >
+                  <div
+                    class="payment-status-tag payment-summary-badge"
                     [class.is-pending]="order.paymentStatus === 'Pending'"
                     [class.is-paid]="order.paymentStatus === 'Paid'"
                   >
-                    <img
-                      [src]="
-                        order.paymentStatus === 'Pending'
-                          ? '/icons/cashier/money.svg'
-                          : '/icons/cashier/check.svg'
-                      "
-                      alt=""
-                      aria-hidden="true"
-                      class="badge-icon"
-                    />
                     @if (order.paymentStatus === 'Pending') {
-                      <span
-                        >{{ copy().cashier.collect }} {{ order.total }}
-                        {{ copy().common.currency }}</span
-                      >
+                      <span class="tag-unpaid">{{ copy().cashier.collect }}</span>
                     } @else {
-                      <span>{{ copy().cashier.paid }}</span>
+                      <span class="tag-paid">{{ copy().cashier.paid }}</span>
                     }
+                  </div>
+                  <span class="ready-subtext">
+                    {{
+                      order.orderType === 'Takeaway'
+                        ? copy().kitchen.readyForPickup
+                        : copy().cashier.statusReady
+                    }}
                   </span>
                 </div>
-
-                <h3 class="ticket-code order-code" dir="ltr">#{{ order.publicCode }}</h3>
               </div>
 
-              <div class="order-ticket__time">
-                <div
-                  class="aging-badge"
-                  [class.aging-badge--long-wait]="isLongWait(order.createdAt)"
-                >
-                  <img src="/icons/cashier/clock.svg" alt="" aria-hidden="true" class="time-icon" />
-                  <strong class="time-elapsed" [class.is-urgent]="isLongWait(order.createdAt)">{{
-                    elapsedLabel(order.createdAt)
-                  }}</strong>
-                </div>
-                <span class="time-received" dir="auto">
-                  {{ copy().kitchen.received }} {{ receivedAt(order.createdAt) }}
-                </span>
-              </div>
-            </header>
-
-            <!-- Card Body: Customer & Quick Summary -->
-            <div class="order-ticket__summary">
-              <div class="summary-customer order-ticket__customer">
-                <img
-                  src="/icons/cashier/customer.svg"
-                  alt=""
-                  aria-hidden="true"
-                  class="customer-icon"
-                />
-                <strong class="customer-name" [title]="order.customerName">{{
-                  order.customerName
-                }}</strong>
-                @if (
-                  order.orderType === 'Delivery' &&
-                  (order.deliveryAreaNameAr || order.deliveryAreaNameEn)
-                ) {
-                  <span class="area-pill delivery-detail" [title]="areaName(order)">
-                    <img
-                      src="/icons/cashier/location.svg"
-                      alt=""
-                      aria-hidden="true"
-                      class="area-icon"
-                    />
-                    <span>{{ areaName(order) }}</span>
-                  </span>
+              <!-- Items List Section -->
+              <div class="card-items-section details-items-list order-ticket__items">
+                @for (item of order.items; track $index) {
+                  <div class="item-line details-item-row order-item-row">
+                    <span class="item-title item-name">{{ itemName(item) }}</span>
+                    <strong class="item-quantity-pill item-qty item-quantity" dir="ltr"
+                      >x{{ item.quantity }}</strong
+                    >
+                  </div>
                 }
               </div>
 
-              <div class="summary-financials">
+              <!-- Details Toggle for Address/Breakdown -->
+              <div class="card-details-toggle-bar">
                 <button
                   type="button"
-                  class="details-toggle-btn"
+                  class="card-details-btn details-toggle-btn"
                   [class.is-expanded]="expandedOrderIds().has(order.id)"
                   [attr.aria-expanded]="expandedOrderIds().has(order.id)"
                   (click)="toggleDetails(order.id)"
-                  [attr.aria-label]="
+                >
+                  <span>{{
                     expandedOrderIds().has(order.id)
                       ? copy().cashier.hideDetails
                       : copy().cashier.showDetails
-                  "
-                >
-                  <img src="/icons/cashier/bag.svg" alt="" aria-hidden="true" class="btn-icon" />
-                  <span>{{ order.items.length }} {{ copy().cashier.items }}</span>
-                  <span class="toggle-arrow" aria-hidden="true">{{
+                  }}</span>
+                  <span class="toggle-icon" aria-hidden="true">{{
                     expandedOrderIds().has(order.id) ? '▲' : '▼'
                   }}</span>
                 </button>
               </div>
-            </div>
 
-            <!-- Progressive Disclosure Details Drawer -->
-            @if (expandedOrderIds().has(order.id)) {
-              <div
-                class="order-ticket__details"
-                role="region"
-                [attr.aria-label]="copy().cashier.items"
-              >
-                <div class="details-items-list order-ticket__items">
-                  @for (item of order.items; track $index) {
-                    <div class="details-item-row order-item-row">
-                      <span class="item-name">{{ itemName(item) }}</span>
-                      <strong class="item-qty item-quantity" dir="ltr">{{ item.quantity }}×</strong>
-                    </div>
-                  }
-                </div>
-
-                @if (order.customerNote) {
-                  <div class="details-note kitchen-note" role="note">
-                    <img
-                      src="/icons/cashier/note.svg"
-                      alt=""
-                      aria-hidden="true"
-                      class="note-icon"
-                    />
-                    <div>
-                      <strong>{{ copy().cashier.note }}:</strong>
-                      <span>{{ order.customerNote }}</span>
-                    </div>
+              <!-- Customer Note Callout (Matches Figma note box) -->
+              @if (order.customerNote) {
+                <div class="figma-note-box details-note kitchen-note" role="note">
+                  <div class="note-header">
+                    <img src="/icons/cashier/note.svg" alt="" aria-hidden="true" class="note-svg" />
+                    <strong>{{ copy().cashier.note }}</strong>
                   </div>
-                }
-
-                @if (order.orderType === 'Delivery' && order.address) {
-                  <div class="details-address delivery-detail">
-                    <img
-                      src="/icons/cashier/location.svg"
-                      alt=""
-                      aria-hidden="true"
-                      class="address-icon"
-                    />
-                    <div>
-                      <strong>{{ copy().cashier.address }}:</strong>
-                      <span>{{ order.address }}</span>
-                    </div>
-                  </div>
-                }
-
-                <div class="details-breakdown">
-                  <span
-                    >{{ copy().cashier.subtotal }}: {{ order.subtotal }}
-                    {{ copy().common.currency }}</span
-                  >
-                  @if (order.deliveryFee > 0) {
-                    <span
-                      >{{ copy().cashier.deliveryFee }}: {{ order.deliveryFee }}
-                      {{ copy().common.currency }}</span
-                    >
-                  }
-                  <span class="breakdown-total"
-                    >{{ copy().cashier.total }}: {{ order.total }}
-                    {{ copy().common.currency }}</span
-                  >
+                  <p class="note-text">{{ order.customerNote }}</p>
                 </div>
-              </div>
-            }
+              }
 
-            <!-- Primary Action Zone -->
-            <footer class="order-ticket__actions">
-              @if (order.orderType === 'Takeaway') {
-                @if (confirmingOrders().has(order.id)) {
-                  <div class="handoff-confirm modal-card--confirm" role="dialog" aria-modal="true">
-                    <div class="confirm-prompt">
-                      <strong>{{ copy().cashier.handoffConfirmTitle }}</strong>
-                      <p>
-                        {{ copy().cashier.handoffConfirmBody }} (<strong
-                          >{{ order.total }} {{ copy().common.currency }}</strong
-                        >)
-                      </p>
-                    </div>
-                    <div class="handoff-confirm__buttons confirm-actions">
-                      <button
-                        type="button"
-                        class="btn-cancel button button--secondary"
-                        (click)="cancelHandoff(order.id)"
-                        [disabled]="inFlightHandoffs().has(order.id)"
-                      >
-                        {{ copy().cashier.handoffConfirmNo }}
-                      </button>
-                      <button
-                        type="button"
-                        class="btn-confirm button button--confirm button--success"
-                        (click)="confirmHandoff(order)"
-                        [disabled]="inFlightHandoffs().has(order.id)"
-                      >
-                        @if (inFlightHandoffs().has(order.id)) {
-                          <span class="action-spinner btn-spinner" aria-hidden="true"></span>
-                          <span>{{ copy().cashier.completing }}</span>
-                        } @else {
-                          <span class="btn-icon" aria-hidden="true">✓</span>
-                          <span>{{ copy().cashier.handoffConfirmYes }}</span>
+              <!-- Expanded Details Drawer -->
+              @if (expandedOrderIds().has(order.id)) {
+                <div class="card-expanded-drawer order-ticket__details" role="region">
+                  @if (order.orderType === 'Delivery' && order.address) {
+                    <div class="delivery-address-box details-address delivery-detail">
+                      <div class="address-header">
+                        <img
+                          src="/icons/cashier/location.svg"
+                          alt=""
+                          aria-hidden="true"
+                          class="address-svg"
+                        />
+                        <strong>{{ copy().cashier.address }}</strong>
+                        @if (order.deliveryAreaNameAr || order.deliveryAreaNameEn) {
+                          <span class="area-tag">({{ areaName(order) }})</span>
                         }
-                      </button>
-                    </div>
-                  </div>
-                } @else {
-                  <button
-                    type="button"
-                    class="handoff-button action-button action-button--ready"
-                    (click)="initiateHandoff(order.id)"
-                  >
-                    <span class="btn-icon" aria-hidden="true">✓</span>
-                    <span>{{ copy().cashier.handoff }}</span>
-                  </button>
-                }
-
-                @if (staleOrders().has(order.id)) {
-                  <p class="error-badge error-badge--stale" role="alert">
-                    ⚠️ {{ copy().cashier.handoffStaleError }}
-                  </p>
-                }
-                @if (errorOrders().has(order.id)) {
-                  <p class="error-badge" role="alert">⚠️ {{ copy().cashier.handoffError }}</p>
-                }
-              } @else {
-                <!-- Delivery Order Status & Driver Assignment -->
-                @if (order.driverId || order.driverName) {
-                  <div class="assigned-driver-card">
-                    <div class="assigned-driver-info">
-                      <img
-                        src="/icons/cashier/driver.svg"
-                        alt=""
-                        aria-hidden="true"
-                        class="driver-icon"
-                      />
-                      <div class="driver-text">
-                        <span class="driver-label">{{ copy().cashier.assignedDriver }}:</span>
-                        <strong class="driver-name">{{ order.driverName }}</strong>
                       </div>
+                      <p class="address-text">{{ order.address }}</p>
                     </div>
-                    <div
-                      class="driver-status-badge"
-                      [class.is-ontheway]="order.status === 'OnTheWay'"
-                    >
-                      <span>{{ copy().cashier.driverStatus }}:</span>
-                      <strong>{{ statusLabel(order.status) }}</strong>
+                  }
+
+                  <div class="financial-breakdown-box details-breakdown">
+                    <div class="breakdown-row">
+                      <span>{{ copy().cashier.subtotal }}</span>
+                      <strong dir="ltr">{{ order.subtotal }} {{ copy().common.currency }}</strong>
+                    </div>
+                    @if (order.deliveryFee > 0) {
+                      <div class="breakdown-row">
+                        <span>{{ copy().cashier.deliveryFee }}</span>
+                        <strong dir="ltr"
+                          >{{ order.deliveryFee }} {{ copy().common.currency }}</strong
+                        >
+                      </div>
+                    }
+                    <div class="breakdown-row breakdown-row--total">
+                      <span>{{ copy().cashier.total }}</span>
+                      <strong class="breakdown-total" dir="ltr"
+                        >{{ order.total }} {{ copy().common.currency }}</strong
+                      >
                     </div>
                   </div>
-                } @else {
-                  @if (confirmingAssignments().has(order.id)) {
+                </div>
+              }
+
+              <!-- Primary Action Zone Footer (Matches exact Figma CTA styling) -->
+              <footer class="card-action-footer order-ticket__actions">
+                @if (order.orderType === 'Takeaway') {
+                  @if (confirmingOrders().has(order.id)) {
                     <div
-                      class="assignment-confirm modal-card--confirm"
+                      class="handoff-confirm modal-card--confirm"
                       role="dialog"
                       aria-modal="true"
                     >
                       <div class="confirm-prompt">
-                        <strong>{{ copy().cashier.assignConfirmTitle }}</strong>
-                        <p>{{ copy().cashier.assignConfirmBody }}</p>
-                        <div class="driver-preview">
-                          <span>{{ copy().cashier.assignedDriver }}:</span>
-                          <strong>{{ getDriverName(getSelectedDriver(order.id)) }}</strong>
-                        </div>
+                        <strong>{{ copy().cashier.handoffConfirmTitle }}</strong>
+                        <p>
+                          {{ copy().cashier.handoffConfirmBody }} (<strong
+                            >{{ order.total }} {{ copy().common.currency }}</strong
+                          >)
+                        </p>
                       </div>
-                      <div class="assignment-confirm__buttons confirm-actions">
+                      <div class="confirm-buttons-row handoff-confirm__buttons confirm-actions">
                         <button
                           type="button"
                           class="btn-cancel button button--secondary"
-                          (click)="cancelAssign(order.id)"
-                          [disabled]="inFlightAssignments().has(order.id)"
+                          (click)="cancelHandoff(order.id)"
+                          [disabled]="inFlightHandoffs().has(order.id)"
                         >
-                          {{ copy().cashier.assignConfirmNo }}
+                          {{ copy().cashier.handoffConfirmNo }}
                         </button>
                         <button
                           type="button"
                           class="btn-confirm button button--confirm button--success"
-                          (click)="confirmAssign(order)"
-                          [disabled]="inFlightAssignments().has(order.id)"
+                          (click)="confirmHandoff(order)"
+                          [disabled]="inFlightHandoffs().has(order.id)"
                         >
-                          @if (inFlightAssignments().has(order.id)) {
+                          @if (inFlightHandoffs().has(order.id)) {
                             <span class="action-spinner btn-spinner" aria-hidden="true"></span>
                             <span>{{ copy().cashier.completing }}</span>
                           } @else {
-                            <span class="btn-icon" aria-hidden="true">✓</span>
-                            <span>{{ copy().cashier.assignConfirmYes }}</span>
+                            <span>{{ copy().cashier.handoffConfirmYes }}</span>
                           }
                         </button>
                       </div>
                     </div>
                   } @else {
-                    <div class="driver-assignment-form">
-                      <select
-                        [id]="'driver-select-' + order.id"
-                        class="driver-select"
-                        [value]="getSelectedDriver(order.id)"
-                        (change)="onSelectDriver(order.id, $event)"
-                        [disabled]="inFlightAssignments().has(order.id)"
-                        [attr.aria-label]="copy().cashier.selectDriver"
-                      >
-                        <option value="">{{ copy().cashier.selectDriverPlaceholder }}</option>
-                        @for (driver of drivers(); track driver.id) {
-                          <option [value]="driver.id">{{ driver.name }}</option>
-                        }
-                      </select>
-                      <button
-                        type="button"
-                        class="assign-driver-button action-button action-button--confirm"
-                        [disabled]="
-                          !getSelectedDriver(order.id) || inFlightAssignments().has(order.id)
-                        "
-                        (click)="initiateAssign(order.id)"
-                      >
+                    <button
+                      type="button"
+                      class="primary-card-action-btn action--pickup handoff-button action-button action-button--ready"
+                      (click)="initiateHandoff(order.id)"
+                    >
+                      <img
+                        src="/icons/cashier/bag.svg"
+                        alt=""
+                        aria-hidden="true"
+                        class="action-icon"
+                      />
+                      <span>{{ copy().cashier.handoff }}</span>
+                    </button>
+                  }
+
+                  @if (staleOrders().has(order.id)) {
+                    <p class="error-badge error-badge--stale" role="alert">
+                      ⚠️ {{ copy().cashier.handoffStaleError }}
+                    </p>
+                  }
+                  @if (errorOrders().has(order.id)) {
+                    <p class="error-badge" role="alert">⚠️ {{ copy().cashier.handoffError }}</p>
+                  }
+                } @else {
+                  <!-- Delivery Actions & Driver Assignment -->
+                  @if (order.driverId || order.driverName) {
+                    <div class="assigned-driver-card">
+                      <div class="assigned-driver-info">
                         <img
                           src="/icons/cashier/driver.svg"
                           alt=""
                           aria-hidden="true"
-                          class="btn-icon"
+                          class="driver-icon"
                         />
-                        <span>{{ copy().cashier.assignDriver }}</span>
-                      </button>
+                        <div class="driver-text">
+                          <span class="driver-label">{{ copy().cashier.assignedDriver }}:</span>
+                          <strong class="driver-name">{{ order.driverName }}</strong>
+                        </div>
+                      </div>
+                      <div
+                        class="driver-status-badge"
+                        [class.is-ontheway]="order.status === 'OnTheWay'"
+                      >
+                        <span>{{ statusLabel(order.status) }}</span>
+                      </div>
                     </div>
-                  }
+                  } @else {
+                    @if (confirmingAssignments().has(order.id)) {
+                      <div
+                        class="assignment-confirm modal-card--confirm"
+                        role="dialog"
+                        aria-modal="true"
+                      >
+                        <div class="confirm-prompt">
+                          <strong>{{ copy().cashier.assignConfirmTitle }}</strong>
+                          <p>{{ copy().cashier.assignConfirmBody }}</p>
+                          <div class="driver-preview">
+                            <span>{{ copy().cashier.assignedDriver }}:</span>
+                            <strong>{{ getDriverName(getSelectedDriver(order.id)) }}</strong>
+                          </div>
+                        </div>
+                        <div
+                          class="confirm-buttons-row assignment-confirm__buttons confirm-actions"
+                        >
+                          <button
+                            type="button"
+                            class="btn-cancel button button--secondary"
+                            (click)="cancelAssign(order.id)"
+                            [disabled]="inFlightAssignments().has(order.id)"
+                          >
+                            {{ copy().cashier.assignConfirmNo }}
+                          </button>
+                          <button
+                            type="button"
+                            class="btn-confirm button button--confirm button--success"
+                            (click)="confirmAssign(order)"
+                            [disabled]="inFlightAssignments().has(order.id)"
+                          >
+                            @if (inFlightAssignments().has(order.id)) {
+                              <span class="action-spinner btn-spinner" aria-hidden="true"></span>
+                              <span>{{ copy().cashier.completing }}</span>
+                            } @else {
+                              <span>{{ copy().cashier.assignConfirmYes }}</span>
+                            }
+                          </button>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="figma-driver-assign-container driver-assignment-form">
+                        <span class="assign-driver-caption"
+                          >{{ copy().cashier.selectDriver }}:</span
+                        >
+                        <div class="driver-select-row">
+                          <select
+                            [id]="'driver-select-' + order.id"
+                            class="figma-driver-select driver-select"
+                            [value]="getSelectedDriver(order.id)"
+                            (change)="onSelectDriver(order.id, $event)"
+                            [disabled]="inFlightAssignments().has(order.id)"
+                            [attr.aria-label]="copy().cashier.selectDriver"
+                          >
+                            <option value="">{{ copy().cashier.selectDriverPlaceholder }}</option>
+                            @for (driver of drivers(); track driver.id) {
+                              <option [value]="driver.id">{{ driver.name }}</option>
+                            }
+                          </select>
+                        </div>
+                        <button
+                          type="button"
+                          class="primary-card-action-btn action--delivery assign-driver-button action-button action-button--confirm"
+                          [disabled]="
+                            !getSelectedDriver(order.id) || inFlightAssignments().has(order.id)
+                          "
+                          (click)="initiateAssign(order.id)"
+                        >
+                          <img
+                            src="/icons/cashier/driver.svg"
+                            alt=""
+                            aria-hidden="true"
+                            class="action-icon"
+                          />
+                          <span>{{ copy().cashier.assignDriver }}</span>
+                        </button>
+                      </div>
+                    }
 
-                  @if (staleAssignmentOrders().has(order.id)) {
-                    <p class="error-badge error-badge--stale" role="alert">
-                      ⚠️ {{ copy().cashier.assignDriverStaleError }}
-                    </p>
-                  }
-                  @if (errorAssignmentOrders().has(order.id)) {
-                    <p class="error-badge" role="alert">
-                      ⚠️ {{ copy().cashier.assignDriverError }}
-                    </p>
+                    @if (staleAssignmentOrders().has(order.id)) {
+                      <p class="error-badge error-badge--stale" role="alert">
+                        ⚠️ {{ copy().cashier.assignDriverStaleError }}
+                      </p>
+                    }
+                    @if (errorAssignmentOrders().has(order.id)) {
+                      <p class="error-badge" role="alert">
+                        ⚠️ {{ copy().cashier.assignDriverError }}
+                      </p>
+                    }
                   }
                 }
-              }
-            </footer>
-          </article>
-        }
-      </section>
-    }
-  </main>
+              </footer>
+            </article>
+          }
+        </section>
+
+        <!-- Bottom Pagination (Matches Figma Reference) -->
+        <footer class="cashier-pagination-bar" aria-label="Pagination">
+          <button type="button" class="page-btn page-btn--nav" disabled aria-label="Previous page">
+            ‹
+          </button>
+          <button type="button" class="page-btn is-active" aria-current="page">1</button>
+          <button type="button" class="page-btn">2</button>
+          <button type="button" class="page-btn">3</button>
+          <span class="page-ellipsis">…</span>
+          <button type="button" class="page-btn">8</button>
+          <button type="button" class="page-btn page-btn--nav" aria-label="Next page">›</button>
+        </footer>
+      }
+    </main>
+  </div>
 </div>
