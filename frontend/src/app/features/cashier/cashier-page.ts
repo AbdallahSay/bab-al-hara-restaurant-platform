@@ -51,7 +51,6 @@ export class CashierPage implements OnInit, OnDestroy {
   protected readonly newOrderBanner = signal<string | null>(null);
   protected readonly now = signal(Date.now());
   protected readonly staffDisplayName = signal<string | null>(null);
-  protected readonly isNavOpen = signal(false);
 
   // Handoff confirmation state (Takeaway)
   protected readonly inFlightHandoffs = signal<Set<string>>(new Set());
@@ -239,20 +238,8 @@ export class CashierPage implements OnInit, OnDestroy {
     this.soundEnabled.set(true);
   }
 
-  protected toggleNav(): void {
-    this.isNavOpen.update((v) => !v);
-  }
-
-  protected closeNav(): void {
-    this.isNavOpen.set(false);
-  }
-
   @HostListener('document:keydown.escape')
   protected handleEscape(): void {
-    if (this.isNavOpen()) {
-      this.closeNav();
-      return;
-    }
     if (this.confirmingOrders().size > 0) {
       this.confirmingOrders.set(new Set());
     }

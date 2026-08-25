@@ -1,62 +1,8 @@
 <div class="cashier-shell">
-  <!-- Side Navigation Drawer (Matches Cashier Page-4) -->
-  @if (isNavOpen()) {
-    <div class="nav-drawer-backdrop" (click)="closeNav()" aria-hidden="true"></div>
-  }
-  <aside class="nav-drawer" [class.is-open]="isNavOpen()" aria-label="Navigation Drawer">
-    <div class="nav-drawer__header">
-      <div class="nav-brand">
-        <span class="nav-brand-mark" aria-hidden="true">ب</span>
-        <span class="nav-brand-text">
-          <strong>{{ copy().brand.name }}</strong>
-          <span>{{ copy().cashier.title }}</span>
-        </span>
-      </div>
-      <button type="button" class="nav-close-btn" (click)="closeNav()" aria-label="Close menu">
-        ✕
-      </button>
-    </div>
-    <nav class="nav-drawer__links">
-      <a routerLink="/cashier" class="nav-link is-active" (click)="closeNav()">
-        <img src="/icons/cashier/bag.svg" alt="" aria-hidden="true" class="nav-link-icon" />
-        <span>{{ copy().cashier.readyOrders }}</span>
-      </a>
-      <a routerLink="/management/operations" class="nav-link" (click)="closeNav()">
-        <img src="/icons/cashier/driver.svg" alt="" aria-hidden="true" class="nav-link-icon" />
-        <span>{{ copy().cashier.deliveryQueue }}</span>
-      </a>
-      <a routerLink="/management/reports" class="nav-link" (click)="closeNav()">
-        <img src="/icons/cashier/money.svg" alt="" aria-hidden="true" class="nav-link-icon" />
-        <span>{{ copy().cashier.totalToCollect }}</span>
-      </a>
-      <a routerLink="/orders" class="nav-link" (click)="closeNav()">
-        <img src="/icons/cashier/note.svg" alt="" aria-hidden="true" class="nav-link-icon" />
-        <span>{{ copy().cashier.all }}</span>
-      </a>
-    </nav>
-    <div class="nav-drawer__footer">
-      <button type="button" class="nav-signout-btn" (click)="signOut()">
-        {{ copy().cashier.signOut }}
-      </button>
-    </div>
-  </aside>
-
-  <!-- Top Header (Matches Cashier Page-3) -->
+  <!-- Top Header -->
   <header class="cashier-header">
     <div class="cashier-header__inner">
       <div class="cashier-header__left">
-        <button
-          type="button"
-          class="hamburger-btn"
-          (click)="toggleNav()"
-          aria-label="Toggle navigation menu"
-          [attr.aria-expanded]="isNavOpen()"
-        >
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-        </button>
-
         <div class="brand-lockup">
           <span class="brand-badge-circle" aria-hidden="true">ب</span>
           <div class="header-titles">
@@ -712,19 +658,6 @@
             </article>
           }
         </section>
-
-        <!-- Bottom Pagination (Matches Figma Reference) -->
-        <footer class="cashier-pagination-bar" aria-label="Pagination">
-          <button type="button" class="page-btn page-btn--nav" disabled aria-label="Previous page">
-            ‹
-          </button>
-          <button type="button" class="page-btn is-active" aria-current="page">1</button>
-          <button type="button" class="page-btn">2</button>
-          <button type="button" class="page-btn">3</button>
-          <span class="page-ellipsis">…</span>
-          <button type="button" class="page-btn">8</button>
-          <button type="button" class="page-btn page-btn--nav" aria-label="Next page">›</button>
-        </footer>
       }
     </main>
   </div>
