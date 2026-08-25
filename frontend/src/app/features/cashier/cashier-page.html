@@ -328,7 +328,7 @@
                     [class.type-badge--delivery]="order.orderType === 'Delivery'"
                     [class.is-delivery]="order.orderType === 'Delivery'"
                   >
-                    {{ order.orderType === 'Takeaway' ? 'PICKUP' : 'DELIVERY' }}
+                    {{ orderType(order) }}
                   </span>
                 </div>
               </div>

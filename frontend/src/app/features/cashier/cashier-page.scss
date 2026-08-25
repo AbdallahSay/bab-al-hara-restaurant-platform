@@ -7,6 +7,10 @@
   min-block-size: 100vh;
   background: #f8fafc;
   position: relative;
+  inline-size: 100%;
+  max-inline-size: 100vw;
+  overflow-x: clip;
+  box-sizing: border-box;
 }
 
 /* Header */
@@ -25,6 +29,7 @@
     justify-content: space-between;
     padding: 0.875rem 1.5rem;
     gap: 1rem;
+    box-sizing: border-box;
   }
 
   &__left,
@@ -36,28 +41,6 @@
 
   &__right {
     flex-wrap: wrap;
-  }
-}
-
-.hamburger-btn {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.3rem;
-  inline-size: 2.5rem;
-  block-size: 2.5rem;
-  padding: 0.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background: transparent;
-  cursor: pointer;
-
-  .hamburger-line {
-    display: block;
-    inline-size: 100%;
-    block-size: 2px;
-    background: #1e293b;
-    border-radius: 999rem;
   }
 }
 
@@ -111,10 +94,6 @@
 }
 
 .header-datetime-group {
-  gap: 0.75rem;
-}
-
-.brand-lockup {
   gap: 0.75rem;
 }
 
@@ -268,11 +247,14 @@
 /* Content Container */
 .cashier-content-wrapper {
   inline-size: min(100%, 82rem);
+  max-inline-size: 100%;
   margin-inline: auto;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  box-sizing: border-box;
+  overflow-x: clip;
 }
 
 /* Search Bar */
@@ -282,6 +264,9 @@
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  box-sizing: border-box;
 }
 
 .search-input-container {
@@ -289,7 +274,9 @@
   display: flex;
   align-items: center;
   flex: 1;
-  min-inline-size: 18rem;
+  min-inline-size: 0;
+  inline-size: 100%;
+  box-sizing: border-box;
 
   .search-icon {
     position: absolute;
@@ -310,6 +297,7 @@
     background: white;
     color: #0f172a;
     font-size: 0.9rem;
+    box-sizing: border-box;
 
     &:focus {
       outline: none;
@@ -330,9 +318,8 @@
 }
 
 .quick-operations-group {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .op-action-btn {
@@ -348,6 +335,7 @@
   font-size: 0.8125rem;
   font-weight: 750;
   cursor: pointer;
+  box-sizing: border-box;
 
   .op-icon {
     inline-size: 1rem;
@@ -378,13 +366,17 @@
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  box-sizing: border-box;
 }
 
 .status-filters-group {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  box-sizing: border-box;
 }
 
 .toolbar-filter-pill {
@@ -400,6 +392,7 @@
   font-size: 0.8125rem;
   font-weight: 750;
   cursor: pointer;
+  box-sizing: border-box;
 
   .pill-svg {
     inline-size: 0.95rem;
@@ -447,15 +440,17 @@
 }
 
 .order-type-segment-wrapper {
-  display: flex;
-  align-items: center;
   gap: 0.65rem;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  box-sizing: border-box;
 
   .order-type-label {
     font-size: 0.75rem;
     font-weight: 800;
     color: #ea580c;
     letter-spacing: 0.04em;
+    white-space: nowrap;
   }
 }
 
@@ -466,6 +461,7 @@
   border: 1px solid #cbd5e1;
   border-radius: 0.5rem;
   background: white;
+  box-sizing: border-box;
 
   .segment-btn {
     display: inline-flex;
@@ -506,6 +502,7 @@
   border-radius: 1rem;
   background: white;
   text-align: center;
+  box-sizing: border-box;
 
   .empty-icon,
   .error-icon {
@@ -551,6 +548,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
+  box-sizing: border-box;
 }
 
 .figma-order-card {
@@ -562,6 +560,7 @@
   background: white;
   padding: 1.25rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
 }
 
 .card-status-row {
@@ -779,6 +778,7 @@
   border-radius: 0.5rem;
   background: #fffbeb;
   border: 1px solid #fef3c7;
+  box-sizing: border-box;
 
   .note-header {
     display: flex;
@@ -814,6 +814,7 @@
   border-radius: 0.5rem;
   background: #f8fafc;
   border: 1px dashed #cbd5e1;
+  box-sizing: border-box;
 }
 
 .delivery-address-box {
@@ -894,6 +895,7 @@
   font-weight: 850;
   text-transform: uppercase;
   cursor: pointer;
+  box-sizing: border-box;
 
   .action-icon {
     inline-size: 1.1rem;
@@ -931,6 +933,7 @@
   border-radius: 0.5rem;
   background: #fffbeb;
   border: 1px solid #f59e0b;
+  box-sizing: border-box;
 
   .confirm-prompt {
     strong {
@@ -967,6 +970,7 @@
     font-weight: 800;
     cursor: pointer;
     border: 0;
+    box-sizing: border-box;
   }
 
   .btn-cancel {
@@ -1006,6 +1010,7 @@
   font-size: 0.75rem;
   font-weight: 750;
   text-align: center;
+  box-sizing: border-box;
 
   &--stale {
     background: #fffbeb;
@@ -1023,6 +1028,7 @@
   border-radius: 0.5rem;
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
+  box-sizing: border-box;
 
   .assigned-driver-info {
     display: flex;
@@ -1074,6 +1080,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  box-sizing: border-box;
 
   .assign-driver-caption {
     font-size: 0.72rem;
@@ -1093,6 +1100,7 @@
   color: #0f172a;
   font-size: 0.8125rem;
   font-weight: 650;
+  box-sizing: border-box;
 
   &:focus {
     outline: none;
@@ -1135,7 +1143,7 @@
   }
 }
 
-@media (max-width: 48rem) {
+@media (max-width: 47.9375rem) {
   .cashier-content-wrapper {
     padding: 1rem;
     gap: 1rem;
@@ -1153,12 +1161,46 @@
 
   .status-filters-group {
     overflow-x: auto;
-    padding-block-end: 0.25rem;
+    overflow-y: hidden;
+    padding-block-end: 0.35rem;
     flex-wrap: nowrap;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
   }
 
   .order-type-segment-wrapper {
+    inline-size: 100%;
+    max-inline-size: 100%;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .order-type-segments {
+    inline-size: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    text-align: center;
+
+    .segment-btn {
+      justify-content: center;
+    }
+  }
+
+  .quick-operations-group {
+    inline-size: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.35rem;
+
+    .op-action-btn {
+      flex: 1;
+      justify-content: center;
+      padding: 0.4rem 0.5rem;
+      font-size: 0.75rem;
+    }
   }
 
   .header-datetime-group {
