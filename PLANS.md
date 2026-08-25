@@ -1,4 +1,4 @@
-﻿# PLANS.md â€” Delivery Plan
+# PLANS.md â€” Delivery Plan
 
 ## Operating rule
 
@@ -62,6 +62,22 @@ Status: COMPLETE FOR VISUAL REVIEW — 2026-08-24
 - preserved the authenticated staff session, active-order API, exact lifecycle transitions, optimistic-concurrency recovery, SignalR reconciliation, sound alert, fulfillment context, notes, and menu availability controls
 - used only repository-owned Bab Al Hara branding and exact eligible Figma utility assets; excluded the reference's third-party FreshBite identity and fictional data
 - retained all five real queue states and adapted the reference's three-column composition to two columns on tablet and one column on mobile with direction-safe Arabic RTL and English LTR behavior
+
+### Figma page-by-page visual calibration — cashier operations
+
+Status: COMPLETE FOR VISUAL REVIEW — 2026-08-25
+
+- calibrated cashier operational interface (`/cashier` and `/cashier/sign-in`) strictly against local Figma exports (`Cashier Page-3.png` dashboard reference and `Cashier Page-4.png` navigation drawer reference)
+- migrated `/cashier/sign-in` to the unified dark split auth composition with Bab Al Hara branding and food artwork
+- migrated `/cashier` to the exact Figma header composition (hamburger menu, brand badge, title/subtitle, live clock, date, SignalR status dot, language switcher, staff capsule, and orange Log Out button)
+- integrated accessible navigation drawer (`isNavOpen`) with fast drawer backdrop matching `Cashier Page-4.png`
+- built top search bar with clear button, quick operations toolbar (sound alerts, refresh queue, expand/collapse all), status filter pills with counts (`All Orders`, `Takeaway`, `Delivery`, `In-Store Payment`), and segmented `ORDER TYPE:` control
+- redesigned order cards into high-density 3-column operational grid with dual-row header (status dot + uppercase status on start, `PICKUP` / `DELIVERY` badge on end; order public code, customer name, elapsed time, total EGP, and payment status), progressive item list disclosure, amber customer note box, delivery address card, driver assignment dropdown, and solid action buttons (`MARK AS PICKED UP` orange / `DISPATCH DELIVERY` green)
+- added bottom pagination matching `< 1 2 3 ... 8 >`
+- replaced all inline emojis with repository-owned SVG utility icons in `frontend/public/icons/cashier/`
+- preserved all cashier backend integrations, SignalR realtime events, optimistic-concurrency 409 handling, driver assignment workflow, Takeaway cash handoff confirmation, and audio notifications
+- verified direction-safe Arabic RTL and English LTR across 1440px, 1280px, 768px, and 390px viewports; all 9 verification screenshots saved in `visual-verification/cashier-redesign/screenshots/`
+
 
 ## Phase 2 â€” Menu + customer ordering vertical slice
 

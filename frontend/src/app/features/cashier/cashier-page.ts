@@ -50,6 +50,7 @@ export class CashierPage implements OnInit, OnDestroy {
   protected readonly soundEnabled = signal(false);
   protected readonly newOrderBanner = signal<string | null>(null);
   protected readonly now = signal(Date.now());
+  protected readonly staffDisplayName = signal<string | null>(null);
 
   // Handoff confirmation state (Takeaway)
   protected readonly inFlightHandoffs = signal<Set<string>>(new Set());
@@ -132,6 +133,7 @@ export class CashierPage implements OnInit, OnDestroy {
             void this.router.navigate(['/cashier/sign-in']);
             return;
           }
+          this.staffDisplayName.set(session.displayName ?? null);
           this.startSync();
         },
         error: () => void this.router.navigate(['/cashier/sign-in']),
@@ -278,6 +280,28 @@ export class CashierPage implements OnInit, OnDestroy {
   protected elapsedLabel(value: string): string {
     const minutes = this.elapsedMinutes(value);
     return `${minutes} ${minutes === 1 ? this.copy().cashier.minute : this.copy().cashier.minutes}`;
+  }
+
+  protected receivedAt(value: string): string {
+    return new Intl.DateTimeFormat(this.language.current() === 'ar' ? 'ar-EG' : 'en-EG', {
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(new Date(value));
+  }
+
+  protected currentTime(): string {
+    return new Intl.DateTimeFormat(this.language.current() === 'ar' ? 'ar-EG' : 'en-EG', {
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(this.now());
+  }
+
+  protected currentDate(): string {
+    return new Intl.DateTimeFormat(this.language.current() === 'ar' ? 'ar-EG' : 'en-EG', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(this.now());
   }
 
   protected isLongWait(value: string): boolean {
