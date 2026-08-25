@@ -1,4 +1,4 @@
-﻿# PLANS.md â€” Delivery Plan
+# PLANS.md â€” Delivery Plan
 
 ## Operating rule
 
@@ -62,6 +62,17 @@ Status: COMPLETE FOR VISUAL REVIEW — 2026-08-24
 - preserved the authenticated staff session, active-order API, exact lifecycle transitions, optimistic-concurrency recovery, SignalR reconciliation, sound alert, fulfillment context, notes, and menu availability controls
 - used only repository-owned Bab Al Hara branding and exact eligible Figma utility assets; excluded the reference's third-party FreshBite identity and fictional data
 - retained all five real queue states and adapted the reference's three-column composition to two columns on tablet and one column on mobile with direction-safe Arabic RTL and English LTR behavior
+
+### Figma page-by-page visual calibration — cashier operations
+
+Status: COMPLETE FOR VISUAL REVIEW — 2026-08-25
+
+- calibrated cashier operational interface (`/cashier` and `/cashier/sign-in`) with the unified Figma design foundation
+- migrated `/cashier/sign-in` to the dark split auth composition with Bab Al Hara branding and food artwork
+- migrated `/cashier` to the light operational header, brand mark circle, staff session metadata, filter pills with count badges, and modern card hierarchy
+- replaced inline emojis with repository-owned SVG utility icons (`/icons/cashier/`)
+- preserved all cashier backend integrations, SignalR realtime events, cash handoff confirmation, driver assignment, search, and audio alerts
+- full direction-safe Arabic RTL and English LTR support, responsive across mobile, tablet, and desktop viewports
 
 ## Phase 2 â€” Menu + customer ordering vertical slice
 
