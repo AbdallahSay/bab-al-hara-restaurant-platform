@@ -23,6 +23,9 @@ public sealed record CashierOrderDto(
     decimal Total,
     PaymentMethod PaymentMethod,
     PaymentStatus PaymentStatus,
+    Guid? DriverId,
+    string? DriverName,
+    DateTimeOffset? DriverAssignedAtUtc,
     byte[] RowVersion,
     IReadOnlyList<CashierOrderItemDto> Items);
 
