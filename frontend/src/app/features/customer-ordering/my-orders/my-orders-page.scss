@@ -667,3 +667,22 @@
     }
   }
 }
+
+.privacy-svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+  flex-shrink: 0;
+}
+
+.empty-svg {
+  inline-size: 3rem;
+  block-size: 3rem;
+  opacity: 0.6;
+}
+
+.btn-icon-svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+}

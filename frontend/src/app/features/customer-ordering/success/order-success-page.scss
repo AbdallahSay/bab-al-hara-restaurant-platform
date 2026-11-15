@@ -57,8 +57,10 @@
   border-radius: 50%;
   background: var(--color-success-soft);
   color: var(--color-success);
-  font-size: 2rem;
-  font-weight: 800;
+  .success-check-svg {
+    inline-size: 2rem;
+    block-size: 2rem;
+  }
 }
 
 .eyebrow {

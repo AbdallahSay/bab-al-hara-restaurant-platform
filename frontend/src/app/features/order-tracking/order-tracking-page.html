@@ -10,7 +10,12 @@
 
   @if (state() === 'no-credential') {
     <div class="tracking-card tracking-card--centered" role="alert">
-      <span class="state-icon" aria-hidden="true">🔒</span>
+      <div class="state-icon-wrap" aria-hidden="true">
+        <svg class="state-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
       <p class="state-message">{{ copy().orderTracking.noCredential }}</p>
       <a class="button button--primary" routerLink="/">{{ copy().common.backToMenu }}</a>
     </div>
@@ -18,7 +23,9 @@
 
   @if (state() === 'error') {
     <div class="tracking-card tracking-card--centered" role="alert">
-      <span class="state-icon" aria-hidden="true">⚠️</span>
+      <div class="state-icon-wrap" aria-hidden="true">
+        <img src="/icons/cashier/refresh.svg" alt="" class="state-svg-icon" />
+      </div>
       <p class="state-message">{{ copy().orderTracking.error }}</p>
       <button class="button button--primary" (click)="loadTracking()">
         {{ copy().orderTracking.retry }}
@@ -44,15 +51,15 @@
       <div class="status-badge" [attr.data-status]="t.status">
         <span class="status-icon" aria-hidden="true">
           @if (t.status === 'Delivered') {
-            ✓
+            <img src="/icons/cashier/check.svg" alt="" class="status-svg" />
           } @else if (t.status === 'OnTheWay') {
-            🚗
+            <img src="/icons/cashier/driver.svg" alt="" class="status-svg" />
           } @else if (t.status === 'Ready') {
-            🍽️
+            <img src="/icons/cashier/bag.svg" alt="" class="status-svg" />
           } @else if (t.status === 'Preparing') {
-            👨‍🍳
+            <img src="/icons/kitchen/clock.svg" alt="" class="status-svg" />
           } @else {
-            ⏳
+            <img src="/icons/cashier/clock.svg" alt="" class="status-svg" />
           }
         </span>
         <h1 id="status-heading" class="status-wording">{{ statusWording() }}</h1>
@@ -73,11 +80,11 @@
         <div class="reorder-feedback__body">
           <span class="reorder-feedback__icon" aria-hidden="true">
             @if (fb.type === 'error') {
-              ⚠️
+              <span class="feedback-mark feedback-mark--error">!</span>
             } @else if (fb.type === 'partial') {
-              ℹ️
+              <span class="feedback-mark feedback-mark--info">i</span>
             } @else {
-              ✓
+              <img src="/icons/cashier/check.svg" alt="" class="feedback-check-svg" />
             }
           </span>
           <div class="reorder-feedback__text">
@@ -135,7 +142,7 @@
               <span class="spinner spinner--small" aria-hidden="true"></span>
               <span>{{ copy().orderTracking.reorder.loadingPreview }}</span>
             } @else {
-              <span class="reorder-icon" aria-hidden="true">🔁</span>
+              <img src="/icons/cashier/refresh.svg" alt="" class="reorder-svg-icon" aria-hidden="true" />
               <span>{{ copy().orderTracking.reorder.orderAgain }}</span>
             }
           </button>
@@ -154,11 +161,13 @@
           >
             <span class="stepper__icon" aria-hidden="true">
               @if (sc === 'completed') {
-                ✓
+                <svg class="stepper-check-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="4 10 8 14 16 6" />
+                </svg>
               } @else if (sc === 'current') {
-                ●
+                <span class="stepper-current-dot"></span>
               } @else {
-                ○
+                <span class="stepper-pending-ring"></span>
               }
             </span>
             <span class="stepper__label">{{ step.label() }}</span>
@@ -180,8 +189,11 @@
           class="summary-toggle__chevron"
           [class.summary-toggle__chevron--open]="summaryOpen()"
           aria-hidden="true"
-          >▼</span
         >
+          <svg class="chevron-svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </span>
       </button>
 
       @if (summaryOpen()) {
@@ -249,7 +261,7 @@
           </p>
 
           <p class="modal-card__notice">
-            <span aria-hidden="true">ℹ️</span>
+            <span class="notice-info-icon" aria-hidden="true">i</span>
             {{ copy().orderTracking.reorder.priceChangeNotice }}
           </p>
 

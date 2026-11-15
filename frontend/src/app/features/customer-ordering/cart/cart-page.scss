@@ -44,16 +44,19 @@
   background: var(--color-surface);
   text-align: center;
 
-  div {
+  .empty-icon-wrap {
     display: grid;
     place-items: center;
-    inline-size: 4rem;
-    block-size: 4rem;
+    inline-size: 4.5rem;
+    block-size: 4.5rem;
     border-radius: 50%;
     background: var(--color-primary-soft);
-    color: var(--color-primary);
-    font-size: 1.5rem;
-    font-weight: 800;
+
+    .empty-svg-icon {
+      inline-size: 2.25rem;
+      block-size: 2.25rem;
+      filter: invert(41%) sepia(85%) saturate(1478%) hue-rotate(358deg) brightness(97%) contrast(93%);
+    }
   }
 
   h2 {
@@ -235,5 +238,26 @@
   .cart-summary {
     position: sticky;
     inset-block-start: 6rem;
+  }
+}
+
+@media (max-width: 26rem) {
+  .cart-shell {
+    padding: var(--space-4) var(--space-2) var(--space-6);
+  }
+
+  .cart-line {
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    padding: var(--space-2);
+    gap: var(--space-2);
+
+    img {
+      inline-size: 4.5rem;
+      block-size: 4.5rem;
+    }
+  }
+
+  .cart-summary {
+    padding: var(--space-4) var(--space-3);
   }
 }

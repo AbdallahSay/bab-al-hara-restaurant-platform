@@ -3,7 +3,11 @@
 <main class="success-shell">
   @if (receipt(); as confirmed) {
     <section class="success-card" aria-labelledby="success-title">
-      <div class="success-mark" aria-hidden="true">✓</div>
+      <div class="success-mark" aria-hidden="true">
+        <svg class="success-check-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </div>
       <p class="eyebrow">{{ copy().success.eyebrow }}</p>
       <h1 id="success-title">{{ copy().success.title }}</h1>
       <p>{{ copy().success.message }}</p>
