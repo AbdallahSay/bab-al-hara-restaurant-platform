@@ -129,7 +129,9 @@
           </div>
           <div class="metric-info">
             <span class="metric-label">{{ copy().driver.codAmount }}</span>
-            <strong class="metric-value">{{ totalCodToCollect() }} {{ copy().common.currency }}</strong>
+            <strong class="metric-value"
+              >{{ totalCodToCollect() }} {{ copy().common.currency }}</strong
+            >
           </div>
         </div>
       </section>
@@ -194,7 +196,12 @@
                   </div>
 
                   <div class="order-card__time">
-                    <img src="/icons/cashier/clock.svg" alt="" aria-hidden="true" class="card-time-icon" />
+                    <img
+                      src="/icons/cashier/clock.svg"
+                      alt=""
+                      aria-hidden="true"
+                      class="card-time-icon"
+                    />
                     <span class="time-text">{{ elapsedLabel(order.createdAt) }}</span>
                   </div>
                 </header>
@@ -218,7 +225,12 @@
                   <!-- Destination Block (High Prominence) -->
                   <div class="info-block info-block--destination">
                     <div class="info-label">
-                      <img src="/icons/cashier/location.svg" alt="" aria-hidden="true" class="inline-icon" />
+                      <img
+                        src="/icons/cashier/location.svg"
+                        alt=""
+                        aria-hidden="true"
+                        class="inline-icon"
+                      />
                       <span>{{ copy().driver.deliveryDestination }}</span>
                     </div>
                     @if (order.deliveryAreaNameAr || order.deliveryAreaNameEn) {
@@ -230,7 +242,12 @@
                     @if (order.customerNote) {
                       <div class="destination-note">
                         <span class="note-label">
-                          <img src="/icons/cashier/note.svg" alt="" aria-hidden="true" class="inline-icon" />
+                          <img
+                            src="/icons/cashier/note.svg"
+                            alt=""
+                            aria-hidden="true"
+                            class="inline-icon"
+                          />
                           {{ copy().driver.deliveryNote }}:
                         </span>
                         <span class="note-content">{{ order.customerNote }}</span>
@@ -242,7 +259,12 @@
                   <div class="info-block info-block--customer">
                     <div class="customer-details">
                       <span class="customer-name">
-                        <img src="/icons/cashier/customer.svg" alt="" aria-hidden="true" class="inline-icon" />
+                        <img
+                          src="/icons/cashier/customer.svg"
+                          alt=""
+                          aria-hidden="true"
+                          class="inline-icon"
+                        />
                         {{ order.customerName }}
                       </span>
                       <a
@@ -251,7 +273,12 @@
                         [attr.aria-label]="copy().driver.callCustomer + ': ' + order.customerPhone"
                         dir="ltr"
                       >
-                        <img src="/icons/driver/phone.svg" alt="" aria-hidden="true" class="btn-phone-icon" />
+                        <img
+                          src="/icons/driver/phone.svg"
+                          alt=""
+                          aria-hidden="true"
+                          class="btn-phone-icon"
+                        />
                         <span>{{ order.customerPhone }}</span>
                       </a>
                     </div>
@@ -267,7 +294,12 @@
                       <div class="payment-cod">
                         <div class="payment-cod__header">
                           <span class="payment-badge payment-badge--cod">
-                            <img src="/icons/cashier/money.svg" alt="" aria-hidden="true" class="inline-icon" />
+                            <img
+                              src="/icons/cashier/money.svg"
+                              alt=""
+                              aria-hidden="true"
+                              class="inline-icon"
+                            />
                             {{ copy().driver.cashOnDelivery }}
                           </span>
                         </div>
@@ -281,7 +313,12 @@
                     } @else {
                       <div class="payment-prepaid">
                         <span class="payment-badge payment-badge--paid">
-                          <img src="/icons/cashier/check.svg" alt="" aria-hidden="true" class="inline-icon" />
+                          <img
+                            src="/icons/cashier/check.svg"
+                            alt=""
+                            aria-hidden="true"
+                            class="inline-icon"
+                          />
                           {{ copy().driver.paidOnline }}
                         </span>
                         <div class="payment-prepaid__note">0 {{ copy().common.currency }}</div>
@@ -298,7 +335,12 @@
                       [attr.aria-expanded]="isItemsExpanded(order.id)"
                     >
                       <span class="toggle-label-wrap">
-                        <img src="/icons/cashier/bag.svg" alt="" aria-hidden="true" class="inline-icon" />
+                        <img
+                          src="/icons/cashier/bag.svg"
+                          alt=""
+                          aria-hidden="true"
+                          class="inline-icon"
+                        />
                         <span>{{ copy().driver.items }} ({{ order.items.length }})</span>
                       </span>
                       <span class="toggle-icon">{{ isItemsExpanded(order.id) ? '▲' : '▼' }}</span>
@@ -330,7 +372,12 @@
                         <span class="action-spinner" aria-hidden="true"></span>
                         <span>{{ copy().driver.actionInProgress }}</span>
                       } @else {
-                        <img src="/icons/cashier/driver.svg" alt="" aria-hidden="true" class="action-icon" />
+                        <img
+                          src="/icons/cashier/driver.svg"
+                          alt=""
+                          aria-hidden="true"
+                          class="action-icon"
+                        />
                         <span>{{ copy().driver.startDeliveryAction }}</span>
                       }
                     </button>
@@ -345,7 +392,12 @@
                         <span class="action-spinner" aria-hidden="true"></span>
                         <span>{{ copy().driver.actionInProgress }}</span>
                       } @else {
-                        <img src="/icons/cashier/check.svg" alt="" aria-hidden="true" class="action-icon" />
+                        <img
+                          src="/icons/cashier/check.svg"
+                          alt=""
+                          aria-hidden="true"
+                          class="action-icon"
+                        />
                         <span>{{ copy().driver.markDeliveredAction }}</span>
                       }
                     </button>
@@ -388,7 +440,12 @@
                 </div>
                 <div class="completed-card__side">
                   <span class="badge badge--delivered">
-                    <img src="/icons/cashier/check.svg" alt="" aria-hidden="true" class="badge-icon" />
+                    <img
+                      src="/icons/cashier/check.svg"
+                      alt=""
+                      aria-hidden="true"
+                      class="badge-icon"
+                    />
                     {{ copy().driver.statusDelivered }}
                   </span>
                   <span class="total-text">{{ order.total }} {{ copy().common.currency }}</span>

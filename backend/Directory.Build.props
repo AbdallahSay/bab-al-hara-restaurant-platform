@@ -9,8 +9,14 @@
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
     <Deterministic>true</Deterministic>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    <NuGetAudit>false</NuGetAudit>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditLevel>high</NuGetAuditLevel>
   </PropertyGroup>
+
+  <!-- Pin transitive dependency to fix GHSA-846f-f764-76mx (DoS via SignedCms.CheckSignature) -->
+  <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+  </ItemGroup>
 
   <PropertyGroup Condition="'$(CI)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>

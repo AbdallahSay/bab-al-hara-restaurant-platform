@@ -18,6 +18,12 @@
           "Microsoft.TestPlatform.TestHost": "17.14.1"
         }
       },
+      "System.Security.Cryptography.Pkcs": {
+        "type": "Direct",
+        "requested": "[10.0.13, )",
+        "resolved": "10.0.13",
+        "contentHash": "a+EovgC1fBnwdlQ6cn3j4JFBfKqiFaFvoAhjisOoSvazLAcIznaBzPQP0oYnvccmeXfqUH1KebVZOxSeH6rMaw=="
+      },
       "xunit": {
         "type": "Direct",
         "requested": "[2.9.3, )",
@@ -495,11 +501,6 @@
         "resolved": "8.0.1",
         "contentHash": "BVYuec3jV23EMRDeR7Dr1/qhx7369dZzJ9IWy2xylvb4YfXsrUxspWc4UWYid/tj4zZK58uGZqn2WQiaDMhmAg=="
       },
-      "System.Security.Cryptography.Pkcs": {
-        "type": "Transitive",
-        "resolved": "9.0.11",
-        "contentHash": "YS2YqtN6fFjlTDIQI+ucjbbrEvwMn796r+VLTQRr/5Oy6g+i+m7nIou83KnJCnAcKna2I+5eVJRks6SoHSpetQ=="
-      },
       "System.Security.Cryptography.ProtectedData": {
         "type": "Transitive",
         "resolved": "9.0.11",
@@ -551,17 +552,22 @@
           "BabAlHara.Application": "[1.0.0, )",
           "BabAlHara.Infrastructure": "[1.0.0, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.11, )",
-          "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": "[10.0.11, )"
+          "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": "[10.0.11, )",
+          "System.Security.Cryptography.Pkcs": "[10.0.13, )"
         }
       },
       "babalhara.application": {
         "type": "Project",
         "dependencies": {
-          "BabAlHara.Domain": "[1.0.0, )"
+          "BabAlHara.Domain": "[1.0.0, )",
+          "System.Security.Cryptography.Pkcs": "[10.0.13, )"
         }
       },
       "babalhara.domain": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "System.Security.Cryptography.Pkcs": "[10.0.13, )"
+        }
       },
       "babalhara.infrastructure": {
         "type": "Project",
@@ -569,7 +575,8 @@
           "BabAlHara.Application": "[1.0.0, )",
           "BabAlHara.Domain": "[1.0.0, )",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "[10.0.11, )",
-          "Microsoft.EntityFrameworkCore.SqlServer": "[10.0.11, )"
+          "Microsoft.EntityFrameworkCore.SqlServer": "[10.0.11, )",
+          "System.Security.Cryptography.Pkcs": "[10.0.13, )"
         }
       }
     }

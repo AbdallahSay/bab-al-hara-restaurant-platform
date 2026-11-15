@@ -12,9 +12,16 @@
       <h1 class="page-title">{{ copy().myOrders.title }}</h1>
       <p class="page-subtitle">{{ copy().myOrders.subtitle }}</p>
       <div class="privacy-notice" role="note">
-        <svg class="privacy-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        <svg
+          class="privacy-svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
         <span>{{ copy().myOrders.privacyNotice }}</span>
       </div>
@@ -96,7 +103,12 @@
 
                 <div class="order-card__actions">
                   <a [routerLink]="['/order', order.publicCode, 'track']" class="btn-track-primary">
-                    <img src="/icons/cashier/location.svg" alt="" class="btn-icon-svg" aria-hidden="true" />
+                    <img
+                      src="/icons/cashier/location.svg"
+                      alt=""
+                      class="btn-icon-svg"
+                      aria-hidden="true"
+                    />
                     <span>{{ copy().myOrders.trackOrder }}</span>
                   </a>
                 </div>
@@ -162,7 +174,12 @@
                       <span class="btn-spinner" aria-hidden="true"></span>
                       <span>{{ copy().orderTracking.reorder.loadingPreview }}</span>
                     } @else {
-                      <img src="/icons/cashier/refresh.svg" alt="" class="btn-icon-svg" aria-hidden="true" />
+                      <img
+                        src="/icons/cashier/refresh.svg"
+                        alt=""
+                        class="btn-icon-svg"
+                        aria-hidden="true"
+                      />
                       <span>{{ copy().myOrders.orderAgain }}</span>
                     }
                   </button>
