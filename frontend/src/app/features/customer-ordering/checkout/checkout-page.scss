@@ -6,6 +6,7 @@
   max-inline-size: 70rem;
   margin-inline: auto;
   padding: var(--space-4) var(--space-4) calc(var(--space-7) + 4.5rem);
+  overflow-x: clip;
 }
 
 .checkout-topbar {
@@ -734,6 +735,37 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 30rem) {
+  .checkout-stepper {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .step-label {
+    display: none;
+  }
+
+  .stepper-step {
+    gap: 0;
+  }
+
+  .stepper-divider {
+    margin-inline: var(--space-1);
+  }
+}
+
+@media (max-width: 25rem) {
+  .mobile-action-bar {
+    padding-inline: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .mobile-action-bar__btn {
+    min-inline-size: 0;
+    flex: 1 1 auto;
+    padding-inline: var(--space-2);
   }
 }
 
