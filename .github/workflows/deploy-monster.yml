@@ -1,10 +1,8 @@
 name: Deploy Bab Al Hara to MonsterASP.NET
 
+# Production deployments are manual-only.
+# Merging a PR into main must never apply migrations or publish automatically.
 on:
-  push:
-    branches:
-      - main
-
   workflow_dispatch:
 
 permissions:
@@ -17,6 +15,7 @@ concurrency:
 jobs:
   deploy:
     name: Build, migrate and deploy
+    environment: production
     runs-on: windows-latest
 
     # Production must only deploy from main.
