@@ -1,71 +1,116 @@
-<main class="sign-in-shell">
-  <section class="sign-in-card" aria-labelledby="sign-in-title">
-    <div class="sign-in-topbar">
-      <a class="brand" routerLink="/">
-        <span aria-hidden="true">ب</span>
-        <strong>{{ copy().brand.name }}</strong>
-      </a>
-      <div class="language-switcher" role="group" [attr.aria-label]="copy().brand.languageLabel">
-        <button
-          type="button"
-          [class.is-active]="language.current() === 'ar'"
-          [attr.aria-pressed]="language.current() === 'ar'"
-          (click)="setLanguage('ar')"
-        >
-          {{ copy().brand.arabic }}
-        </button>
-        <button
-          type="button"
-          [class.is-active]="language.current() === 'en'"
-          [attr.aria-pressed]="language.current() === 'en'"
-          (click)="setLanguage('en')"
-        >
-          {{ copy().brand.english }}
-        </button>
-      </div>
-    </div>
+<main class="signin-shell">
+  <div class="auth-artwork" aria-hidden="true">
+    <img src="/images/auth/management-sign-in-burger.jpeg" alt="" />
+  </div>
 
-    <div class="sign-in-heading">
-      <h1 id="sign-in-title">{{ copy().staff.title }}</h1>
-      <p>{{ copy().staff.description }}</p>
-    </div>
+  <section class="signin-panel" aria-labelledby="kitchen-signin-title">
+    <div class="auth-glow" aria-hidden="true"></div>
 
-    @if (failed()) {
-      <p class="sign-in-error" role="alert">{{ copy().staff.error }}</p>
-    }
-
-    <form (submit)="signIn(); $event.preventDefault()" novalidate>
-      <div class="field-group">
-        <label for="staff-email">{{ copy().staff.email }}</label>
-        <input
-          id="staff-email"
-          type="email"
-          autocomplete="username"
-          [formControl]="form.controls.email"
-          [attr.aria-invalid]="submitted() && form.controls.email.invalid"
-        />
-        @if (submitted() && form.controls.email.invalid) {
-          <p class="field-error">{{ copy().checkout.required }}</p>
-        }
-      </div>
-      <div class="field-group">
-        <label for="staff-password">{{ copy().staff.password }}</label>
-        <input
-          id="staff-password"
-          type="password"
-          autocomplete="current-password"
-          [formControl]="form.controls.password"
-          [attr.aria-invalid]="submitted() && form.controls.password.invalid"
-        />
-        @if (submitted() && form.controls.password.invalid) {
-          <p class="field-error">{{ copy().checkout.required }}</p>
-        }
-      </div>
-      <button class="button button--primary button--wide" type="submit" [disabled]="sending()">
-        {{ sending() ? copy().staff.signingIn : copy().staff.signIn }}
+    <div class="language-switcher" role="group" [attr.aria-label]="copy().brand.languageLabel">
+      <button
+        type="button"
+        [class.is-active]="language.current() === 'ar'"
+        [attr.aria-pressed]="language.current() === 'ar'"
+        (click)="setLanguage('ar')"
+      >
+        {{ copy().brand.arabic }}
       </button>
-    </form>
+      <button
+        type="button"
+        [class.is-active]="language.current() === 'en'"
+        [attr.aria-pressed]="language.current() === 'en'"
+        (click)="setLanguage('en')"
+      >
+        {{ copy().brand.english }}
+      </button>
+    </div>
 
-    <a class="customer-link" routerLink="/">{{ copy().staff.customerMenu }}</a>
+    <div class="auth-content">
+      <a class="brand-lockup" routerLink="/" [attr.aria-label]="copy().brand.homeLabel">
+        <span class="brand-mark" aria-hidden="true">ب</span>
+        <span class="brand-name">
+          <strong lang="ar" dir="rtl">باب الحارة</strong>
+          <span lang="en" dir="ltr">Bab Al Hara</span>
+        </span>
+      </a>
+
+      <div class="signin-card">
+        <header class="signin-header">
+          <h1 id="kitchen-signin-title">{{ copy().staff.title }}</h1>
+          <p>{{ copy().staff.description }}</p>
+        </header>
+
+        @if (failed()) {
+          <div class="signin-alert" role="alert">
+            <span class="signin-alert__mark" aria-hidden="true">!</span>
+            <p>{{ copy().staff.error }}</p>
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="signIn()" class="signin-form" novalidate>
+          <div class="form-field">
+            <label for="kitchen-signin-email">{{ copy().staff.email }}</label>
+            <input
+              id="kitchen-signin-email"
+              class="mixed-direction-input"
+              type="email"
+              formControlName="email"
+              autocomplete="username"
+              inputmode="email"
+              autocapitalize="none"
+              spellcheck="false"
+              dir="ltr"
+              [attr.aria-invalid]="submitted() && form.controls.email.invalid"
+              [attr.aria-describedby]="
+                submitted() && form.controls.email.invalid ? 'kitchen-signin-email-error' : null
+              "
+              [placeholder]="copy().staff.email"
+            />
+            @if (submitted() && form.controls.email.invalid) {
+              <p id="kitchen-signin-email-error" class="field-error">
+                {{ copy().checkout.required }}
+              </p>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="kitchen-signin-password">{{ copy().staff.password }}</label>
+            <input
+              id="kitchen-signin-password"
+              class="mixed-direction-input"
+              type="password"
+              formControlName="password"
+              autocomplete="current-password"
+              dir="ltr"
+              [attr.aria-invalid]="submitted() && form.controls.password.invalid"
+              [attr.aria-describedby]="
+                submitted() && form.controls.password.invalid
+                  ? 'kitchen-signin-password-error'
+                  : null
+              "
+              [placeholder]="copy().staff.password"
+            />
+            @if (submitted() && form.controls.password.invalid) {
+              <p id="kitchen-signin-password-error" class="field-error">
+                {{ copy().checkout.required }}
+              </p>
+            }
+          </div>
+
+          <button type="submit" class="button button--primary auth-submit" [disabled]="sending()">
+            @if (sending()) {
+              <span class="button-spinner" aria-hidden="true"></span>
+              <span>{{ copy().staff.signingIn }}</span>
+            } @else {
+              <span>{{ copy().staff.title }}</span>
+            }
+          </button>
+        </form>
+
+        <footer class="signin-footer">
+          <a routerLink="/">{{ copy().staff.customerMenu }}</a>
+        </footer>
+      </div>
+    </div>
   </section>
 </main>

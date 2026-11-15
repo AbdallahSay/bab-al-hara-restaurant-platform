@@ -1,58 +1,85 @@
 <main class="driver-workspace" [attr.dir]="language.direction()">
-  <!-- Top Operational Bar -->
-  <header class="driver-topbar">
-    <div class="topbar-identity">
-      <h1 class="topbar-title">{{ copy().driver.title }}</h1>
-      <div
-        class="realtime-status"
-        [class.status--connected]="realtime.status() === 'connected'"
-        [class.status--connecting]="realtime.status() === 'connecting'"
-        [class.status--reconnecting]="realtime.status() === 'reconnecting'"
-        [class.status--disconnected]="realtime.status() === 'disconnected'"
-        role="status"
-        aria-live="polite"
-      >
-        <span class="status-dot" aria-hidden="true"></span>
-        <span class="status-text">{{ realtimeLabel() }}</span>
-      </div>
-    </div>
-
-    <div class="topbar-controls">
-      <div class="language-switch" role="group" [attr.aria-label]="copy().brand.languageLabel">
-        <button
-          type="button"
-          class="lang-btn"
-          [class.is-active]="language.current() === 'ar'"
-          (click)="setLanguage('ar')"
-        >
-          عربي
-        </button>
-        <button
-          type="button"
-          class="lang-btn"
-          [class.is-active]="language.current() === 'en'"
-          (click)="setLanguage('en')"
-        >
-          EN
-        </button>
+  <!-- Top Operational Header -->
+  <header class="driver-header">
+    <div class="driver-header__inner">
+      <div class="driver-header__left">
+        <div class="brand-lockup">
+          <span class="brand-badge-circle" aria-hidden="true">ب</span>
+          <div class="header-titles">
+            <h1 class="header-main-title">{{ copy().driver.title }}</h1>
+            <p class="header-subtitle">{{ copy().driver.assignedOrders }}</p>
+          </div>
+        </div>
       </div>
 
-      <button
-        type="button"
-        class="signout-btn"
-        (click)="signOut()"
-        [attr.aria-label]="copy().driver.signOut"
-      >
-        {{ copy().driver.signOut }}
-      </button>
+      <div class="driver-header__right">
+        <div class="header-datetime-group">
+          <div class="datetime-chip">
+            <img src="/icons/cashier/clock.svg" alt="" aria-hidden="true" class="chip-icon" />
+            <span dir="auto">{{ currentTime() }}</span>
+          </div>
+          <div class="datetime-chip">
+            <img src="/icons/kitchen/calendar.svg" alt="" aria-hidden="true" class="chip-icon" />
+            <span dir="auto">{{ currentDate() }}</span>
+          </div>
+        </div>
+
+        <div
+          class="connection-status-capsule"
+          [class.is-connected]="realtime.status() === 'connected'"
+          [class.is-reconnecting]="realtime.status() === 'reconnecting'"
+          [class.is-disconnected]="realtime.status() === 'disconnected'"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>{{ realtimeLabel() }}</span>
+        </div>
+
+        <div
+          class="language-switcher-pill language-switcher"
+          role="group"
+          [attr.aria-label]="copy().brand.languageLabel"
+        >
+          <button
+            type="button"
+            class="lang-btn"
+            [class.is-active]="language.current() === 'ar'"
+            [attr.aria-pressed]="language.current() === 'ar'"
+            (click)="setLanguage('ar')"
+          >
+            {{ copy().brand.arabic }}
+          </button>
+          <button
+            type="button"
+            class="lang-btn"
+            [class.is-active]="language.current() === 'en'"
+            [attr.aria-pressed]="language.current() === 'en'"
+            (click)="setLanguage('en')"
+          >
+            {{ copy().brand.english }}
+          </button>
+        </div>
+
+        <button
+          type="button"
+          class="signout-btn"
+          (click)="signOut()"
+          [attr.aria-label]="copy().driver.signOut"
+        >
+          {{ copy().driver.signOut }}
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- Main Operational Container -->
+  <!-- Main Driver Operational Shell -->
   <div class="driver-content">
     @if (state() === 'unauthorized' || sessionExpired()) {
       <div class="state-container state-container--error" role="alert">
-        <span class="error-icon" aria-hidden="true">🔒</span>
+        <div class="state-icon-wrap" aria-hidden="true">
+          <img src="/icons/cashier/driver.svg" alt="" class="state-svg-icon" />
+        </div>
         <h2 class="state-title">{{ copy().driver.sessionExpired }}</h2>
         <button type="button" class="btn-retry" (click)="goToSignIn()">
           {{ copy().driver.signIn }}
@@ -65,30 +92,83 @@
       </div>
     } @else if (state() === 'error') {
       <div class="state-container state-container--error" role="alert">
-        <span class="error-icon" aria-hidden="true">⚠️</span>
+        <div class="state-icon-wrap" aria-hidden="true">
+          <img src="/icons/cashier/refresh.svg" alt="" class="state-svg-icon" />
+        </div>
         <h2 class="state-title">{{ copy().driver.queueError }}</h2>
         <button type="button" class="btn-retry" (click)="loadOrders()">
           {{ copy().driver.refresh }}
         </button>
       </div>
     } @else {
+      <!-- Summary KPI Metrics Bar -->
+      <section class="driver-metrics-bar" aria-label="Delivery Summary">
+        <div class="metric-card metric-card--active">
+          <div class="metric-icon-wrap">
+            <img src="/icons/cashier/bag.svg" alt="" aria-hidden="true" class="metric-icon" />
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">{{ copy().driver.activeDeliveries }}</span>
+            <strong class="metric-value">{{ activeCount() }}</strong>
+          </div>
+        </div>
+
+        <div class="metric-card metric-card--completed">
+          <div class="metric-icon-wrap">
+            <img src="/icons/cashier/check.svg" alt="" aria-hidden="true" class="metric-icon" />
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">{{ copy().driver.completedDeliveries }}</span>
+            <strong class="metric-value">{{ completedCount() }}</strong>
+          </div>
+        </div>
+
+        <div class="metric-card metric-card--cod">
+          <div class="metric-icon-wrap">
+            <img src="/icons/cashier/money.svg" alt="" aria-hidden="true" class="metric-icon" />
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">{{ copy().driver.codAmount }}</span>
+            <strong class="metric-value"
+              >{{ totalCodToCollect() }} {{ copy().common.currency }}</strong
+            >
+          </div>
+        </div>
+      </section>
+
       <!-- Active Deliveries Section (Dominant) -->
       <section
         class="delivery-section delivery-section--active"
         aria-labelledby="active-orders-heading"
       >
         <div class="section-header">
-          <h2 id="active-orders-heading" class="section-title">
-            {{ copy().driver.activeDeliveries }}
-            <span class="count-badge" [class.count-badge--alert]="activeCount() > 0">
-              {{ activeCount() }}
-            </span>
-          </h2>
+          <div class="section-header__title-group">
+            <h2 id="active-orders-heading" class="section-title">
+              {{ copy().driver.activeDeliveries }}
+              <span class="count-badge" [class.count-badge--alert]="activeCount() > 0">
+                {{ activeCount() }}
+              </span>
+            </h2>
+          </div>
+
+          <div class="section-header__actions">
+            <button
+              type="button"
+              class="refresh-btn"
+              (click)="loadOrders(true)"
+              [attr.aria-label]="copy().driver.refresh"
+            >
+              <img src="/icons/cashier/refresh.svg" alt="" aria-hidden="true" class="btn-icon" />
+              <span>{{ copy().driver.refresh }}</span>
+            </button>
+          </div>
         </div>
 
         @if (activeOrders().length === 0) {
           <div class="state-container state-container--empty">
-            <span class="empty-icon" aria-hidden="true">🛵</span>
+            <div class="empty-icon-wrap" aria-hidden="true">
+              <img src="/icons/cashier/driver.svg" alt="" class="empty-svg-icon" />
+            </div>
             <h3 class="empty-title">{{ copy().driver.noActiveOrders }}</h3>
             <p class="empty-sub">{{ copy().driver.noActiveOrdersSub }}</p>
           </div>
@@ -116,6 +196,12 @@
                   </div>
 
                   <div class="order-card__time">
+                    <img
+                      src="/icons/cashier/clock.svg"
+                      alt=""
+                      aria-hidden="true"
+                      class="card-time-icon"
+                    />
                     <span class="time-text">{{ elapsedLabel(order.createdAt) }}</span>
                   </div>
                 </header>
@@ -123,12 +209,14 @@
                 <!-- Feedback Banners -->
                 @if (staleOrders().has(order.id)) {
                   <div class="feedback-banner feedback-banner--stale" role="alert">
-                    ⚠️ {{ copy().driver.staleError }}
+                    <span class="banner-mark" aria-hidden="true">!</span>
+                    <span>{{ copy().driver.staleError }}</span>
                   </div>
                 }
                 @if (errorOrders().has(order.id)) {
                   <div class="feedback-banner feedback-banner--error" role="alert">
-                    ❌ {{ copy().driver.actionError }}
+                    <span class="banner-mark" aria-hidden="true">!</span>
+                    <span>{{ copy().driver.actionError }}</span>
                   </div>
                 }
 
@@ -136,7 +224,15 @@
                 <div class="order-card__body">
                   <!-- Destination Block (High Prominence) -->
                   <div class="info-block info-block--destination">
-                    <div class="info-label">📍 {{ copy().driver.deliveryDestination }}</div>
+                    <div class="info-label">
+                      <img
+                        src="/icons/cashier/location.svg"
+                        alt=""
+                        aria-hidden="true"
+                        class="inline-icon"
+                      />
+                      <span>{{ copy().driver.deliveryDestination }}</span>
+                    </div>
                     @if (order.deliveryAreaNameAr || order.deliveryAreaNameEn) {
                       <div class="destination-area">{{ areaName(order) }}</div>
                     }
@@ -145,7 +241,15 @@
                     }
                     @if (order.customerNote) {
                       <div class="destination-note">
-                        <span class="note-label">📝 {{ copy().driver.deliveryNote }}:</span>
+                        <span class="note-label">
+                          <img
+                            src="/icons/cashier/note.svg"
+                            alt=""
+                            aria-hidden="true"
+                            class="inline-icon"
+                          />
+                          {{ copy().driver.deliveryNote }}:
+                        </span>
                         <span class="note-content">{{ order.customerNote }}</span>
                       </div>
                     }
@@ -154,14 +258,28 @@
                   <!-- Customer Contact Block -->
                   <div class="info-block info-block--customer">
                     <div class="customer-details">
-                      <span class="customer-name">👤 {{ order.customerName }}</span>
+                      <span class="customer-name">
+                        <img
+                          src="/icons/cashier/customer.svg"
+                          alt=""
+                          aria-hidden="true"
+                          class="inline-icon"
+                        />
+                        {{ order.customerName }}
+                      </span>
                       <a
                         [href]="'tel:' + order.customerPhone"
                         class="call-btn"
                         [attr.aria-label]="copy().driver.callCustomer + ': ' + order.customerPhone"
                         dir="ltr"
                       >
-                        📞 {{ order.customerPhone }}
+                        <img
+                          src="/icons/driver/phone.svg"
+                          alt=""
+                          aria-hidden="true"
+                          class="btn-phone-icon"
+                        />
+                        <span>{{ order.customerPhone }}</span>
                       </a>
                     </div>
                   </div>
@@ -175,9 +293,15 @@
                     @if (isCOD(order)) {
                       <div class="payment-cod">
                         <div class="payment-cod__header">
-                          <span class="payment-badge payment-badge--cod"
-                            >💵 {{ copy().driver.cashOnDelivery }}</span
-                          >
+                          <span class="payment-badge payment-badge--cod">
+                            <img
+                              src="/icons/cashier/money.svg"
+                              alt=""
+                              aria-hidden="true"
+                              class="inline-icon"
+                            />
+                            {{ copy().driver.cashOnDelivery }}
+                          </span>
                         </div>
                         <div class="payment-cod__amount">
                           <span class="payment-cod__label">{{ copy().driver.codAmount }}:</span>
@@ -188,9 +312,15 @@
                       </div>
                     } @else {
                       <div class="payment-prepaid">
-                        <span class="payment-badge payment-badge--paid"
-                          >✅ {{ copy().driver.paidOnline }}</span
-                        >
+                        <span class="payment-badge payment-badge--paid">
+                          <img
+                            src="/icons/cashier/check.svg"
+                            alt=""
+                            aria-hidden="true"
+                            class="inline-icon"
+                          />
+                          {{ copy().driver.paidOnline }}
+                        </span>
                         <div class="payment-prepaid__note">0 {{ copy().common.currency }}</div>
                       </div>
                     }
@@ -204,7 +334,15 @@
                       (click)="toggleItems(order.id)"
                       [attr.aria-expanded]="isItemsExpanded(order.id)"
                     >
-                      <span>📋 {{ copy().driver.items }} ({{ order.items.length }})</span>
+                      <span class="toggle-label-wrap">
+                        <img
+                          src="/icons/cashier/bag.svg"
+                          alt=""
+                          aria-hidden="true"
+                          class="inline-icon"
+                        />
+                        <span>{{ copy().driver.items }} ({{ order.items.length }})</span>
+                      </span>
                       <span class="toggle-icon">{{ isItemsExpanded(order.id) ? '▲' : '▼' }}</span>
                     </button>
 
@@ -231,9 +369,16 @@
                       (click)="requestStartDelivery(order)"
                     >
                       @if (inFlightOrders().has(order.id)) {
-                        ⏳ {{ copy().driver.actionInProgress }}
+                        <span class="action-spinner" aria-hidden="true"></span>
+                        <span>{{ copy().driver.actionInProgress }}</span>
                       } @else {
-                        🛵 {{ copy().driver.startDeliveryAction }}
+                        <img
+                          src="/icons/cashier/driver.svg"
+                          alt=""
+                          aria-hidden="true"
+                          class="action-icon"
+                        />
+                        <span>{{ copy().driver.startDeliveryAction }}</span>
                       }
                     </button>
                   } @else if (order.status === 'OnTheWay') {
@@ -244,9 +389,16 @@
                       (click)="requestMarkDelivered(order)"
                     >
                       @if (inFlightOrders().has(order.id)) {
-                        ⏳ {{ copy().driver.actionInProgress }}
+                        <span class="action-spinner" aria-hidden="true"></span>
+                        <span>{{ copy().driver.actionInProgress }}</span>
                       } @else {
-                        ✅ {{ copy().driver.markDeliveredAction }}
+                        <img
+                          src="/icons/cashier/check.svg"
+                          alt=""
+                          aria-hidden="true"
+                          class="action-icon"
+                        />
+                        <span>{{ copy().driver.markDeliveredAction }}</span>
                       }
                     </button>
                   }
@@ -287,7 +439,15 @@
                   </div>
                 </div>
                 <div class="completed-card__side">
-                  <span class="badge badge--delivered">✔ {{ copy().driver.statusDelivered }}</span>
+                  <span class="badge badge--delivered">
+                    <img
+                      src="/icons/cashier/check.svg"
+                      alt=""
+                      aria-hidden="true"
+                      class="badge-icon"
+                    />
+                    {{ copy().driver.statusDelivered }}
+                  </span>
                   <span class="total-text">{{ order.total }} {{ copy().common.currency }}</span>
                 </div>
               </article>
@@ -328,7 +488,10 @@
 
         @if (action.type === 'mark-delivered' && isCOD(action.order)) {
           <div class="modal-cod-reminder">
-            <span class="modal-cod-label">💵 {{ copy().driver.codAmount }}:</span>
+            <span class="modal-cod-label">
+              <img src="/icons/cashier/money.svg" alt="" aria-hidden="true" class="inline-icon" />
+              {{ copy().driver.codAmount }}:
+            </span>
             <span class="modal-cod-amount"
               >{{ action.order.total }} {{ copy().common.currency }}</span
             >

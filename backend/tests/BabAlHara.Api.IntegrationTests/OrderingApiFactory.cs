@@ -257,18 +257,51 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
     private static string CreateConnectionString()
     {
         var configured = Environment.GetEnvironmentVariable("BAB_AL_HARA_TEST_SQLSERVER");
-        var builder = string.IsNullOrWhiteSpace(configured)
-            ? new SqlConnectionStringBuilder
+        SqlConnectionStringBuilder builder;
+        if (!string.IsNullOrWhiteSpace(configured))
+        {
+            builder = new SqlConnectionStringBuilder(configured);
+        }
+        else
+        {
+            var defaultDataSource = CanConnectToDataSource(@".\MSSQLSERVER01")
+                ? @".\MSSQLSERVER01"
+                : @"(localdb)\MSSQLLocalDB";
+
+            builder = new SqlConnectionStringBuilder
             {
-                DataSource = @".\MSSQLSERVER01",
+                DataSource = defaultDataSource,
                 IntegratedSecurity = true,
                 Encrypt = false,
                 TrustServerCertificate = true,
-            }
-            : new SqlConnectionStringBuilder(configured);
+            };
+        }
+
         builder.InitialCatalog = $"bab_al_hara_ordering_tests_{Guid.NewGuid():N}";
         builder.ConnectTimeout = 10;
         return builder.ConnectionString;
+    }
+
+    private static bool CanConnectToDataSource(string dataSource)
+    {
+        try
+        {
+            var testBuilder = new SqlConnectionStringBuilder
+            {
+                DataSource = dataSource,
+                IntegratedSecurity = true,
+                Encrypt = false,
+                TrustServerCertificate = true,
+                ConnectTimeout = 1,
+            };
+            using var conn = new Microsoft.Data.SqlClient.SqlConnection(testBuilder.ConnectionString);
+            conn.Open();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public sealed class RecordingKitchenRealtimeNotifier : IKitchenRealtimeNotifier, INewOrderNotifier

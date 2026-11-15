@@ -1,4 +1,4 @@
-﻿<app-customer-header />
+<app-customer-header />
 
 <main class="cart-shell">
   <a class="back-link" routerLink="/">← {{ copy().common.backToMenu }}</a>
@@ -12,7 +12,9 @@
 
   @if (cart.items().length === 0) {
     <section class="empty-cart" role="status">
-      <div aria-hidden="true">۰</div>
+      <div class="empty-icon-wrap" aria-hidden="true">
+        <img src="/icons/cashier/bag.svg" alt="" class="empty-svg-icon" />
+      </div>
       <h2>{{ copy().cart.emptyTitle }}</h2>
       <p>{{ copy().cart.emptyBody }}</p>
       <a class="button button--primary" routerLink="/">{{ copy().cart.browseMenu }}</a>

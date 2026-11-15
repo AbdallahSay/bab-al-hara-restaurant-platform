@@ -76,6 +76,33 @@ export class DriverPage implements OnInit, OnDestroy {
   protected readonly activeCount = computed(() => this.activeOrders().length);
   protected readonly completedCount = computed(() => this.completedOrders().length);
 
+  protected readonly searchQuery = signal('');
+  protected readonly selectedFilter = signal<'all' | 'ready' | 'transit'>('all');
+
+  protected readonly totalCodToCollect = computed(() => {
+    return this.activeOrders()
+      .filter((o) => this.isCOD(o))
+      .reduce((sum, o) => sum + o.total, 0);
+  });
+
+  protected readonly displayActiveOrders = computed(() => {
+    const q = this.searchQuery().trim().toLowerCase();
+    const filter = this.selectedFilter();
+    return this.activeOrders().filter((o) => {
+      if (filter === 'ready' && o.status !== 'Ready') return false;
+      if (filter === 'transit' && o.status !== 'OnTheWay') return false;
+      if (!q) return true;
+      return (
+        o.publicCode.toLowerCase().includes(q) ||
+        o.customerName.toLowerCase().includes(q) ||
+        o.customerPhone.includes(q) ||
+        (o.deliveryAreaNameAr && o.deliveryAreaNameAr.toLowerCase().includes(q)) ||
+        (o.deliveryAreaNameEn && o.deliveryAreaNameEn.toLowerCase().includes(q)) ||
+        (o.address && o.address.toLowerCase().includes(q))
+      );
+    });
+  });
+
   ngOnInit(): void {
     this.sessions
       .getDriverSession()
@@ -102,6 +129,21 @@ export class DriverPage implements OnInit, OnDestroy {
 
   protected setLanguage(language: Language): void {
     this.language.setLanguage(language);
+  }
+
+  protected currentTime(): string {
+    return new Intl.DateTimeFormat(this.language.current() === 'ar' ? 'ar-EG' : 'en-EG', {
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(this.now());
+  }
+
+  protected currentDate(): string {
+    return new Intl.DateTimeFormat(this.language.current() === 'ar' ? 'ar-EG' : 'en-EG', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(this.now());
   }
 
   protected loadOrders(silent = false): void {

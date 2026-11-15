@@ -103,8 +103,9 @@
             [attr.aria-selected]="activeFilter() === 'ALL'"
             (click)="setFilter('ALL')"
           >
-            <span>{{ copy().kitchen.allOrders }}</span
-            ><span class="tab-count">{{ allCount() }}</span>
+            <span>{{ copy().kitchen.allOrders }}</span><span class="tab-count">{{
+              allCount()
+            }}</span>
           </button>
           <button
             type="button"
@@ -114,8 +115,10 @@
             [attr.aria-selected]="activeFilter() === 'Pending'"
             (click)="setFilter('Pending')"
           >
-            <span>{{ copy().kitchen.pendingFilter }}</span
-            ><span class="tab-count tab-count--pending">{{ pendingCount() }}</span>
+            <span>{{ copy().kitchen.pendingFilter }}</span><span
+              class="tab-count tab-count--pending"
+              >{{ pendingCount() }}</span
+            >
           </button>
           <button
             type="button"
@@ -125,8 +128,10 @@
             [attr.aria-selected]="activeFilter() === 'Confirmed'"
             (click)="setFilter('Confirmed')"
           >
-            <span>{{ copy().kitchen.confirmedFilter }}</span
-            ><span class="tab-count tab-count--confirmed">{{ confirmedCount() }}</span>
+            <span>{{ copy().kitchen.confirmedFilter }}</span><span
+              class="tab-count tab-count--confirmed"
+              >{{ confirmedCount() }}</span
+            >
           </button>
           <button
             type="button"
@@ -136,8 +141,10 @@
             [attr.aria-selected]="activeFilter() === 'Preparing'"
             (click)="setFilter('Preparing')"
           >
-            <span>{{ copy().kitchen.preparingFilter }}</span
-            ><span class="tab-count tab-count--preparing">{{ preparingCount() }}</span>
+            <span>{{ copy().kitchen.preparingFilter }}</span><span
+              class="tab-count tab-count--preparing"
+              >{{ preparingCount() }}</span
+            >
           </button>
           <button
             type="button"
@@ -147,8 +154,9 @@
             [attr.aria-selected]="activeFilter() === 'Ready'"
             (click)="setFilter('Ready')"
           >
-            <span>{{ copy().kitchen.readyFilter }}</span
-            ><span class="tab-count tab-count--ready">{{ readyCount() }}</span>
+            <span>{{ copy().kitchen.readyFilter }}</span><span class="tab-count tab-count--ready">{{
+              readyCount()
+            }}</span>
           </button>
         </div>
 
@@ -285,8 +293,11 @@
             <section class="order-ticket__items" [attr.aria-label]="copy().kitchen.items">
               @for (item of order.items; track item.productNameEn) {
                 <div class="order-item-row">
-                  <span class="item-name">{{ itemName(item) }}</span
-                  ><strong class="item-quantity" dir="ltr">{{ item.quantity }}×</strong>
+                  <span class="item-name">{{ itemName(item) }}</span><strong
+                    class="item-quantity"
+                    dir="ltr"
+                    >{{ item.quantity }}×</strong
+                  >
                 </div>
               }
             </section>
