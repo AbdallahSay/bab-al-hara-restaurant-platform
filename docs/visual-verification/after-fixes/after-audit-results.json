@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-16T12:00:19.394Z",
+  "timestamp": "2026-11-16T13:54:01.081Z",
   "modeA_fixtureQA": {
     "summary": "Deterministic responsive & visual verification across 12 viewports x 2 locales (24 combinations) + special states",
     "totalCombinations": 24,
@@ -617,6 +617,119 @@
       }
     ],
     "errors": []
+  },
+  "figmaEvidenceValidation": {
+    "status": "PASS",
+    "gates": {
+      "gate1_sourcesExist": true,
+      "gate2_sourcesValidPng": true,
+      "gate3_sourceDimensions": true,
+      "gate4_figmaReferencesAuthentic": true,
+      "gate5_bilingualDifferentiation": true,
+      "gate6_menuPopulatedCatalogVerified": true,
+      "gate7_comparisonDimensions": true,
+      "gate8_threePanelsPresent": true,
+      "gate9_reopenAndDecodeComparisonPngs": true,
+      "gate10_zeroMissingArtifacts": true
+    }
+  },
+  "evidenceMetadata": {
+    "figmaHome": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\figma-reference\\figma-home-69-789.png",
+      "format": "png",
+      "width": 1280,
+      "height": 3279,
+      "channels": 4,
+      "sizeBytes": 1065234,
+      "sha256": "cf3a4ace8d01629389ff3568d7b7eb86a503cbdc782550d0ca77657ddce32884"
+    },
+    "figmaMenu": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\figma-reference\\figma-menu-79-1294.png",
+      "format": "png",
+      "width": 1280,
+      "height": 2606,
+      "channels": 4,
+      "sizeBytes": 539196,
+      "sha256": "519ab0237188e50f719dea9644e7e1975f8ed66d31e01cfb56d7f0013940b9d9"
+    },
+    "browserHomeFoldAr": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-home-ar-w1280-fold.png",
+      "format": "png",
+      "width": 1280,
+      "height": 1061,
+      "channels": 3,
+      "sizeBytes": 576280,
+      "sha256": "9661a838fd356f2f370789b07cbf79b0670e8a8989c2d770bec849cc277d9462"
+    },
+    "browserHomeFoldEn": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-home-en-w1280-fold.png",
+      "format": "png",
+      "width": 1280,
+      "height": 1145,
+      "channels": 3,
+      "sizeBytes": 573865,
+      "sha256": "845c0c210b08aef5fef026d1de3e298972f811cb059a4d20e04f7974e3dfa463"
+    },
+    "browserMenuAr": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-menu-ar-w1280.png",
+      "format": "png",
+      "width": 1280,
+      "height": 1687,
+      "channels": 3,
+      "sizeBytes": 1373659,
+      "sha256": "de4155eef95ca625df1835049041358c1804dfd32e84c9b6e66470f09100eef1"
+    },
+    "browserMenuEn": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-menu-en-w1280.png",
+      "format": "png",
+      "width": 1280,
+      "height": 1828,
+      "channels": 3,
+      "sizeBytes": 1380989,
+      "sha256": "9d8caf2f52a8a17eb0a9d40999561bddd2e5336179208498b8bc6687220d03f8"
+    },
+    "comparisonHome": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\figma-vs-browser-home-1280.png",
+      "format": "png",
+      "width": 1888,
+      "height": 781,
+      "sizeBytes": 844504,
+      "sha256": "a98b05132bb6d1268e141cb3fcec738ce8031b1728f297484f572f4385d08aba"
+    },
+    "comparisonMenu": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\figma-vs-browser-menu-1280.png",
+      "format": "png",
+      "width": 1888,
+      "height": 1361,
+      "sizeBytes": 1707318,
+      "sha256": "1a276bd229c3698a37abdf0f4e0244843a93736b645c575304e03406607bd020"
+    }
+  },
+  "figmaFidelityAssessment": {
+    "header": {
+      "classification": "ADAPTATION",
+      "notes": "Intentional brand change from FreshBite (generic fast-food) to Bab Al Hara (Levantine charcoal grill). Added bilingual switcher (العربية / English), secure My Orders tracking link, and >=44px touch targets."
+    },
+    "homeHero": {
+      "classification": "PASS",
+      "notes": "Two-column desktop layout (1280px). Symmetrical LTR/RTL composition. Authentic Levantine mixed-grill food photography with floating flame badge (\"طبق مميز - شواء على الفحم الطبيعي\"). Two CTA buttons."
+    },
+    "benefitsSection": {
+      "classification": "ADAPTATION",
+      "notes": "FreshBite uses 3 generic fast-food cards. Bab Al Hara adapts to 4 authentic Levantine craft cards: Traditional Marinades, Charcoal Grilling, Fresh Upon Order, and Warm Hospitality in a balanced 4-column grid."
+    },
+    "menuCategoryChips": {
+      "classification": "PASS",
+      "notes": "Pill category chips with active orange highlight. All categories, Grills, Sandwiches, Sides, and Drinks cleanly filter catalog with ARIA pressed state and keyboard navigation."
+    },
+    "menuProductCardsGrid": {
+      "classification": "PASS",
+      "notes": "Three-column desktop card grid matching Figma 79:1294. Aspect-ratio loaded webp food photos, wishlist action heart, dish titles, formatted currency (EGP / ج.م.), prep time badges, and 44px Add to Cart touch targets."
+    },
+    "responsiveTransformations": {
+      "classification": "PASS",
+      "notes": "Verified across 12 viewports (320px to 1920px) in both Arabic RTL and English LTR (24 combinations). 0px horizontal overflow, mobile drawer navigation, sticky floating mobile cart."
+    }
   },
   "overallStatus": "PASS"
 }
