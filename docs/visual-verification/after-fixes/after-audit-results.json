@@ -1,0 +1,735 @@
+{
+  "timestamp": "2026-11-16T18:58:16.089Z",
+  "modeA_fixtureQA": {
+    "summary": "Deterministic responsive & visual verification across 12 viewports x 2 locales (24 combinations) + special states",
+    "totalCombinations": 24,
+    "passCount": 24,
+    "failCount": 0,
+    "records": [
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 320,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w320.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 360,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w360.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 375,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w375.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 390,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w390.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 412,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w412.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 430,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w430.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 480,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w480.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 768,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w768.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "69:789 / 79:1294",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 1024,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شامية\nعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شامية\nعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w1024.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "69:789 / 79:1294",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 1280,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شامية\nعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شامية\nعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w1280.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "69:789 / 79:1294",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 1440,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شامية\nعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شامية\nعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w1440.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "69:789 / 79:1294",
+        "stage": "after-10A.2",
+        "lang": "ar",
+        "dir": "rtl",
+        "width": 1920,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (مشاوي وأكلات شامية\nعلى أصولها)",
+        "verifiedLocale": {
+          "lang": "ar",
+          "dir": "rtl",
+          "h1Text": "مشاوي وأكلات شامية\nعلى أصولها",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-ar-w1920.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 320,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w320.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 360,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w360.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 375,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w375.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 390,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w390.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 412,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w412.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 430,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w430.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 480,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w480.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "Supplemental mobile (2028:3118)",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 768,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w768.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "69:789 / 79:1294",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 1024,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills\n& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills\n& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w1024.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "69:789 / 79:1294",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 1280,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills\n& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills\n& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w1280.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "69:789 / 79:1294",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 1440,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills\n& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills\n& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w1440.png"
+      },
+      {
+        "route": "home-menu",
+        "figmaNode": "69:789 / 79:1294",
+        "stage": "after-10A.2",
+        "lang": "en",
+        "dir": "ltr",
+        "width": 1920,
+        "result": "PASS",
+        "overflow": "PASS (0px)",
+        "headings": "1 h1 (Traditional Charcoal Grills\n& Specialties)",
+        "verifiedLocale": {
+          "lang": "en",
+          "dir": "ltr",
+          "h1Text": "Traditional Charcoal Grills\n& Specialties",
+          "status": "VERIFIED"
+        },
+        "imagesStatus": "PASS (9 verified loaded)",
+        "touchTargets": "PASS (all >= 44px)",
+        "headerOverlap": "PASS (no overlap)",
+        "itemCount": 8,
+        "categoryCount": 5,
+        "errors": [],
+        "filename": "after-customer-home-en-w1920.png"
+      }
+    ]
+  },
+  "modeB_realIntegrationSmoke": {
+    "host": "https://bab-al-hara.runasp.net",
+    "environment": "Production",
+    "status": "PASS",
+    "healthLive": "Healthy",
+    "healthReady": "Healthy",
+    "restaurantStatus": {
+      "acceptingOrders": true,
+      "messageAr": null,
+      "messageEn": null
+    },
+    "categoriesCount": 4,
+    "itemsCount": 8,
+    "deliveryAreasCount": 3,
+    "verifiedImages": [
+      {
+        "ref": "/images/menu/mixed-grill.webp",
+        "size": 171808
+      },
+      {
+        "ref": "/images/menu/grilled-chicken.webp",
+        "size": 106148
+      },
+      {
+        "ref": "/images/menu/kofta-sandwich.webp",
+        "size": 112928
+      },
+      {
+        "ref": "/images/menu/shish-sandwich.webp",
+        "size": 121224
+      }
+    ],
+    "errors": []
+  },
+  "figmaEvidenceValidation": {
+    "status": "PASS",
+    "gates": {
+      "gate1_sourcesExist": true,
+      "gate2_sourcesValidPng": true,
+      "gate3_sourceDimensions": true,
+      "gate4_figmaReferencesAuthentic": true,
+      "gate5_bilingualDifferentiation": true,
+      "gate6_menuPopulatedCatalogVerified": true,
+      "gate7_comparisonDimensions": true,
+      "gate8_threePanelsPresent": true,
+      "gate9_reopenAndDecodeComparisonPngs": true,
+      "gate10_zeroMissingArtifacts": true
+    }
+  },
+  "evidenceMetadata": {
+    "figmaHome": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\figma-reference\\figma-home-69-789.png",
+      "format": "png",
+      "width": 1280,
+      "height": 3279,
+      "channels": 4,
+      "sizeBytes": 1065234,
+      "sha256": "cf3a4ace8d01629389ff3568d7b7eb86a503cbdc782550d0ca77657ddce32884"
+    },
+    "figmaMenu": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\figma-reference\\figma-menu-79-1294.png",
+      "format": "png",
+      "width": 1280,
+      "height": 2606,
+      "channels": 4,
+      "sizeBytes": 539196,
+      "sha256": "519ab0237188e50f719dea9644e7e1975f8ed66d31e01cfb56d7f0013940b9d9"
+    },
+    "browserHomeFoldAr": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-home-ar-w1280-fold.png",
+      "format": "png",
+      "width": 1280,
+      "height": 1386,
+      "channels": 3,
+      "sizeBytes": 807301,
+      "sha256": "810cc3e3c974be50e73e5b68d173ebdda20b7c9a53259d17dd060f8a8ed9e5ca"
+    },
+    "browserHomeFoldEn": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-home-en-w1280-fold.png",
+      "format": "png",
+      "width": 1280,
+      "height": 1402,
+      "channels": 3,
+      "sizeBytes": 788923,
+      "sha256": "7d5742af78672d46980a12a50e3d85ca187927a763c36040e00016930633d1fa"
+    },
+    "browserMenuAr": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-menu-ar-w1280.png",
+      "format": "png",
+      "width": 1280,
+      "height": 1925,
+      "channels": 3,
+      "sizeBytes": 1009140,
+      "sha256": "3dc807b424b9f6c8f624ce521f2d7d492bf53a2cf57ad7796b1b24bad77a5872"
+    },
+    "browserMenuEn": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-menu-en-w1280.png",
+      "format": "png",
+      "width": 1280,
+      "height": 1925,
+      "channels": 3,
+      "sizeBytes": 1020907,
+      "sha256": "f2d7b194d722221b6155335cc6742a3e3ef72c6935369698ef62d60960f09c18"
+    },
+    "comparisonHome": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\figma-vs-browser-home-1280.png",
+      "format": "png",
+      "width": 1888,
+      "height": 781,
+      "sizeBytes": 971181,
+      "sha256": "68c56e688f44557a6064d0e12d1b7d3c7b5ae7d49e42db655d02c3db298ccd74"
+    },
+    "comparisonMenu": {
+      "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\figma-vs-browser-menu-1280.png",
+      "format": "png",
+      "width": 1888,
+      "height": 1361,
+      "sizeBytes": 1253372,
+      "sha256": "3e12fe1c371b108208591d83ede8cd97219f54930dc3b25ba26ba8a2f9727d12"
+    }
+  },
+  "figmaFidelityAssessment": {
+    "header": {
+      "classification": "ADAPTATION",
+      "notes": "Intentional brand change from FreshBite (generic fast-food) to Bab Al Hara (Levantine charcoal grill). Added bilingual switcher (العربية / English), secure My Orders tracking link, and >=44px touch targets."
+    },
+    "homeHero": {
+      "classification": "PASS",
+      "notes": "Two-column desktop layout (1280px). Symmetrical LTR/RTL composition. Authentic Levantine mixed-grill food photography with floating flame badge (\"طبق مميز - شواء على الفحم الطبيعي\"). Two CTA buttons."
+    },
+    "benefitsSection": {
+      "classification": "ADAPTATION",
+      "notes": "FreshBite uses 3 generic fast-food cards. Bab Al Hara adapts to 4 authentic Levantine craft cards: Traditional Marinades, Charcoal Grilling, Fresh Upon Order, and Warm Hospitality in a balanced 4-column grid."
+    },
+    "menuCategoryChips": {
+      "classification": "PASS",
+      "notes": "Pill category chips with active orange highlight. All categories, Grills, Sandwiches, Sides, and Drinks cleanly filter catalog with ARIA pressed state and keyboard navigation."
+    },
+    "menuProductCardsGrid": {
+      "classification": "PASS",
+      "notes": "Three-column desktop card grid matching Figma 79:1294. Aspect-ratio loaded webp food photos, wishlist action heart, dish titles, formatted currency (EGP / ج.م.), prep time badges, and 44px Add to Cart touch targets."
+    },
+    "responsiveTransformations": {
+      "classification": "PASS",
+      "notes": "Verified across 12 viewports (320px to 1920px) in both Arabic RTL and English LTR (24 combinations). 0px horizontal overflow, mobile drawer navigation, sticky floating mobile cart."
+    }
+  },
+  "overallStatus": "PASS"
+}

@@ -1,0 +1,522 @@
+{
+  "timestamp": "2026-11-16T18:58:33.594Z",
+  "phase": "10A.5",
+  "title": "Bab Al Hara Exact Figma Hero Reconstruction",
+  "figmaReferenceFrame": "69:789",
+  "viewportWidth": 1280,
+  "englishLtr": {
+    "heroSection": {
+      "target": {
+        "x": 0,
+        "y": 177,
+        "width": 1280,
+        "height": 720
+      },
+      "actual": {
+        "x": 0,
+        "y": 177,
+        "width": 1280,
+        "height": 720
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "copyColumn": {
+      "target": {
+        "x": 65,
+        "y": 294,
+        "width": 576,
+        "height": 486
+      },
+      "actual": {
+        "x": 65,
+        "y": 294,
+        "width": 576,
+        "height": 486
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "badge": {
+      "target": {
+        "x": 65,
+        "y": 294,
+        "width": 258,
+        "height": 36
+      },
+      "actual": {
+        "x": 65,
+        "y": 294,
+        "width": 258,
+        "height": 36
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "h1": {
+      "target": {
+        "x": 65,
+        "y": 362,
+        "width": 576,
+        "height": 159
+      },
+      "actual": {
+        "x": 65,
+        "y": 362,
+        "width": 576,
+        "height": 159
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "tagline": {
+      "target": {
+        "x": 65,
+        "y": 553,
+        "width": 576,
+        "height": 32
+      },
+      "actual": {
+        "x": 65,
+        "y": 553,
+        "width": 576,
+        "height": 32
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "description": {
+      "target": {
+        "x": 65,
+        "y": 617,
+        "width": 576,
+        "height": 59
+      },
+      "actual": {
+        "x": 65,
+        "y": 617,
+        "width": 576,
+        "height": 59
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "cta": {
+      "target": {
+        "x": 65,
+        "y": 708,
+        "width": 359,
+        "height": 72
+      },
+      "actual": {
+        "x": 65,
+        "y": 708,
+        "width": 359,
+        "height": 72
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "visualColumn": {
+      "target": {
+        "x": 641,
+        "y": 177,
+        "width": 576,
+        "height": 720
+      },
+      "actual": {
+        "x": 641,
+        "y": 177,
+        "width": 576,
+        "height": 720
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "foodPhoto": {
+      "target": {
+        "x": 641,
+        "y": 249,
+        "width": 576,
+        "height": 576
+      },
+      "actual": {
+        "x": 641,
+        "y": 249,
+        "width": 576,
+        "height": 576
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "floatingBadge": {
+      "target": {
+        "x": 1023,
+        "y": 257,
+        "width": 194,
+        "height": 80
+      },
+      "actual": {
+        "x": 1023,
+        "y": 257,
+        "width": 194,
+        "height": 80
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "badgeIconBox": {
+      "target": {
+        "x": 1039,
+        "y": 273,
+        "width": 48,
+        "height": 48
+      },
+      "actual": {
+        "x": 1039,
+        "y": 273,
+        "width": 48,
+        "height": 48
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "backgroundGlow": {
+      "target": {
+        "x": 476,
+        "y": 194,
+        "width": 787,
+        "height": 770
+      },
+      "actual": {
+        "x": 476,
+        "y": 194,
+        "width": 787,
+        "height": 770
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    }
+  },
+  "arabicRtl": {
+    "heroSection": {
+      "target": {
+        "x": 0,
+        "y": 177,
+        "width": 1280,
+        "height": 720
+      },
+      "actual": {
+        "x": 0,
+        "y": 177,
+        "width": 1280,
+        "height": 720
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "copyColumn": {
+      "target": {
+        "x": 639,
+        "y": 294,
+        "width": 576,
+        "height": 486
+      },
+      "actual": {
+        "x": 639,
+        "y": 294,
+        "width": 576,
+        "height": 486
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "badge": {
+      "target": {
+        "x": 957,
+        "y": 294,
+        "width": 258,
+        "height": 36
+      },
+      "actual": {
+        "x": 957,
+        "y": 294,
+        "width": 258,
+        "height": 36
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "h1": {
+      "target": {
+        "x": 639,
+        "y": 362,
+        "width": 576,
+        "height": 159
+      },
+      "actual": {
+        "x": 639,
+        "y": 362,
+        "width": 576,
+        "height": 159
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "tagline": {
+      "target": {
+        "x": 639,
+        "y": 553,
+        "width": 576,
+        "height": 32
+      },
+      "actual": {
+        "x": 639,
+        "y": 553,
+        "width": 576,
+        "height": 32
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "description": {
+      "target": {
+        "x": 639,
+        "y": 617,
+        "width": 576,
+        "height": 59
+      },
+      "actual": {
+        "x": 639,
+        "y": 617,
+        "width": 576,
+        "height": 59
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "cta": {
+      "target": {
+        "x": 856,
+        "y": 708,
+        "width": 359,
+        "height": 72
+      },
+      "actual": {
+        "x": 856,
+        "y": 708,
+        "width": 359,
+        "height": 72
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "visualColumn": {
+      "target": {
+        "x": 63,
+        "y": 177,
+        "width": 576,
+        "height": 720
+      },
+      "actual": {
+        "x": 63,
+        "y": 177,
+        "width": 576,
+        "height": 720
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "foodPhoto": {
+      "target": {
+        "x": 63,
+        "y": 249,
+        "width": 576,
+        "height": 576
+      },
+      "actual": {
+        "x": 63,
+        "y": 249,
+        "width": 576,
+        "height": 576
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "floatingBadge": {
+      "target": {
+        "x": 63,
+        "y": 257,
+        "width": 194,
+        "height": 80
+      },
+      "actual": {
+        "x": 63,
+        "y": 257,
+        "width": 194,
+        "height": 80
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "badgeIconBox": {
+      "target": {
+        "x": 193,
+        "y": 273,
+        "width": 48,
+        "height": 48
+      },
+      "actual": {
+        "x": 193,
+        "y": 273,
+        "width": 48,
+        "height": 48
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    },
+    "backgroundGlow": {
+      "target": {
+        "x": -42,
+        "y": 194,
+        "width": 787,
+        "height": 770
+      },
+      "actual": {
+        "x": -42,
+        "y": 194,
+        "width": 787,
+        "height": 770
+      },
+      "delta": {
+        "dx": 0,
+        "dy": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "exact": true
+    }
+  },
+  "artifacts": {
+    "figmaReference": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\figma-hero-extract-1280.png",
+    "browserEnglishHero": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\hero-browser-en-1280.png",
+    "browserArabicHero": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\hero-browser-ar-1280.png",
+    "semiTransparentOverlay": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\hero-semi-transparent-overlay-1280.png",
+    "sideBySideComparison": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\figma-vs-browser-hero-exact-1280.png"
+  }
+}

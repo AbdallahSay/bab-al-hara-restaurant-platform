@@ -44,6 +44,17 @@ jobs:
       - name: Format, lint, test, and build
         run: npm run check
 
+      - name: Run Responsive Visual QA Acceptance Suite
+        run: node ../docs/visual-verification/run_qa.js
+
+      - name: Upload Visual QA Screenshot Evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-qa-evidence
+          path: docs/visual-verification/after-fixes/
+          if-no-files-found: ignore
+
   backend:
     name: Backend
     runs-on: ubuntu-latest

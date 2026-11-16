@@ -25,22 +25,22 @@
           <small>{{ copy().brand.tagline }}</small>
         </span>
       </a>
-
-      <nav class="desktop-nav" [attr.aria-label]="copy().brand.name">
-        <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
-          {{ copy().brand.homeLabel }}
-        </a>
-        <a routerLink="/search" routerLinkActive="is-active">
-          {{ copy().brand.search }}
-        </a>
-        <a routerLink="/about" routerLinkActive="is-active">
-          {{ copy().brand.about }}
-        </a>
-        <a routerLink="/contact" routerLinkActive="is-active">
-          {{ copy().brand.contact }}
-        </a>
-      </nav>
     </div>
+
+    <nav class="desktop-nav" [attr.aria-label]="copy().brand.name">
+      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
+        {{ copy().brand.homeLabel }}
+      </a>
+      <a routerLink="/menu" routerLinkActive="is-active">
+        {{ copy().brand.menu }}
+      </a>
+      <a routerLink="/about" routerLinkActive="is-active">
+        {{ copy().brand.about }}
+      </a>
+      <a routerLink="/contact" routerLinkActive="is-active">
+        {{ copy().brand.contact }}
+      </a>
+    </nav>
 
     <div class="customer-header__actions">
       @if (activeOrderCode(); as code) {
@@ -50,9 +50,51 @@
           [attr.aria-label]="copy().brand.trackActiveOrder"
         >
           <span class="active-order-link__indicator" aria-hidden="true"></span>
-          <span>{{ copy().brand.trackActiveOrder }}</span>
+          <span class="active-order-link__label">{{ copy().brand.trackActiveOrder }}</span>
         </a>
       }
+
+      <div class="language-switcher" role="group" [attr.aria-label]="copy().brand.languageLabel">
+        <button
+          type="button"
+          data-language="ar"
+          [class.is-active]="language.current() === 'ar'"
+          [attr.aria-pressed]="language.current() === 'ar'"
+          (click)="setLanguage('ar')"
+        >
+          عربي
+        </button>
+        <button
+          type="button"
+          data-language="en"
+          [class.is-active]="language.current() === 'en'"
+          [attr.aria-pressed]="language.current() === 'en'"
+          (click)="setLanguage('en')"
+        >
+          EN
+        </button>
+      </div>
+
+      <a
+        class="icon-link profile-link"
+        routerLink="/profile"
+        [attr.aria-label]="copy().brand.profile"
+        title="{{ copy().brand.profile }}"
+      >
+        <svg
+          class="nav-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </a>
 
       <a
         class="icon-link search-link"
@@ -92,7 +134,7 @@
           aria-hidden="true"
         >
           <path
-            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
           ></path>
         </svg>
         @if (wishlist.count() > 0) {
@@ -105,13 +147,13 @@
       </a>
 
       <a
-        class="icon-link profile-link"
-        routerLink="/profile"
-        [attr.aria-label]="copy().brand.profile"
-        title="{{ copy().brand.profile }}"
+        class="icon-link cart-link"
+        routerLink="/cart"
+        [attr.aria-label]="copy().brand.cart"
+        title="{{ copy().brand.cart }}"
       >
         <svg
-          class="nav-icon"
+          class="nav-icon cart-icon"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -120,35 +162,13 @@
           stroke-linejoin="round"
           aria-hidden="true"
         >
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
         </svg>
-      </a>
-
-      <div class="language-switcher" role="group" [attr.aria-label]="copy().brand.languageLabel">
-        <button
-          type="button"
-          data-language="ar"
-          [class.is-active]="language.current() === 'ar'"
-          [attr.aria-pressed]="language.current() === 'ar'"
-          (click)="setLanguage('ar')"
-        >
-          {{ copy().brand.arabic }}
-        </button>
-        <button
-          type="button"
-          data-language="en"
-          [class.is-active]="language.current() === 'en'"
-          [attr.aria-pressed]="language.current() === 'en'"
-          (click)="setLanguage('en')"
-        >
-          {{ copy().brand.english }}
-        </button>
-      </div>
-
-      <a class="cart-link" routerLink="/cart">
-        <span>{{ copy().brand.cart }}</span>
-        <strong aria-live="polite">{{ cart.itemCount() }}</strong>
+        @if (cart.itemCount() > 0) {
+          <strong class="badge-count" aria-live="polite">{{ cart.itemCount() }}</strong>
+        }
       </a>
     </div>
   </div>
@@ -159,6 +179,10 @@
         <a routerLink="/" (click)="closeMobileMenu()">
           <span class="icon">🏠</span>
           <span>{{ copy().brand.homeLabel }}</span>
+        </a>
+        <a routerLink="/menu" (click)="closeMobileMenu()">
+          <span class="icon">🍽️</span>
+          <span>{{ copy().brand.menu }}</span>
         </a>
         <a routerLink="/search" (click)="closeMobileMenu()">
           <span class="icon">🔍</span>
