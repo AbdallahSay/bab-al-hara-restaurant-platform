@@ -219,7 +219,7 @@ export class CheckoutPage implements OnInit {
   }
 
   protected submit(): void {
-    if (this.statusService.isPaused()) {
+    if (this.sending() || this.statusService.isPaused()) {
       return;
     }
 

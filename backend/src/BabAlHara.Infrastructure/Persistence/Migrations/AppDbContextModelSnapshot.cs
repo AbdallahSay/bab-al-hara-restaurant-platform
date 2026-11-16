@@ -327,6 +327,80 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BabAlHara.Domain.Customers.CustomerUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasPrecision(7)
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTimeOffset?>("LastLoginAtUtc")
+                        .HasPrecision(7)
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedPhone")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<Guid?>("PreferredDeliveryAreaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SavedAddress")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("SecurityStamp")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .IsUnique()
+                        .HasFilter("[NormalizedEmail] IS NOT NULL");
+
+                    b.HasIndex("NormalizedPhone")
+                        .IsUnique()
+                        .HasFilter("[NormalizedPhone] IS NOT NULL");
+
+                    b.ToTable("CustomerUsers", "app");
+                });
+
             modelBuilder.Entity("BabAlHara.Domain.Delivery.DeliveryArea", b =>
                 {
                     b.Property<Guid>("Id")
@@ -393,6 +467,61 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BabAlHara.Domain.Inquiries.CustomerInquiry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContactInfo")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasPrecision(7)
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<DateTimeOffset?>("ReviewedAtUtc")
+                        .HasPrecision(7)
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("ReviewedByStaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("StaffNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Subject")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAtUtc")
+                        .IsDescending();
+
+                    b.HasIndex("Status", "CreatedAtUtc")
+                        .IsDescending(false, true);
+
+                    b.ToTable("CustomerInquiries", "app");
+                });
+
             modelBuilder.Entity("BabAlHara.Domain.Ordering.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -405,6 +534,9 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasPrecision(7)
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CustomerName")
                         .IsRequired()
@@ -498,6 +630,8 @@ namespace BabAlHara.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CreatedAt")
                         .IsDescending();
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("DeliveryAreaId");
 

@@ -3,13 +3,31 @@
 <main class="profile-shell">
   <div class="profile-container">
     <header class="profile-hero">
-      <div class="profile-avatar" aria-hidden="true">
-        <span>{{ displayName().charAt(0) || '👤' }}</span>
+      <div class="profile-hero__main">
+        <div class="profile-avatar" aria-hidden="true">
+          <span>{{ displayName().charAt(0) || '👤' }}</span>
+        </div>
+        <div class="profile-meta">
+          <span class="profile-badge">
+            {{
+              authService.isAuthenticated() ? copy().profile.memberBadge : copy().profile.guestBadge
+            }}
+          </span>
+          <h1 class="profile-title">{{ displayName() }}</h1>
+          <p class="profile-phone" dir="ltr">{{ displayPhone() }}</p>
+        </div>
       </div>
-      <div class="profile-meta">
-        <span class="profile-badge">{{ copy().profile.guestBadge }}</span>
-        <h1 class="profile-title">{{ displayName() }}</h1>
-        <p class="profile-phone" dir="ltr">{{ displayPhone() }}</p>
+
+      <div class="profile-hero__actions">
+        @if (authService.isAuthenticated()) {
+          <button type="button" class="button button--outline" (click)="signOut()">
+            {{ copy().profile.signOut }}
+          </button>
+        } @else {
+          <a routerLink="/sign-in" class="button button--primary">
+            {{ copy().profile.signInPrompt }}
+          </a>
+        }
       </div>
     </header>
 

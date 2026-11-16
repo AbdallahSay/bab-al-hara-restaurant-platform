@@ -14,11 +14,13 @@
           <div class="info-icon" aria-hidden="true">📞</div>
           <div class="info-text">
             <h3>{{ copy().contact.phoneTitle }}</h3>
-            <p>
-              <a [href]="'tel:' + copy().contact.phoneValue" dir="ltr">{{
-                copy().contact.phoneValue
-              }}</a>
-            </p>
+            @if (dialablePhone(); as phone) {
+              <p>
+                <a [href]="'tel:' + phone" dir="ltr">{{ phone }}</a>
+              </p>
+            } @else {
+              <p>{{ copy().contact.phoneValue }}</p>
+            }
           </div>
         </div>
 
@@ -26,15 +28,15 @@
           <div class="info-icon" aria-hidden="true">💬</div>
           <div class="info-text">
             <h3>{{ copy().contact.whatsappTitle }}</h3>
-            <p>
-              <a
-                [href]="'https://wa.me/' + copy().contact.whatsappValue"
-                target="_blank"
-                rel="noopener"
-                dir="ltr"
-                >{{ copy().contact.whatsappValue }}</a
-              >
-            </p>
+            @if (whatsappDigits(); as wa) {
+              <p>
+                <a [href]="'https://wa.me/' + wa" target="_blank" rel="noopener" dir="ltr">{{
+                  copy().contact.whatsappValue
+                }}</a>
+              </p>
+            } @else {
+              <p>{{ copy().contact.whatsappValue }}</p>
+            }
           </div>
         </div>
 

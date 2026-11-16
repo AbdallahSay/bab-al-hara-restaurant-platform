@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using BabAlHara.Api.Features.Cashier;
 using BabAlHara.Api.Features.Catalog;
+using BabAlHara.Api.Features.Contact;
+using BabAlHara.Api.Features.Customer;
 using BabAlHara.Api.Features.Driver;
 using BabAlHara.Api.Features.Kitchen;
 using BabAlHara.Api.Features.Operations;
@@ -159,7 +161,14 @@ builder.Services
                 .RequireAuthenticatedUser()
                 .RequireRole(
                     DevelopmentDataSeeder.ManagerRole,
-                    DevelopmentDataSeeder.AdminRole));
+                    DevelopmentDataSeeder.AdminRole))
+    .AddPolicy(
+        AuthorizationPolicies.Customer,
+        policy =>
+            policy
+                .AddAuthenticationSchemes(CustomerAuthSchemes.Customer)
+                .RequireAuthenticatedUser()
+                .RequireRole("Customer"));
 
 //
 // Staff Authentication Cookie Schemes
@@ -232,7 +241,55 @@ builder.Services
         options => ConfigureStaffCookieOptions(
             options,
             "BabAlHara.Management.Auth",
-            "__Host-BabAlHara-Management"));
+            "__Host-BabAlHara-Management"))
+    .AddCookie(
+        CustomerAuthSchemes.Customer,
+        options => ConfigureCustomerCookieOptions(
+            options,
+            "BabAlHara.Customer.Auth",
+            "__Host-BabAlHara-Customer"));
+
+void ConfigureCustomerCookieOptions(
+    CookieAuthenticationOptions options,
+    string devName,
+    string prodName)
+{
+    options.Cookie.Name = builder.Environment.IsDevelopment()
+        ? devName
+        : prodName;
+
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.Path = "/";
+    options.Cookie.Domain = null;
+
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
+
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+    options.SlidingExpiration = true;
+
+    options.Events = new CookieAuthenticationEvents
+    {
+        OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode =
+                StatusCodes.Status401Unauthorized;
+
+            return Task.CompletedTask;
+        },
+
+        OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode =
+                StatusCodes.Status403Forbidden;
+
+            return Task.CompletedTask;
+        },
+        OnValidatePrincipal = BabAlHara.Infrastructure.Identity.CustomerPrincipalValidator.ValidateAsync,
+    };
+}
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -305,6 +362,34 @@ builder.Services.AddRateLimiter(options =>
                     PermitLimit = trackingReadPermitLimit,
                     Window = TimeSpan.FromMinutes(1),
                     SegmentsPerWindow = 4,
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                }));
+
+    options.AddPolicy(
+        "customer-auth",
+        context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 10,
+                    Window = TimeSpan.FromMinutes(5),
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                }));
+
+    options.AddPolicy(
+        "contact-submit",
+        context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 5,
+                    Window = TimeSpan.FromMinutes(10),
                     QueueLimit = 0,
                     AutoReplenishment = true,
                 }));
@@ -475,6 +560,8 @@ app.MapOperationsEndpoints();
 
 app.MapOrderTrackingEndpoints();
 app.MapRestaurantControlEndpoints();
+app.MapCustomerAuthEndpoints();
+app.MapContactEndpoints();
 
 //
 // SignalR

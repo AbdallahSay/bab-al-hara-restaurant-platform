@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 
+import { CustomerAuthService } from '../../../core/auth/customer-auth.service';
 import { LanguageService } from '../../../core/i18n/language.service';
 import { Language } from '../../../core/i18n/translations';
-import { CustomerContactProfileService } from '../customer-contact-profile.service';
 
 type AuthTab = 'signin' | 'signup';
 
@@ -18,8 +20,9 @@ type AuthTab = 'signin' | 'signup';
 export class CustomerAuthPage {
   protected readonly language = inject(LanguageService);
   protected readonly copy = this.language.copy;
-  private readonly contactService = inject(CustomerContactProfileService);
+  private readonly authService = inject(CustomerAuthService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly activeTab = signal<AuthTab>('signin');
   protected readonly name = signal('');
@@ -43,6 +46,11 @@ export class CustomerAuthPage {
 
   onSubmit(event: Event): void {
     event.preventDefault();
+
+    if (this.submitting()) {
+      return;
+    }
+
     if (!this.identifier().trim() || !this.password().trim()) {
       this.errorMessage.set(this.copy().auth.validationError);
       return;
@@ -55,21 +63,30 @@ export class CustomerAuthPage {
 
     this.submitting.set(true);
     this.errorMessage.set(null);
+    this.successMessage.set(null);
 
-    // Save profile details locally so user profile reflects authenticated info
-    const resolvedName =
-      this.name().trim() || this.identifier().trim().split('@')[0] || 'عميل باب الحارة';
-    this.contactService.save({
-      name: resolvedName,
-      phone: this.identifier().trim(),
+    const auth$ =
+      this.activeTab() === 'signin'
+        ? this.authService.signIn(this.identifier().trim(), this.password(), this.rememberMe())
+        : this.authService.signUp(this.name().trim(), this.identifier().trim(), this.password());
+
+    auth$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.successMessage.set(this.copy().auth.successNotice);
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 600);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.submitting.set(false);
+        const detail =
+          err.error?.detail ||
+          (this.language.current() === 'ar'
+            ? 'فشلت عملية المصادقة، يرجى التأكد من صحة البيانات.'
+            : 'Authentication failed. Please verify your details.');
+        this.errorMessage.set(detail);
+      },
     });
-
-    setTimeout(() => {
-      this.submitting.set(false);
-      this.successMessage.set(this.copy().auth.successNotice);
-      setTimeout(() => {
-        this.router.navigate(['/']);
-      }, 800);
-    }, 500);
   }
 }

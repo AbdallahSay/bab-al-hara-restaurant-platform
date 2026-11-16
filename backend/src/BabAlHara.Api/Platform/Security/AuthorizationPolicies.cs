@@ -6,6 +6,12 @@ public static class AuthorizationPolicies
     public const string Cashier = "CashierAccess";
     public const string Driver = "DriverAccess";
     public const string Management = "ManagementAccess";
+    public const string Customer = "CustomerAccess";
+}
+
+public static class CustomerAuthSchemes
+{
+    public const string Customer = "BabAlHara.Customer";
 }
 
 public static class StaffAuthSchemes

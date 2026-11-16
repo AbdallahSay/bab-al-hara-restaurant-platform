@@ -22,46 +22,92 @@ public sealed class CustomerOrderTrackingService(AppDbContext dbContext) : ICust
         return Convert.ToHexString(hashBytes).ToLowerInvariant();
     }
 
-    public async Task<CustomerOrderTrackingDto?> GetTrackingDataAsync(string publicCode, string rawToken, CancellationToken cancellationToken)
-    {
-        var hash = HashToken(rawToken);
+    public Task<CustomerOrderTrackingDto?> GetTrackingDataAsync(string publicCode, string rawToken, CancellationToken cancellationToken) =>
+        GetTrackingDataAsync(publicCode, rawToken, null, cancellationToken);
 
+    public async Task<CustomerOrderTrackingDto?> GetTrackingDataAsync(string publicCode, string? rawToken, Guid? customerId, CancellationToken cancellationToken)
+    {
         var order = await dbContext.Orders
             .Include(o => o.Items)
             .Include(o => o.StatusHistory)
             .AsNoTracking()
-            .FirstOrDefaultAsync(o => o.PublicCode == publicCode && o.TrackingTokenHash == hash, cancellationToken);
+            .FirstOrDefaultAsync(o => o.PublicCode == publicCode, cancellationToken);
 
         if (order is null)
         {
             return null;
         }
 
-        if (order.TrackingTokenExpiresAtUtc.HasValue && order.TrackingTokenExpiresAtUtc.Value <= DateTimeOffset.UtcNow)
+        // If order was placed by a customer, require matching customer
+        if (order.CustomerId.HasValue)
         {
-            return null;
+            if (!customerId.HasValue || order.CustomerId.Value != customerId.Value)
+            {
+                return null;
+            }
+        }
+        else
+        {
+            // Guest order: requires valid unexpired tracking token
+            if (string.IsNullOrWhiteSpace(rawToken))
+            {
+                return null;
+            }
+
+            var hash = HashToken(rawToken);
+            if (!string.Equals(order.TrackingTokenHash, hash, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            if (order.TrackingTokenExpiresAtUtc.HasValue && order.TrackingTokenExpiresAtUtc.Value <= DateTimeOffset.UtcNow)
+            {
+                return null;
+            }
         }
 
         return MapToDto(order);
     }
 
-    public async Task<ReorderPreviewDto?> GetReorderPreviewAsync(string publicCode, string rawToken, CancellationToken cancellationToken)
-    {
-        var hash = HashToken(rawToken);
+    public Task<ReorderPreviewDto?> GetReorderPreviewAsync(string publicCode, string rawToken, CancellationToken cancellationToken) =>
+        GetReorderPreviewAsync(publicCode, rawToken, null, cancellationToken);
 
+    public async Task<ReorderPreviewDto?> GetReorderPreviewAsync(string publicCode, string? rawToken, Guid? customerId, CancellationToken cancellationToken)
+    {
         var order = await dbContext.Orders
             .Include(o => o.Items)
             .AsNoTracking()
-            .FirstOrDefaultAsync(o => o.PublicCode == publicCode && o.TrackingTokenHash == hash, cancellationToken);
+            .FirstOrDefaultAsync(o => o.PublicCode == publicCode, cancellationToken);
 
         if (order is null)
         {
             return null;
         }
 
-        if (order.TrackingTokenExpiresAtUtc.HasValue && order.TrackingTokenExpiresAtUtc.Value <= DateTimeOffset.UtcNow)
+        if (order.CustomerId.HasValue)
         {
-            return null;
+            if (!customerId.HasValue || order.CustomerId.Value != customerId.Value)
+            {
+                return null;
+            }
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(rawToken))
+            {
+                return null;
+            }
+
+            var hash = HashToken(rawToken);
+            if (!string.Equals(order.TrackingTokenHash, hash, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            if (order.TrackingTokenExpiresAtUtc.HasValue && order.TrackingTokenExpiresAtUtc.Value <= DateTimeOffset.UtcNow)
+            {
+                return null;
+            }
         }
 
         var menuItemIds = order.Items.Select(i => i.MenuItemId).Distinct().ToList();

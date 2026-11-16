@@ -1,6 +1,9 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
+import { APP_ENVIRONMENT } from '../../core/config/app-environment';
 import { LanguageService } from '../../core/i18n/language.service';
 import { RecentOrdersService } from '../../features/customer-ordering/recent-orders.service';
 import { CustomerHeader } from './customer-header';
@@ -16,7 +19,15 @@ describe('CustomerHeader', () => {
 
     await TestBed.configureTestingModule({
       imports: [CustomerHeader],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        {
+          provide: APP_ENVIRONMENT,
+          useValue: { production: false, apiBaseUrl: '/api', kitchenHubUrl: '/hubs/kitchen' },
+        },
+      ],
     }).compileComponents();
 
     recentOrdersService = TestBed.inject(RecentOrdersService);

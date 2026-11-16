@@ -1,6 +1,9 @@
+using System.Security.Claims;
 using BabAlHara.Api.Features.OrderTracking;
+using BabAlHara.Api.Platform.Security;
 using BabAlHara.Application.Ordering;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication;
 
 namespace BabAlHara.Api.Features.Ordering;
 
@@ -20,6 +23,17 @@ public static class OrderEndpoints
                     IWebHostEnvironment env,
                     CancellationToken cancellationToken) =>
                 {
+                    Guid? customerId = null;
+                    var authResult = await httpContext.AuthenticateAsync(CustomerAuthSchemes.Customer);
+                    if (authResult.Succeeded && authResult.Principal is not null)
+                    {
+                        var idStr = authResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+                        if (Guid.TryParse(idStr, out var parsedId))
+                        {
+                            customerId = parsedId;
+                        }
+                    }
+
                     var command = new CreateOrderCommand(
                         request.CustomerName ?? string.Empty,
                         request.CustomerPhone ?? string.Empty,
@@ -29,7 +43,8 @@ public static class OrderEndpoints
                         request.CustomerNote,
                         request.Items?
                             .Select(item => new CreateOrderLine(item.MenuItemId, item.Quantity))
-                            .ToList() ?? []);
+                            .ToList() ?? [],
+                        customerId);
                     var outcome = await service.CreateAsync(command, cancellationToken);
                     if (outcome.IsSuccess)
                     {

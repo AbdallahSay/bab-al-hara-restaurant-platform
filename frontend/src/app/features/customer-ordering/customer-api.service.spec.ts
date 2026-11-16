@@ -83,4 +83,29 @@ describe('CustomerApiService', () => {
     expect(publicCode).toBe('BH-123');
     http.verify();
   });
+
+  it('posts contact inquiry with antiforgery token', () => {
+    const service = TestBed.inject(CustomerApiService);
+    const http = TestBed.inject(HttpTestingController);
+    let success = false;
+
+    service
+      .submitContactInquiry({
+        name: 'طارق',
+        phoneOrEmail: '01012345678',
+        subject: 'استفسار',
+        message: 'رسالة تجريبية',
+      })
+      .subscribe((res) => (success = res.success));
+
+    http.expectOne('/api/security/csrf').flush({ requestToken: 'csrf-contact-token' });
+
+    const request = http.expectOne('/api/contact');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.headers.get('X-XSRF-TOKEN')).toBe('csrf-contact-token');
+    request.flush({ id: 'inq-123', createdAtUtc: '2026-11-16T10:00:00Z', success: true });
+
+    expect(success).toBe(true);
+    http.verify();
+  });
 });

@@ -12,6 +12,19 @@ import {
   RestaurantPublicStatusResponse,
 } from './order.models';
 
+export interface ContactInquiryRequest {
+  readonly name: string;
+  readonly phoneOrEmail: string;
+  readonly subject?: string;
+  readonly message: string;
+}
+
+export interface ContactInquiryResponse {
+  readonly id: string;
+  readonly createdAtUtc: string;
+  readonly success: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CustomerApiService {
   private readonly http = inject(HttpClient);
@@ -38,6 +51,17 @@ export class CustomerApiService {
     return this.antiforgeryToken().pipe(
       switchMap((token) =>
         this.http.post<CreatedOrder>(`${this.apiBaseUrl}/orders`, request, {
+          headers: { 'X-XSRF-TOKEN': token },
+          withCredentials: true,
+        }),
+      ),
+    );
+  }
+
+  submitContactInquiry(request: ContactInquiryRequest): Observable<ContactInquiryResponse> {
+    return this.antiforgeryToken().pipe(
+      switchMap((token) =>
+        this.http.post<ContactInquiryResponse>(`${this.apiBaseUrl}/contact`, request, {
           headers: { 'X-XSRF-TOKEN': token },
           withCredentials: true,
         }),

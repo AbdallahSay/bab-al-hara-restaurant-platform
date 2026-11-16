@@ -22,6 +22,7 @@
   padding: 2.5rem 2rem;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 2rem;
   box-shadow: var(--shadow-subtle);
   margin-bottom: 2rem;
@@ -30,6 +31,47 @@
     flex-direction: column;
     text-align: center;
     gap: 1.25rem;
+  }
+
+  &__main {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+
+    @media (max-width: 40rem) {
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+
+    .button {
+      padding: 0.65rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: var(--radius-md, 0.75rem);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .button--primary {
+      background: var(--color-primary, #ea580c);
+      color: #fff;
+      border: none;
+    }
+
+    .button--outline {
+      background: transparent;
+      color: var(--color-primary, #ea580c);
+      border: 1.5px solid var(--color-primary, #ea580c);
+
+      &:hover {
+        background: var(--color-primary-soft, #fff1e8);
+      }
+    }
   }
 
   .profile-avatar {
