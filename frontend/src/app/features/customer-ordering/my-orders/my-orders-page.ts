@@ -14,6 +14,7 @@ import { catchError } from 'rxjs/operators';
 
 import { formatMoney, localizedText } from '../../../core/i18n/formatters';
 import { LanguageService } from '../../../core/i18n/language.service';
+import { CustomerFooter } from '../../../shared/customer-footer/customer-footer';
 import { CustomerHeader } from '../../../shared/customer-header/customer-header';
 import { CartService } from '../cart/cart.service';
 import { RecentOrdersService } from '../recent-orders.service';
@@ -39,7 +40,7 @@ export interface ReorderFeedbackState {
 
 @Component({
   selector: 'app-my-orders-page',
-  imports: [CustomerHeader, RouterLink],
+  imports: [CustomerHeader, CustomerFooter, RouterLink],
   templateUrl: './my-orders-page.html',
   styleUrl: './my-orders-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,130 @@
+<app-customer-header />
+
+<main class="contact-shell">
+  <div class="contact-container">
+    <header class="contact-hero">
+      <p class="contact-eyebrow">{{ copy().contact.eyebrow }}</p>
+      <h1 class="contact-title">{{ copy().contact.title }}</h1>
+      <p class="contact-subtitle">{{ copy().contact.subtitle }}</p>
+    </header>
+
+    <div class="contact-layout">
+      <aside class="contact-info-cards">
+        <div class="info-card">
+          <div class="info-icon" aria-hidden="true">📞</div>
+          <div class="info-text">
+            <h3>{{ copy().contact.phoneTitle }}</h3>
+            <p>
+              <a [href]="'tel:' + copy().contact.phoneValue" dir="ltr">{{
+                copy().contact.phoneValue
+              }}</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon" aria-hidden="true">💬</div>
+          <div class="info-text">
+            <h3>{{ copy().contact.whatsappTitle }}</h3>
+            <p>
+              <a
+                [href]="'https://wa.me/' + copy().contact.whatsappValue"
+                target="_blank"
+                rel="noopener"
+                dir="ltr"
+                >{{ copy().contact.whatsappValue }}</a
+              >
+            </p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon" aria-hidden="true">📍</div>
+          <div class="info-text">
+            <h3>{{ copy().contact.addressTitle }}</h3>
+            <p>{{ copy().contact.addressValue }}</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon" aria-hidden="true">⏰</div>
+          <div class="info-text">
+            <h3>{{ copy().contact.hoursTitle }}</h3>
+            <p>{{ copy().contact.hoursValue }}</p>
+          </div>
+        </div>
+      </aside>
+
+      <section class="contact-form-section">
+        <h2 class="form-title">{{ copy().contact.formTitle }}</h2>
+
+        @if (submitted()) {
+          <div class="form-alert form-alert--success" role="status">
+            <span>✓</span> {{ copy().contact.successMessage }}
+          </div>
+        } @else {
+          <form class="contact-form" (submit)="onSubmit($event)">
+            @if (errorMessage()) {
+              <div class="form-alert form-alert--error" role="alert">
+                {{ errorMessage() }}
+              </div>
+            }
+
+            <div class="form-group">
+              <label for="contact-name">{{ copy().contact.nameLabel }} *</label>
+              <input
+                id="contact-name"
+                type="text"
+                class="form-control"
+                [value]="name()"
+                (input)="name.set($any($event.target).value)"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="contact-phone">{{ copy().contact.phoneOrEmailLabel }} *</label>
+              <input
+                id="contact-phone"
+                type="text"
+                class="form-control"
+                [value]="phoneOrEmail()"
+                (input)="phoneOrEmail.set($any($event.target).value)"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="contact-subject">{{ copy().contact.subjectLabel }}</label>
+              <input
+                id="contact-subject"
+                type="text"
+                class="form-control"
+                [value]="subject()"
+                (input)="subject.set($any($event.target).value)"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="contact-message">{{ copy().contact.messageLabel }} *</label>
+              <textarea
+                id="contact-message"
+                rows="5"
+                class="form-control"
+                [value]="message()"
+                (input)="message.set($any($event.target).value)"
+                required
+              ></textarea>
+            </div>
+
+            <button type="submit" class="button button--primary" [disabled]="submitting()">
+              {{ copy().contact.submitButton }}
+            </button>
+          </form>
+        }
+      </section>
+    </div>
+  </div>
+</main>
+
+<app-customer-footer />

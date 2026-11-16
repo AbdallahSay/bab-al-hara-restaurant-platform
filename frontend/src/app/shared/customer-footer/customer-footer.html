@@ -1,0 +1,61 @@
+<footer class="customer-footer" role="contentinfo">
+  <div class="customer-footer__content">
+    <div class="customer-footer__col customer-footer__brand">
+      <a class="brand" routerLink="/" [attr.aria-label]="copy().brand.homeLabel">
+        <span class="brand__mark" aria-hidden="true">ب</span>
+        <span class="brand__text">
+          <strong>{{ copy().brand.name }}</strong>
+          <small>{{ copy().brand.tagline }}</small>
+        </span>
+      </a>
+      <p class="brand-desc">{{ copy().footer.description }}</p>
+    </div>
+
+    <div class="customer-footer__col">
+      <h3 class="col-title">{{ copy().footer.quickLinksTitle }}</h3>
+      <ul class="footer-links">
+        <li>
+          <a routerLink="/">{{ copy().brand.homeLabel }}</a>
+        </li>
+        <li>
+          <a routerLink="/search">{{ copy().brand.search }}</a>
+        </li>
+        <li>
+          <a routerLink="/wishlist">{{ copy().brand.wishlist }}</a>
+        </li>
+        <li>
+          <a routerLink="/orders">{{ copy().brand.orders }}</a>
+        </li>
+        <li>
+          <a routerLink="/about">{{ copy().brand.about }}</a>
+        </li>
+        <li>
+          <a routerLink="/contact">{{ copy().brand.contact }}</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="customer-footer__col">
+      <h3 class="col-title">{{ copy().footer.workingHoursTitle }}</h3>
+      <p class="info-text">{{ copy().footer.workingHoursValue }}</p>
+      <h3 class="col-title mt-4">{{ copy().footer.branchesTitle }}</h3>
+      <p class="info-text">{{ copy().footer.branchesValue }}</p>
+    </div>
+
+    <div class="customer-footer__col">
+      <h3 class="col-title">{{ copy().footer.contactTitle }}</h3>
+      <p class="contact-line">
+        <strong dir="ltr">{{ copy().contact.phoneValue }}</strong>
+      </p>
+      <div class="footer-actions">
+        <a class="button button--outline" routerLink="/contact">
+          {{ copy().brand.contact }}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="customer-footer__bottom">
+    <p>{{ copy().footer.copyright }}</p>
+  </div>
+</footer>

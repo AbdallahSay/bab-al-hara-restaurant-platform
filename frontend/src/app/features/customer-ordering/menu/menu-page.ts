@@ -1,4 +1,4 @@
-﻿import {
+import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -13,6 +13,7 @@ import { forkJoin } from 'rxjs';
 
 import { formatMoney, localizedText } from '../../../core/i18n/formatters';
 import { LanguageService } from '../../../core/i18n/language.service';
+import { CustomerFooter } from '../../../shared/customer-footer/customer-footer';
 import { CustomerHeader } from '../../../shared/customer-header/customer-header';
 import { RestaurantPausedBanner } from '../../../shared/restaurant-paused-banner/restaurant-paused-banner';
 import { CartService } from '../cart/cart.service';
@@ -20,12 +21,13 @@ import { CartToastService } from '../cart/cart-toast.service';
 import { CustomerApiService } from '../customer-api.service';
 import { Category, MenuItem } from '../order.models';
 import { RestaurantStatusService } from '../restaurant-status.service';
+import { WishlistService } from '../wishlist/wishlist.service';
 
 type MenuState = 'loading' | 'ready' | 'error';
 
 @Component({
   selector: 'app-menu-page',
-  imports: [CustomerHeader, RestaurantPausedBanner, RouterLink],
+  imports: [CustomerHeader, CustomerFooter, RestaurantPausedBanner, RouterLink],
   templateUrl: './menu-page.html',
   styleUrl: './menu-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,6 +39,7 @@ export class MenuPage implements OnInit {
   protected readonly language = inject(LanguageService);
   protected readonly copy = this.language.copy;
   protected readonly cart = inject(CartService);
+  protected readonly wishlist = inject(WishlistService);
   protected readonly statusService = inject(RestaurantStatusService);
   private readonly cartToast = inject(CartToastService);
   protected readonly state = signal<MenuState>('loading');
@@ -81,13 +84,12 @@ export class MenuPage implements OnInit {
 
   protected addToCart(item: MenuItem): void {
     const inFlight = this.addedItemIds();
-    if (inFlight.has(item.id)) {
+    if (inFlight.has(item.id) || !item.isAvailable) {
       return;
     }
 
     const result = this.cart.add(item);
     if (result) {
-      // Debounce logic / visual state
       const newSet = new Set(inFlight);
       newSet.add(item.id);
       this.addedItemIds.set(newSet);
@@ -98,16 +100,22 @@ export class MenuPage implements OnInit {
         this.addedItemIds.set(currentSet);
       }, 2000);
 
-      // Toast feedback
       this.cartToast.showAddedToast(
         this.itemName(item),
         result === 'updated',
         this.language.current(),
       );
 
-      // Screen reader announcement (kept existing behavior)
       this.announcement.set(`${this.itemName(item)} — ${this.copy().menu.added}`);
     }
+  }
+
+  protected isFavorite(itemId: string): boolean {
+    return this.wishlist.isFavorite(itemId);
+  }
+
+  protected toggleFavorite(item: MenuItem): void {
+    this.wishlist.toggle(item);
   }
 
   protected getButtonText(item: MenuItem): string {
@@ -118,16 +126,16 @@ export class MenuPage implements OnInit {
     return this.copy().menu.add;
   }
 
+  protected categoryName(category: Category): string {
+    return localizedText(this.language.current(), category.nameAr, category.nameEn);
+  }
+
   protected itemName(item: MenuItem): string {
     return localizedText(this.language.current(), item.nameAr, item.nameEn);
   }
 
   protected itemDescription(item: MenuItem): string {
     return localizedText(this.language.current(), item.descriptionAr, item.descriptionEn);
-  }
-
-  protected categoryName(category: Category): string {
-    return localizedText(this.language.current(), category.nameAr, category.nameEn);
   }
 
   protected money(value: number): string {

@@ -1,0 +1,154 @@
+<app-customer-header />
+
+<main class="search-shell">
+  <div class="search-container">
+    <header class="search-header">
+      <h1 class="search-title">{{ copy().search.title }}</h1>
+      <p class="search-subtitle">{{ copy().search.subtitle }}</p>
+
+      <div class="search-box">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input
+          type="search"
+          class="search-input"
+          [placeholder]="copy().search.placeholder"
+          [value]="searchQuery()"
+          (input)="onSearchInput($event)"
+          [attr.aria-label]="copy().search.placeholder"
+        />
+        @if (searchQuery()) {
+          <button
+            type="button"
+            class="clear-btn"
+            [attr.aria-label]="copy().search.clear"
+            (click)="clearSearch()"
+          >
+            ✕
+          </button>
+        }
+      </div>
+
+      <div class="search-tags" [attr.aria-label]="copy().search.quickTags">
+        <span class="tags-label">{{ copy().search.quickTags }}</span>
+        <button
+          type="button"
+          class="tag-btn"
+          [class.is-active]="selectedTag() === null"
+          (click)="selectTag(null)"
+        >
+          {{ copy().search.tagAll }}
+        </button>
+        <button
+          type="button"
+          class="tag-btn"
+          [class.is-active]="selectedTag() === 'مشاوي'"
+          (click)="selectTag('مشاوي')"
+        >
+          {{ copy().search.tagGrills }}
+        </button>
+        <button
+          type="button"
+          class="tag-btn"
+          [class.is-active]="selectedTag() === 'شاورما'"
+          (click)="selectTag('شاورما')"
+        >
+          {{ copy().search.tagShawarma }}
+        </button>
+        <button
+          type="button"
+          class="tag-btn"
+          [class.is-active]="selectedTag() === 'سندوتش'"
+          (click)="selectTag('سندوتش')"
+        >
+          {{ copy().search.tagSandwiches }}
+        </button>
+        <button
+          type="button"
+          class="tag-btn"
+          [class.is-active]="selectedTag() === 'مقبلات'"
+          (click)="selectTag('مقبلات')"
+        >
+          {{ copy().search.tagAppetizers }}
+        </button>
+      </div>
+    </header>
+
+    @if (toastMessage(); as msg) {
+      <div class="search-toast" role="status" aria-live="polite"><span>✓</span> {{ msg }}</div>
+    }
+
+    @if (loading()) {
+      <div class="search-state search-state--loading" role="status">
+        <span class="loader" aria-hidden="true"></span>
+        <p>{{ copy().common.loading }}</p>
+      </div>
+    } @else if (filteredItems().length === 0) {
+      <div class="search-empty" role="status">
+        <div class="empty-icon" aria-hidden="true">🍽️</div>
+        <h2>{{ copy().search.emptyTitle }}</h2>
+        <p>{{ copy().search.emptySubtitle }}</p>
+        <button type="button" class="button button--primary" (click)="clearSearch()">
+          {{ copy().search.browseAll }}
+        </button>
+      </div>
+    } @else {
+      <div class="results-bar">
+        <span class="results-count">
+          {{ resultsCountText() }}
+        </span>
+      </div>
+
+      <div class="search-grid">
+        @for (item of filteredItems(); track item.id) {
+          <article class="search-card" [class.search-card--unavailable]="!item.isAvailable">
+            <div class="card-image-wrap">
+              <img
+                class="card-image"
+                [src]="item.imageReference"
+                [alt]="itemName(item)"
+                loading="lazy"
+                (error)="onImageError($event)"
+              />
+              @if (!item.isAvailable) {
+                <span class="unavailable-tag">{{ copy().common.unavailable }}</span>
+              }
+              <button
+                type="button"
+                class="fav-toggle-btn"
+                [class.is-fav]="isFavorite(item.id)"
+                [attr.aria-label]="copy().brand.wishlist"
+                (click)="toggleWishlist(item)"
+              >
+                {{ isFavorite(item.id) ? '❤️' : '🤍' }}
+              </button>
+            </div>
+
+            <div class="card-content">
+              <div class="card-info">
+                <h2 class="item-name">{{ itemName(item) }}</h2>
+                <p class="item-desc">{{ itemDescription(item) }}</p>
+              </div>
+
+              <div class="card-footer">
+                <span class="item-price">
+                  <strong>{{ item.price }}</strong> <small>{{ copy().common.currency }}</small>
+                </span>
+
+                <button
+                  type="button"
+                  class="button button--primary button--sm"
+                  [disabled]="!item.isAvailable"
+                  (click)="addToCart(item)"
+                >
+                  {{ copy().menu.add }}
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</main>
+
+<app-customer-footer />

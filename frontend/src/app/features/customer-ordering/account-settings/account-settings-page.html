@@ -1,0 +1,106 @@
+<app-customer-header />
+
+<main class="settings-shell">
+  <div class="settings-container">
+    <header class="settings-hero">
+      <h1 class="settings-title">{{ copy().accountSettings.title }}</h1>
+      <p class="settings-subtitle">{{ copy().accountSettings.subtitle }}</p>
+    </header>
+
+    @if (toastMessage(); as msg) {
+      <div class="settings-toast" role="status" aria-live="polite"><span>✓</span> {{ msg }}</div>
+    }
+
+    <form class="settings-form" (submit)="onSave($event)">
+      <section class="settings-card">
+        <h2 class="card-title">{{ copy().accountSettings.personalDetails }}</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="settings-name">{{ copy().accountSettings.name }}</label>
+            <input
+              id="settings-name"
+              type="text"
+              class="form-control"
+              [value]="name()"
+              (input)="name.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="settings-phone">{{ copy().accountSettings.phone }}</label>
+            <input
+              id="settings-phone"
+              type="tel"
+              class="form-control"
+              dir="ltr"
+              placeholder="+20 100 000 0000"
+              [value]="phone()"
+              (input)="phone.set($any($event.target).value)"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <h2 class="card-title">{{ copy().accountSettings.savedDeliveryAddress }}</h2>
+        <div class="form-group">
+          <label for="settings-street">{{ copy().accountSettings.addressStreet }}</label>
+          <input
+            id="settings-street"
+            type="text"
+            class="form-control"
+            [value]="street()"
+            (input)="street.set($any($event.target).value)"
+          />
+        </div>
+
+        <div class="form-grid mt-3">
+          <div class="form-group">
+            <label for="settings-building">{{ copy().accountSettings.addressBuilding }}</label>
+            <input
+              id="settings-building"
+              type="text"
+              class="form-control"
+              [value]="building()"
+              (input)="building.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="settings-floor">{{ copy().accountSettings.addressFloor }}</label>
+            <input
+              id="settings-floor"
+              type="text"
+              class="form-control"
+              [value]="floor()"
+              (input)="floor.set($any($event.target).value)"
+            />
+          </div>
+        </div>
+
+        <div class="form-group mt-3">
+          <label for="settings-notes">{{ copy().accountSettings.addressNotes }}</label>
+          <textarea
+            id="settings-notes"
+            rows="2"
+            class="form-control"
+            [value]="notes()"
+            (input)="notes.set($any($event.target).value)"
+          ></textarea>
+        </div>
+      </section>
+
+      <div class="settings-actions">
+        <button type="submit" class="button button--primary">
+          {{ copy().accountSettings.saveChanges }}
+        </button>
+
+        <button type="button" class="button button--danger-outline" (click)="onClearData()">
+          {{ copy().accountSettings.clearData }}
+        </button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<app-customer-footer />

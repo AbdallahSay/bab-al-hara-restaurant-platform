@@ -1,0 +1,91 @@
+<app-customer-header />
+
+<main class="wishlist-shell">
+  <div class="wishlist-container">
+    <header class="wishlist-header">
+      <div class="wishlist-header__text">
+        <h1 class="wishlist-title">{{ copy().wishlist.title }}</h1>
+        <p class="wishlist-subtitle">{{ copy().wishlist.subtitle }}</p>
+      </div>
+
+      @if (favoriteItems().length > 0) {
+        <div class="wishlist-header__actions">
+          <button type="button" class="button button--primary" (click)="addAllToCart()">
+            {{ copy().wishlist.addAllToCart }}
+          </button>
+        </div>
+      }
+    </header>
+
+    @if (toastMessage(); as msg) {
+      <div class="wishlist-toast" role="status" aria-live="polite"><span>✓</span> {{ msg }}</div>
+    }
+
+    @if (loading()) {
+      <div class="wishlist-state wishlist-state--loading" role="status">
+        <span class="loader" aria-hidden="true"></span>
+        <p>{{ copy().common.loading }}</p>
+      </div>
+    } @else if (favoriteItems().length === 0) {
+      <div class="wishlist-empty" role="status">
+        <div class="empty-icon" aria-hidden="true">❤️</div>
+        <h2>{{ copy().wishlist.emptyTitle }}</h2>
+        <p>{{ copy().wishlist.emptySubtitle }}</p>
+        <a class="button button--primary" routerLink="/">
+          {{ copy().wishlist.browseMenu }}
+        </a>
+      </div>
+    } @else {
+      <div class="wishlist-grid">
+        @for (item of favoriteItems(); track item.id) {
+          <article class="wishlist-card" [class.wishlist-card--unavailable]="!item.isAvailable">
+            <div class="card-image-wrap">
+              <img
+                class="card-image"
+                [src]="item.imageReference"
+                [alt]="itemName(item)"
+                loading="lazy"
+                (error)="onImageError($event)"
+              />
+              @if (!item.isAvailable) {
+                <span class="unavailable-tag">{{ copy().common.unavailable }}</span>
+              }
+              <button
+                type="button"
+                class="remove-fav-btn"
+                [attr.aria-label]="copy().wishlist.remove"
+                (click)="removeFromWishlist(item.id)"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div class="card-content">
+              <div class="card-info">
+                <h2 class="item-name">{{ itemName(item) }}</h2>
+                <p class="item-desc">{{ itemDescription(item) }}</p>
+              </div>
+
+              <div class="card-footer">
+                <span class="item-price">
+                  <strong>{{ item.price }}</strong> <small>{{ copy().common.currency }}</small>
+                </span>
+
+                <button
+                  type="button"
+                  class="button button--primary button--sm"
+                  [disabled]="!item.isAvailable"
+                  (click)="addToCart(item)"
+                >
+                  {{ copy().menu.add }}
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</main>
+
+<app-customer-footer />

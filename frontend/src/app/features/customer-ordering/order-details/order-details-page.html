@@ -1,0 +1,116 @@
+<app-customer-header />
+
+<main class="details-shell">
+  <div class="details-container">
+    @if (state() === 'loading') {
+      <div class="details-state" role="status">
+        <span class="loader" aria-hidden="true"></span>
+        <p>{{ copy().common.loading }}</p>
+      </div>
+    } @else if (state() === 'error' || !order()) {
+      <div class="details-state details-state--error" role="alert">
+        <h2>{{ copy().menu.errorTitle }}</h2>
+        <p>{{ copy().menu.errorBody }}</p>
+        <a routerLink="/orders" class="button button--primary">
+          {{ copy().orderDetails.backToOrders }}
+        </a>
+      </div>
+    } @else {
+      @let ord = order()!;
+
+      <header class="details-header">
+        <div class="details-header__start">
+          <span class="order-code">#{{ ord.publicCode }}</span>
+          <span class="status-badge" [attr.data-status]="ord.status">
+            {{ formatStatus(ord.status, ord.orderType) }}
+          </span>
+        </div>
+
+        <div class="details-header__actions">
+          <a [routerLink]="['/order', ord.publicCode, 'track']" class="button button--track">
+            {{ copy().orderDetails.liveTrackButton }}
+          </a>
+        </div>
+      </header>
+
+      <div class="details-grid">
+        <div class="details-main">
+          <section class="details-card items-card">
+            <h2 class="card-title">{{ copy().orderDetails.itemsTitle }}</h2>
+            <div class="items-list">
+              @for (item of ord.items; track item.productNameAr) {
+                <div class="item-row">
+                  <div class="item-row__info">
+                    <strong class="item-name">{{ itemName(item) }}</strong>
+                    <span class="item-meta"
+                      >{{ item.quantity }} × {{ item.unitPrice }} {{ copy().common.currency }}</span
+                    >
+                  </div>
+                  <strong class="item-total"
+                    >{{ item.lineTotal }} {{ copy().common.currency }}</strong
+                  >
+                </div>
+              }
+            </div>
+
+            <div class="totals-breakdown">
+              <div class="totals-row">
+                <span>{{ copy().common.subtotal }}</span>
+                <strong>{{ ord.subtotal }} {{ copy().common.currency }}</strong>
+              </div>
+              @if (ord.orderType === 'Delivery') {
+                <div class="totals-row">
+                  <span>{{ copy().common.deliveryFee }}</span>
+                  <strong>{{ ord.deliveryFee }} {{ copy().common.currency }}</strong>
+                </div>
+              }
+              <div class="totals-row totals-row--grand">
+                <span>{{ copy().common.total }}</span>
+                <strong>{{ ord.total }} {{ copy().common.currency }}</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="details-sidebar">
+          <section class="details-card">
+            <h2 class="card-title">{{ copy().orderDetails.fulfillmentType }}</h2>
+            <div class="meta-row">
+              <span class="meta-label">{{ copy().orderDetails.fulfillmentType }}:</span>
+              <strong>{{
+                ord.orderType === 'Delivery' ? copy().common.delivery : copy().common.takeaway
+              }}</strong>
+            </div>
+
+            @if (ord.orderType === 'Delivery' && ord.address) {
+              <div class="meta-row">
+                <span class="meta-label">{{ copy().orderDetails.deliveryAddress }}:</span>
+                <p class="address-text">{{ ord.address }}</p>
+              </div>
+            }
+
+            <div class="meta-row">
+              <span class="meta-label">{{ copy().checkout.payment }}:</span>
+              <strong>{{ copy().common.cash }}</strong>
+            </div>
+          </section>
+
+          <section class="details-card actions-card">
+            <button
+              type="button"
+              class="button button--primary button--full"
+              (click)="onReorder(ord)"
+            >
+              {{ copy().orderDetails.reorderButton }}
+            </button>
+            <a routerLink="/orders" class="button button--secondary button--full">
+              {{ copy().orderDetails.backToOrders }}
+            </a>
+          </section>
+        </aside>
+      </div>
+    }
+  </div>
+</main>
+
+<app-customer-footer />

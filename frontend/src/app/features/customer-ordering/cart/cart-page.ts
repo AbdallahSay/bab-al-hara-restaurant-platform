@@ -1,4 +1,4 @@
-﻿import {
+import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -11,6 +11,7 @@ import { RouterLink } from '@angular/router';
 
 import { formatMoney, localizedText } from '../../../core/i18n/formatters';
 import { LanguageService } from '../../../core/i18n/language.service';
+import { CustomerFooter } from '../../../shared/customer-footer/customer-footer';
 import { CustomerHeader } from '../../../shared/customer-header/customer-header';
 import { RestaurantPausedBanner } from '../../../shared/restaurant-paused-banner/restaurant-paused-banner';
 import { CartItem, CartService } from './cart.service';
@@ -18,7 +19,7 @@ import { RestaurantStatusService } from '../restaurant-status.service';
 
 @Component({
   selector: 'app-cart-page',
-  imports: [CustomerHeader, RestaurantPausedBanner, RouterLink],
+  imports: [CustomerHeader, CustomerFooter, RestaurantPausedBanner, RouterLink],
   templateUrl: './cart-page.html',
   styleUrl: './cart-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

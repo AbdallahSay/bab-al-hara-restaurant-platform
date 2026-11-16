@@ -14,6 +14,7 @@ import { HubConnectionState } from '@microsoft/signalr';
 
 import { formatMoney, localizedText } from '../../core/i18n/formatters';
 import { LanguageService } from '../../core/i18n/language.service';
+import { CustomerFooter } from '../../shared/customer-footer/customer-footer';
 import { CustomerHeader } from '../../shared/customer-header/customer-header';
 import { CartService } from '../customer-ordering/cart/cart.service';
 import { RecentOrdersService } from '../customer-ordering/recent-orders.service';
@@ -42,7 +43,7 @@ export interface ReorderFeedbackState {
 
 @Component({
   selector: 'app-order-tracking-page',
-  imports: [CustomerHeader, RouterLink],
+  imports: [CustomerHeader, CustomerFooter, RouterLink],
   templateUrl: './order-tracking-page.html',
   styleUrl: './order-tracking-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
