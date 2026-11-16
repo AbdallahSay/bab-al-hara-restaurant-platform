@@ -31,6 +31,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
 
     public DbSet<BabAlHara.Domain.Ordering.RestaurantControl> RestaurantControls => Set<BabAlHara.Domain.Ordering.RestaurantControl>();
 
+    public DbSet<BabAlHara.Domain.Customers.CustomerUser> CustomerUsers => Set<BabAlHara.Domain.Customers.CustomerUser>();
+
+    public DbSet<BabAlHara.Domain.Inquiries.CustomerInquiry> CustomerInquiries => Set<BabAlHara.Domain.Inquiries.CustomerInquiry>();
+
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         ArgumentNullException.ThrowIfNull(configurationBuilder);

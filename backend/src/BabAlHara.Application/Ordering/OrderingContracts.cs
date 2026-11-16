@@ -11,7 +11,8 @@ public sealed record CreateOrderCommand(
     Guid? DeliveryAreaId,
     string? Address,
     string? CustomerNote,
-    IReadOnlyList<CreateOrderLine> Items);
+    IReadOnlyList<CreateOrderLine> Items,
+    Guid? CustomerId = null);
 
 public sealed record CreatedOrderDto(
     string PublicCode,

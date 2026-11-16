@@ -40,7 +40,9 @@ public interface ICustomerOrderTrackingService
     string GenerateTrackingToken();
     string HashToken(string rawToken);
     Task<CustomerOrderTrackingDto?> GetTrackingDataAsync(string publicCode, string rawToken, CancellationToken cancellationToken);
+    Task<CustomerOrderTrackingDto?> GetTrackingDataAsync(string publicCode, string? rawToken, Guid? customerId, CancellationToken cancellationToken);
     Task<ReorderPreviewDto?> GetReorderPreviewAsync(string publicCode, string rawToken, CancellationToken cancellationToken);
+    Task<ReorderPreviewDto?> GetReorderPreviewAsync(string publicCode, string? rawToken, Guid? customerId, CancellationToken cancellationToken);
 }
 
 public sealed record ReorderEligibleItemDto(

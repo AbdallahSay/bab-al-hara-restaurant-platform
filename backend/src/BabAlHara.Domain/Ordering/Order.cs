@@ -32,7 +32,8 @@ public sealed class Order
         string? address,
         decimal deliveryFee,
         string? customerNote,
-        string? trackingTokenHash = null)
+        string? trackingTokenHash = null,
+        Guid? customerId = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(deliveryFee);
 
@@ -69,9 +70,17 @@ public sealed class Order
             ? Guid.NewGuid().ToString("N")
             : trackingTokenHash.Trim();
         TrackingTokenExpiresAtUtc = createdAt.AddDays(7);
+        CustomerId = customerId;
     }
 
     public Guid Id { get; private set; }
+
+    public Guid? CustomerId { get; private set; }
+
+    public void SetCustomer(Guid customerId)
+    {
+        CustomerId = customerId;
+    }
 
     public string PublicCode { get; private set; } = string.Empty;
 

@@ -1,5 +1,8 @@
+using System.Security.Claims;
+using BabAlHara.Api.Platform.Security;
 using BabAlHara.Application.Tracking;
 using BabAlHara.Infrastructure.Tracking;
+using Microsoft.AspNetCore.Authentication;
 
 namespace BabAlHara.Api.Features.OrderTracking;
 
@@ -14,29 +17,47 @@ public static class OrderTrackingEndpoints
                 "/api/orders/track/{publicCode}",
                 async (
                     string publicCode,
-                    HttpRequest request,
+                    HttpContext context,
                     IWebHostEnvironment env,
                     ICustomerOrderTrackingService trackingService,
                     CancellationToken cancellationToken) =>
                 {
-                    var rawToken = TrackingCookieHelper.GetTrackingTokenFromCookie(request, publicCode, env.IsDevelopment());
+                    Guid? customerId = null;
+                    var authResult = await context.AuthenticateAsync(CustomerAuthSchemes.Customer);
+                    if (authResult.Succeeded && authResult.Principal is not null)
+                    {
+                        var idStr = authResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+                        if (Guid.TryParse(idStr, out var parsedId))
+                        {
+                            customerId = parsedId;
+                        }
+                    }
 
-                    if (string.IsNullOrWhiteSpace(rawToken))
+                    var rawToken = TrackingCookieHelper.GetTrackingTokenFromCookie(context.Request, publicCode, env.IsDevelopment());
+
+                    if (!customerId.HasValue && string.IsNullOrWhiteSpace(rawToken))
                     {
                         return Results.Unauthorized();
                     }
 
-                    // Validate Base64Url format
-                    try
+                    if (!string.IsNullOrWhiteSpace(rawToken))
                     {
-                        Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Decode(rawToken);
-                    }
-                    catch
-                    {
-                        return Results.Unauthorized();
+                        // Validate Base64Url format
+                        try
+                        {
+                            Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Decode(rawToken);
+                        }
+                        catch
+                        {
+                            if (!customerId.HasValue)
+                            {
+                                return Results.Unauthorized();
+                            }
+                            rawToken = null;
+                        }
                     }
 
-                    var dto = await trackingService.GetTrackingDataAsync(publicCode, rawToken, cancellationToken);
+                    var dto = await trackingService.GetTrackingDataAsync(publicCode, rawToken, customerId, cancellationToken);
 
                     if (dto is null)
                     {
@@ -57,29 +78,47 @@ public static class OrderTrackingEndpoints
                 "/api/orders/track/{publicCode}/reorder-preview",
                 async (
                     string publicCode,
-                    HttpRequest request,
+                    HttpContext context,
                     IWebHostEnvironment env,
                     ICustomerOrderTrackingService trackingService,
                     CancellationToken cancellationToken) =>
                 {
-                    var rawToken = TrackingCookieHelper.GetTrackingTokenFromCookie(request, publicCode, env.IsDevelopment());
+                    Guid? customerId = null;
+                    var authResult = await context.AuthenticateAsync(CustomerAuthSchemes.Customer);
+                    if (authResult.Succeeded && authResult.Principal is not null)
+                    {
+                        var idStr = authResult.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+                        if (Guid.TryParse(idStr, out var parsedId))
+                        {
+                            customerId = parsedId;
+                        }
+                    }
 
-                    if (string.IsNullOrWhiteSpace(rawToken))
+                    var rawToken = TrackingCookieHelper.GetTrackingTokenFromCookie(context.Request, publicCode, env.IsDevelopment());
+
+                    if (!customerId.HasValue && string.IsNullOrWhiteSpace(rawToken))
                     {
                         return Results.Unauthorized();
                     }
 
-                    // Validate Base64Url format
-                    try
+                    if (!string.IsNullOrWhiteSpace(rawToken))
                     {
-                        Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Decode(rawToken);
-                    }
-                    catch
-                    {
-                        return Results.Unauthorized();
+                        // Validate Base64Url format
+                        try
+                        {
+                            Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Decode(rawToken);
+                        }
+                        catch
+                        {
+                            if (!customerId.HasValue)
+                            {
+                                return Results.Unauthorized();
+                            }
+                            rawToken = null;
+                        }
                     }
 
-                    var dto = await trackingService.GetReorderPreviewAsync(publicCode, rawToken, cancellationToken);
+                    var dto = await trackingService.GetReorderPreviewAsync(publicCode, rawToken, customerId, cancellationToken);
 
                     if (dto is null)
                     {

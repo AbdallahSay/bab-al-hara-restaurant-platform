@@ -63,9 +63,11 @@ public sealed class OrderingApiFactory : WebApplicationFactory<Program>, IAsyncL
         orderCodeGenerator.UseDefault();
 
         await using var dbContext = CreateDbContext();
+        await dbContext.CustomerInquiries.ExecuteDeleteAsync();
         await dbContext.OrderStatusHistories.ExecuteDeleteAsync();
         await dbContext.OrderItems.ExecuteDeleteAsync();
         await dbContext.Orders.ExecuteDeleteAsync();
+        await dbContext.CustomerUsers.ExecuteDeleteAsync();
         await dbContext.MenuItems.ExecuteDeleteAsync();
         await dbContext.Categories.ExecuteDeleteAsync();
         await dbContext.DeliveryAreas.ExecuteDeleteAsync();

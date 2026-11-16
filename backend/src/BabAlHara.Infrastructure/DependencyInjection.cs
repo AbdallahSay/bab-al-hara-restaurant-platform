@@ -72,6 +72,7 @@ public static class DependencyInjection
         services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
 
         services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<IPasswordHasher<BabAlHara.Domain.Customers.CustomerUser>, PasswordHasher<BabAlHara.Domain.Customers.CustomerUser>>();
         services.AddSingleton<IOrderCodeGenerator, PublicOrderCodeGenerator>();
         services.AddScoped<IMenuQueryService, MenuQueryService>();
         services.AddScoped<IManagementCatalogService, ManagementCatalogService>();

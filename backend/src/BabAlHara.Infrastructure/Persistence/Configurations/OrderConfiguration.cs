@@ -35,6 +35,7 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(order => order.CustomerNote).HasMaxLength(500);
         builder.Property(order => order.PaymentMethod).HasConversion<string>().HasMaxLength(20).IsRequired();
         builder.Property(order => order.PaymentStatus).HasConversion<string>().HasMaxLength(20).IsRequired();
+        builder.Property(order => order.CustomerId);
         builder.Property(order => order.DriverId);
         builder.Property(order => order.DriverName).HasMaxLength(120);
         builder.Property(order => order.DriverAssignedAtUtc);
@@ -43,6 +44,7 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(order => order.RowVersion).IsRowVersion();
         builder.HasIndex(order => order.PublicCode).IsUnique();
         builder.HasIndex(order => order.TrackingTokenHash).IsUnique();
+        builder.HasIndex(order => order.CustomerId);
         builder.HasIndex(order => order.CreatedAt).IsDescending(true);
         builder.HasIndex(order => new { order.Status, order.CreatedAt }).IsDescending(false, true);
         builder.HasIndex(order => new { order.DriverId, order.Status });

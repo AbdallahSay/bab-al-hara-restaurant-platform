@@ -1,5 +1,7 @@
 import { InjectionToken } from '@angular/core';
 
+import { environment } from '../../../environments/environment';
+
 export interface AppEnvironment {
   readonly production: boolean;
   readonly apiBaseUrl: string;
@@ -9,4 +11,7 @@ export interface AppEnvironment {
   readonly operationsHubUrl: string;
 }
 
-export const APP_ENVIRONMENT = new InjectionToken<AppEnvironment>('APP_ENVIRONMENT');
+export const APP_ENVIRONMENT = new InjectionToken<AppEnvironment>('APP_ENVIRONMENT', {
+  providedIn: 'root',
+  factory: () => environment,
+});

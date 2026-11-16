@@ -99,7 +99,8 @@ public sealed partial class OrderApplicationService(
             deliveryArea?.NameEn,
             command.Address,
             deliveryArea?.DeliveryFee ?? 0m,
-            command.CustomerNote);
+            command.CustomerNote,
+            customerId: command.CustomerId);
 
         foreach (var line in command.Items)
         {
