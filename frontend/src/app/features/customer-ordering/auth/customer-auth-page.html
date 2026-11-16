@@ -1,0 +1,146 @@
+<div class="auth-layout" [attr.dir]="language.current() === 'ar' ? 'rtl' : 'ltr'">
+  <header class="auth-topbar">
+    <a class="brand-link" routerLink="/" [attr.aria-label]="copy().brand.homeLabel">
+      <span class="brand-mark" aria-hidden="true">ب</span>
+      <span class="brand-name">{{ copy().brand.name }}</span>
+    </a>
+
+    <div class="language-switcher" role="group" [attr.aria-label]="copy().brand.languageLabel">
+      <button
+        type="button"
+        [class.is-active]="language.current() === 'ar'"
+        (click)="setLanguage('ar')"
+      >
+        {{ copy().brand.arabic }}
+      </button>
+      <button
+        type="button"
+        [class.is-active]="language.current() === 'en'"
+        (click)="setLanguage('en')"
+      >
+        {{ copy().brand.english }}
+      </button>
+    </div>
+  </header>
+
+  <div class="auth-wrapper">
+    <aside class="auth-brand-side">
+      <div class="brand-side-content">
+        <span class="brand-logo" aria-hidden="true">ب</span>
+        <h1 class="brand-headline">{{ copy().brand.name }}</h1>
+        <p class="brand-tagline">{{ copy().brand.tagline }}</p>
+        <p class="brand-subtext">{{ copy().auth.guestNotice }}</p>
+      </div>
+    </aside>
+
+    <main class="auth-form-side">
+      <div class="auth-card">
+        <div class="auth-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            class="tab-btn"
+            [class.is-active]="activeTab() === 'signin'"
+            [attr.aria-selected]="activeTab() === 'signin'"
+            (click)="setTab('signin')"
+          >
+            {{ copy().auth.signInTab }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class="tab-btn"
+            [class.is-active]="activeTab() === 'signup'"
+            [attr.aria-selected]="activeTab() === 'signup'"
+            (click)="setTab('signup')"
+          >
+            {{ copy().auth.signUpTab }}
+          </button>
+        </div>
+
+        <h2 class="card-headline">
+          {{ activeTab() === 'signin' ? copy().auth.signInTitle : copy().auth.signUpTitle }}
+        </h2>
+
+        @if (successMessage(); as sMsg) {
+          <div class="auth-alert auth-alert--success" role="status">
+            <span>✓</span> {{ sMsg }}
+          </div>
+        }
+
+        @if (errorMessage(); as eMsg) {
+          <div class="auth-alert auth-alert--error" role="alert">
+            {{ eMsg }}
+          </div>
+        }
+
+        <form class="auth-form" (submit)="onSubmit($event)">
+          @if (activeTab() === 'signup') {
+            <div class="form-group">
+              <label for="auth-name">{{ copy().auth.name }} *</label>
+              <input
+                id="auth-name"
+                type="text"
+                class="form-control"
+                [value]="name()"
+                (input)="name.set($any($event.target).value)"
+                required
+              />
+            </div>
+          }
+
+          <div class="form-group">
+            <label for="auth-identifier">{{ copy().auth.phoneOrEmail }} *</label>
+            <input
+              id="auth-identifier"
+              type="text"
+              class="form-control"
+              [value]="identifier()"
+              (input)="identifier.set($any($event.target).value)"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="auth-password">{{ copy().auth.password }} *</label>
+            <input
+              id="auth-password"
+              type="password"
+              class="form-control"
+              [value]="password()"
+              (input)="password.set($any($event.target).value)"
+              required
+            />
+          </div>
+
+          <div class="form-row">
+            <label class="remember-check">
+              <input
+                type="checkbox"
+                [checked]="rememberMe()"
+                (change)="rememberMe.set($any($event.target).checked)"
+              />
+              <span>{{ copy().auth.rememberMe }}</span>
+            </label>
+
+            @if (activeTab() === 'signin') {
+              <a routerLink="/contact" class="forgot-link">{{ copy().auth.forgotPassword }}</a>
+            }
+          </div>
+
+          <button type="submit" class="button button--primary" [disabled]="submitting()">
+            {{ activeTab() === 'signin' ? copy().auth.signInSubmit : copy().auth.signUpSubmit }}
+          </button>
+
+          <div class="divider">
+            <span>أو</span>
+          </div>
+
+          <a routerLink="/" class="button button--guest">
+            {{ copy().auth.continueAsGuest }}
+          </a>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>

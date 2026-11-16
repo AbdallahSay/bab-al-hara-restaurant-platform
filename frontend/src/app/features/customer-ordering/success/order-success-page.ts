@@ -3,13 +3,14 @@ import { RouterLink } from '@angular/router';
 
 import { formatMoney, localizedText } from '../../../core/i18n/formatters';
 import { LanguageService } from '../../../core/i18n/language.service';
+import { CustomerFooter } from '../../../shared/customer-footer/customer-footer';
 import { CustomerHeader } from '../../../shared/customer-header/customer-header';
 import { RecentOrdersService } from '../recent-orders.service';
 import { OrderReceiptService } from './order-receipt.service';
 
 @Component({
   selector: 'app-order-success-page',
-  imports: [CustomerHeader, RouterLink],
+  imports: [CustomerHeader, CustomerFooter, RouterLink],
   templateUrl: './order-success-page.html',
   styleUrl: './order-success-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

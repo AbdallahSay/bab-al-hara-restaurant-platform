@@ -4,7 +4,7 @@
 
 .customer-header {
   position: sticky;
-  z-index: 20;
+  z-index: 50;
   inset-block-start: 0;
   border-block-end: 1px solid var(--color-border);
   background: rgb(255 253 249 / 96%);
@@ -15,19 +15,55 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-2);
   max-inline-size: var(--content-width);
   min-block-size: 4.5rem;
   margin-inline: auto;
   padding: var(--space-2) var(--space-4);
 }
 
+.customer-header__start {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.mobile-menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 0.5rem);
+  cursor: pointer;
+  color: var(--color-ink);
+
+  .hamburger-bar {
+    display: block;
+    inline-size: 1.25rem;
+    block-size: 2px;
+    background: currentColor;
+    border-radius: 1px;
+    transition: transform 0.2s ease;
+  }
+
+  @media (max-width: 62rem) {
+    display: inline-flex;
+  }
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   color: var(--color-ink);
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .brand__mark {
@@ -57,17 +93,92 @@
   }
 }
 
-.customer-header__actions,
-.language-switcher {
+.desktop-nav {
   display: flex;
   align-items: center;
+  gap: var(--space-2);
+  margin-inline-start: var(--space-3);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    color: var(--color-ink);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: var(--radius-sm, 0.5rem);
+    transition: all 0.15s ease;
+
+    &:hover {
+      color: var(--color-primary);
+      background: var(--color-primary-soft);
+    }
+
+    &.is-active {
+      color: var(--color-primary);
+      background: var(--color-primary-soft);
+      font-weight: 700;
+    }
+  }
+
+  @media (max-width: 62rem) {
+    display: none;
+  }
 }
 
 .customer-header__actions {
+  display: flex;
+  align-items: center;
   gap: var(--space-2);
 }
 
+.icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: white;
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: all 0.15s ease;
+
+  .nav-icon {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--color-primary-soft);
+  }
+
+  .badge-count {
+    position: absolute;
+    inset-block-start: -0.25rem;
+    inset-inline-end: -0.25rem;
+    display: grid;
+    place-items: center;
+    min-inline-size: 1.25rem;
+    block-size: 1.25rem;
+    padding: 0 0.25rem;
+    border-radius: 1rem;
+    background: var(--color-primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+}
+
 .language-switcher {
+  display: flex;
+  align-items: center;
   padding: 0.1875rem;
   border: 1px solid var(--color-border);
   border-radius: 2rem;
@@ -80,6 +191,7 @@
     background: transparent;
     color: var(--color-ink-muted);
     cursor: pointer;
+    font-weight: 600;
   }
 
   .is-active {
@@ -101,14 +213,18 @@
   font-size: 0.875rem;
   font-weight: 700;
   text-decoration: none;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease;
+  transition: all 0.15s ease;
 
   &:hover,
   &:focus-visible {
     border-color: var(--color-primary);
     color: var(--color-primary);
+  }
+}
+
+.desktop-only {
+  @media (max-width: 48rem) {
+    display: none !important;
   }
 }
 
@@ -132,6 +248,7 @@
     block-size: 0.5rem;
     border-radius: 50%;
     background: var(--color-primary);
+    animation: pulse 1.5s infinite;
   }
 
   &:hover,
@@ -143,6 +260,12 @@
       background: white;
     }
   }
+}
+
+@keyframes pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 .cart-link {
@@ -169,10 +292,62 @@
   }
 }
 
-@media (max-width: 26rem) {
+.mobile-drawer {
+  background: var(--color-surface, #fff);
+  border-block-end: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  animation: slideDown 0.2s ease-out;
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-1);
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm, 0.5rem);
+      color: var(--color-ink);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background 0.15s ease;
+
+      .icon {
+        font-size: 1.15rem;
+      }
+
+      &:hover,
+      &:focus-visible {
+        background: var(--color-primary-soft);
+        color: var(--color-primary);
+      }
+
+      .mobile-badge {
+        margin-inline-start: auto;
+        padding: 0.15rem 0.5rem;
+        border-radius: 1rem;
+        background: var(--color-primary);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 30rem) {
   .customer-header__content {
-    padding: var(--space-2) var(--space-2);
-    gap: 0.35rem;
+    padding: var(--space-2) 0.5rem;
+    gap: 0.25rem;
     min-block-size: 3.75rem;
   }
 
@@ -183,7 +358,19 @@
   }
 
   .customer-header__actions {
-    gap: 0.25rem;
+    gap: 0.2rem;
+  }
+
+  .icon-link,
+  .mobile-menu-toggle {
+    min-inline-size: 2.25rem;
+    min-block-size: 2.25rem;
+    padding: 0.25rem;
+
+    .nav-icon {
+      inline-size: 1.1rem;
+      block-size: 1.1rem;
+    }
   }
 
   .orders-link,
@@ -196,12 +383,12 @@
 
   .language-switcher button {
     min-block-size: 2rem;
-    padding-inline: 0.4rem;
+    padding-inline: 0.35rem;
     font-size: 0.72rem;
   }
 }
 
-@media (min-width: 42rem) {
+@media (min-width: 48rem) {
   .brand__text {
     display: block;
   }

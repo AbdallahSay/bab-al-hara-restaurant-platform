@@ -47,6 +47,68 @@ export const routes: Routes = [
     title: 'Track your order | Bab Al Hara',
   },
   {
+    path: 'order/:publicCode/details',
+    loadComponent: () =>
+      import('./features/customer-ordering/order-details/order-details-page').then(
+        (m) => m.OrderDetailsPage,
+      ),
+    title: 'Order Details | تفاصيل الطلب | Bab Al Hara',
+  },
+  {
+    path: 'search',
+    loadComponent: () =>
+      import('./features/customer-ordering/search/search-page').then((m) => m.SearchPage),
+    title: 'Search | بحث | Bab Al Hara',
+  },
+  {
+    path: 'wishlist',
+    loadComponent: () =>
+      import('./features/customer-ordering/wishlist/wishlist-page').then((m) => m.WishlistPage),
+    title: 'Wishlist | المفضلة | Bab Al Hara',
+  },
+  {
+    path: 'about',
+    loadComponent: () =>
+      import('./features/customer-ordering/about/about-page').then((m) => m.AboutPage),
+    title: 'About | من نحن | Bab Al Hara',
+  },
+  {
+    path: 'contact',
+    loadComponent: () =>
+      import('./features/customer-ordering/contact/contact-page').then((m) => m.ContactPage),
+    title: 'Contact | تواصل معنا | Bab Al Hara',
+  },
+  {
+    path: 'profile',
+    loadComponent: () =>
+      import('./features/customer-ordering/profile/profile-page').then((m) => m.ProfilePage),
+    title: 'My Profile | حسابي | Bab Al Hara',
+  },
+  {
+    path: 'account-settings',
+    loadComponent: () =>
+      import('./features/customer-ordering/account-settings/account-settings-page').then(
+        (m) => m.AccountSettingsPage,
+      ),
+    title: 'Account Settings | إعدادات الحساب | Bab Al Hara',
+  },
+  {
+    path: 'sign-in',
+    loadComponent: () =>
+      import('./features/customer-ordering/auth/customer-auth-page').then(
+        (m) => m.CustomerAuthPage,
+      ),
+    title: 'Sign In | تسجيل الدخول | Bab Al Hara',
+  },
+  {
+    path: 'sign-up',
+    loadComponent: () =>
+      import('./features/customer-ordering/auth/customer-auth-page').then(
+        (m) => m.CustomerAuthPage,
+      ),
+    title: 'Sign Up | إنشاء حساب | Bab Al Hara',
+  },
+  {
     path: 'kitchen/sign-in',
     loadComponent: () =>
       import('./features/kitchen/staff-sign-in-page').then(

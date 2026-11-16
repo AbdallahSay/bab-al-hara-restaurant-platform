@@ -11,6 +11,15 @@ export interface UiCopy {
     readonly cart: string;
     readonly orders: string;
     readonly trackActiveOrder: string;
+    readonly menu: string;
+    readonly about: string;
+    readonly contact: string;
+    readonly search: string;
+    readonly wishlist: string;
+    readonly profile: string;
+    readonly accountSettings: string;
+    readonly signIn: string;
+    readonly signUp: string;
   };
   readonly common: {
     readonly retry: string;
@@ -839,6 +848,185 @@ export interface UiCopy {
       readonly retry: string;
     };
   };
+  readonly home: {
+    readonly heroEyebrow: string;
+    readonly heroTitle: string;
+    readonly heroSubtitle: string;
+    readonly orderNow: string;
+    readonly exploreMenu: string;
+    readonly badgeFresh: string;
+    readonly highlightsTitle: string;
+    readonly feature1Title: string;
+    readonly feature1Desc: string;
+    readonly feature2Title: string;
+    readonly feature2Desc: string;
+    readonly feature3Title: string;
+    readonly feature3Desc: string;
+    readonly feature4Title: string;
+    readonly feature4Desc: string;
+    readonly specialsTitle: string;
+    readonly specialsSubtitle: string;
+    readonly aboutStoryTitle: string;
+    readonly aboutStoryBody: string;
+    readonly readMore: string;
+    readonly reviewsTitle: string;
+    readonly review1Text: string;
+    readonly review1Author: string;
+    readonly review2Text: string;
+    readonly review2Author: string;
+    readonly review3Text: string;
+    readonly review3Author: string;
+  };
+  readonly about: {
+    readonly eyebrow: string;
+    readonly title: string;
+    readonly subtitle: string;
+    readonly storyTitle: string;
+    readonly storyParagraph1: string;
+    readonly storyParagraph2: string;
+    readonly valuesTitle: string;
+    readonly value1Title: string;
+    readonly value1Desc: string;
+    readonly value2Title: string;
+    readonly value2Desc: string;
+    readonly value3Title: string;
+    readonly value3Desc: string;
+    readonly statYears: string;
+    readonly statYearsLabel: string;
+    readonly statCustomers: string;
+    readonly statCustomersLabel: string;
+    readonly statDishes: string;
+    readonly statDishesLabel: string;
+    readonly ctaTitle: string;
+    readonly ctaButton: string;
+  };
+  readonly contact: {
+    readonly eyebrow: string;
+    readonly title: string;
+    readonly subtitle: string;
+    readonly phoneTitle: string;
+    readonly phoneValue: string;
+    readonly whatsappTitle: string;
+    readonly whatsappValue: string;
+    readonly addressTitle: string;
+    readonly addressValue: string;
+    readonly hoursTitle: string;
+    readonly hoursValue: string;
+    readonly formTitle: string;
+    readonly nameLabel: string;
+    readonly phoneOrEmailLabel: string;
+    readonly subjectLabel: string;
+    readonly messageLabel: string;
+    readonly submitButton: string;
+    readonly successMessage: string;
+    readonly validationError: string;
+  };
+  readonly search: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly placeholder: string;
+    readonly clear: string;
+    readonly quickTags: string;
+    readonly tagAll: string;
+    readonly tagGrills: string;
+    readonly tagShawarma: string;
+    readonly tagSandwiches: string;
+    readonly tagAppetizers: string;
+    readonly tagDrinks: string;
+    readonly resultsCount: string;
+    readonly emptyTitle: string;
+    readonly emptySubtitle: string;
+    readonly browseAll: string;
+  };
+  readonly wishlist: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly itemsCount: string;
+    readonly addAllToCart: string;
+    readonly addAllSuccess: string;
+    readonly emptyTitle: string;
+    readonly emptySubtitle: string;
+    readonly browseMenu: string;
+    readonly remove: string;
+  };
+  readonly profile: {
+    readonly title: string;
+    readonly greeting: string;
+    readonly guestBadge: string;
+    readonly personalInfoTitle: string;
+    readonly nameLabel: string;
+    readonly phoneLabel: string;
+    readonly defaultAddressTitle: string;
+    readonly noSavedAddress: string;
+    readonly totalOrdersLabel: string;
+    readonly wishlistLabel: string;
+    readonly quickActionsTitle: string;
+    readonly viewOrders: string;
+    readonly viewWishlist: string;
+    readonly accountSettings: string;
+    readonly startOrder: string;
+  };
+  readonly accountSettings: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly personalDetails: string;
+    readonly name: string;
+    readonly phone: string;
+    readonly savedDeliveryAddress: string;
+    readonly addressStreet: string;
+    readonly addressBuilding: string;
+    readonly addressFloor: string;
+    readonly addressNotes: string;
+    readonly saveChanges: string;
+    readonly savedSuccess: string;
+    readonly clearData: string;
+    readonly clearConfirm: string;
+    readonly clearedSuccess: string;
+  };
+  readonly auth: {
+    readonly signInTab: string;
+    readonly signUpTab: string;
+    readonly signInTitle: string;
+    readonly signUpTitle: string;
+    readonly phoneOrEmail: string;
+    readonly password: string;
+    readonly name: string;
+    readonly rememberMe: string;
+    readonly forgotPassword: string;
+    readonly signInSubmit: string;
+    readonly signUpSubmit: string;
+    readonly continueAsGuest: string;
+    readonly guestNotice: string;
+    readonly successNotice: string;
+    readonly validationError: string;
+  };
+  readonly orderDetails: {
+    readonly title: string;
+    readonly orderNumber: string;
+    readonly orderDate: string;
+    readonly fulfillmentType: string;
+    readonly deliveryAddress: string;
+    readonly customerName: string;
+    readonly customerPhone: string;
+    readonly assignedDriver: string;
+    readonly itemsTitle: string;
+    readonly itemPrice: string;
+    readonly itemQuantity: string;
+    readonly itemTotal: string;
+    readonly liveTrackButton: string;
+    readonly reorderButton: string;
+    readonly backToOrders: string;
+  };
+  readonly footer: {
+    readonly description: string;
+    readonly quickLinksTitle: string;
+    readonly workingHoursTitle: string;
+    readonly workingHoursValue: string;
+    readonly contactTitle: string;
+    readonly branchesTitle: string;
+    readonly branchesValue: string;
+    readonly copyright: string;
+  };
 }
 
 export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
@@ -853,6 +1041,15 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       cart: 'السلة',
       orders: 'طلباتي',
       trackActiveOrder: 'متابعة طلبك',
+      menu: 'القائمة',
+      about: 'من نحن',
+      contact: 'اتصل بنا',
+      search: 'بحث',
+      wishlist: 'المفضلة',
+      profile: 'حسابي',
+      accountSettings: 'إعدادات الحساب',
+      signIn: 'تسجيل الدخول',
+      signUp: 'إنشاء حساب',
     },
     common: {
       retry: 'حاول مرة أخرى',
@@ -1702,6 +1899,194 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         retry: 'إعادة المحاولة',
       },
     },
+    home: {
+      heroEyebrow: 'أصالة المذاق الشامي العريق',
+      heroTitle: 'مشاوي وأكلات شامية على أصولها',
+      heroSubtitle:
+        'نقدم لكم أشهى المشاوي المحضرة على الفحم بتتبيلاتنا الخاصة ولحومنا الطازجة يومياً مع كرم الضيافة الشامية.',
+      orderNow: 'اطلب طعامك الآن',
+      exploreMenu: 'تصفح القائمة الكاملة',
+      badgeFresh: 'لحوم طازجة 100% يومياً',
+      highlightsTitle: 'لماذا يختار زبائننا باب الحارة؟',
+      feature1Title: 'لحوم طازجة يومياً',
+      feature1Desc: 'نعتمد أجود قطع اللحوم البلدية المذبوحة محلياً يومياً بعناية فائقة.',
+      feature2Title: 'شواء على الفحم الطبيعي',
+      feature2Desc: 'نطهو كل طبق بنكهة الشواء الشامي الأصيل على الجمر بدون مساومات.',
+      feature3Title: 'توصيل فوري ساخن',
+      feature3Desc: 'أسطول توصيل مجهز بحقائب حرارية لضمان وصول طلبك ساخناً كأنه خرج من الفرن للتو.',
+      feature4Title: 'تتبيلات عائلية سرية',
+      feature4Desc: 'خلطات بهارات سورية توارثتها أجيال الطهاة لتمنحك مذاقاً فريداً لا ينسى.',
+      specialsTitle: 'أطباقنا المميزة الأكثر طلباً',
+      specialsSubtitle: 'تشكيلة مختارة من أشهى أطباق المشاوي والسندوتشات والمقبلات التي حازت ثقة زبائننا.',
+      aboutStoryTitle: 'قصة باب الحارة',
+      aboutStoryBody:
+        'بدأت رحلتنا من حب المطبخ الشامي الغني وتقاليده الأصيلة. في باب الحارة، نحرص على تقديم تجربة طعام استثنائية تجمع بين عبق دمشق القديمة وأعلى معايير الجودة والنظافة والخدمة الراقية.',
+      readMore: 'تعرف أكثر علينا',
+      reviewsTitle: 'آراء زبائننا الكرام',
+      review1Text:
+        'أفضل مشكل مشاوي ذقته على الإطلاق! اللحم طري للغاية والتتبيلة موزونة بدقة فائقة، والتوصيل سريع جداً.',
+      review1Author: 'أحمد محمود — عميل مخلص',
+      review2Text:
+        'شاورما لحم ومقبلات سورية أصلية تذكرني بدمشق. نظافة واهتمام رائع بالتفاصيل وتغليف محكم وساخن.',
+      review2Author: 'سارة عبد الرحمن — ناقدة طعام',
+      review3Text:
+        'الخدمة ممتازة وفريق العمل محترم وودود. وجبة عائلية متكاملة وسعر عادل مقابل الجودة العالية.',
+      review3Author: 'محمد إبراهيم — زائر متكرر',
+    },
+    about: {
+      eyebrow: 'تاريخنا ورؤيتنا',
+      title: 'من نحن — مطعم باب الحارة',
+      subtitle:
+        'رحلة شغف في فنون الشواء والضيافة الشامية، تأسست لنقدم لكم المذاق الشامي الأصيل بجودة لا تضاهى.',
+      storyTitle: 'عبق الشام وتراث المشاوي الأصيلة',
+      storyParagraph1:
+        'تأسس مطعم باب الحارة ليجسد روح كرم الضيافة السورية العريقة ونكهات أسواق دمشق التاريخية. انطلقنا برؤية واضحة: إحياء فنون الشواء التقليدي على الحطب والفحم الطبيعي، مستخدمين أفضل المكونات المحلية والبهارات الشامية المستوردة.',
+      storyParagraph2:
+        'نحن لا نقدم مجرد وجبات، بل نصنع ذكريات دافئة حول المائدة. طهاتنا من ذوي الخبرة الطويلة يعملون بشغف وإتقان لتقديم الكباب، الشيش طاووق، الريش، وسندوتشات الشاورما المصنوعة من لحوم بلدي طازجة بنسبة 100%.',
+      valuesTitle: 'قيمنا ومبادئنا الثابتة',
+      value1Title: 'الجودة المطلقة',
+      value1Desc: 'لا مساومة على جودة وطزاجة المكونات؛ فحص دقيق واختيار يومي صارم.',
+      value2Title: 'الأصالة والأمانة',
+      value2Desc: 'وصفات متوارثة وتتبيلات طبيعية دون أية محسنات صناعية أو إضافات ضارة.',
+      value3Title: 'كرم الضيافة والاهتمام',
+      value3Desc: 'خدمة راقية وسرعة استجابة تجعل كل عميل يشعر بأنه ضيف في بيتنا.',
+      statYears: '+12',
+      statYearsLabel: 'عاماً من الخبرة والتميز',
+      statCustomers: '+50,000',
+      statCustomersLabel: 'وجبة قُدمت بحب وسعادة',
+      statDishes: '+35',
+      statDishesLabel: 'صنفاً شامياً أصيلاً',
+      ctaTitle: 'هل أنت جاهز لتجربة طعم الشام الحقيقي؟',
+      ctaButton: 'تصفح القائمة واطلب الآن',
+    },
+    contact: {
+      eyebrow: 'يسعدنا تواصلكم',
+      title: 'اتصل بنا — باب الحارة',
+      subtitle: 'نحن هنا للإجابة على استفساراتكم وتلقي مقترحاتكم وطلباتكم الخاصة على مدار الساعة.',
+      phoneTitle: 'الهاتف المباشر',
+      phoneValue: '+20 100 234 5678',
+      whatsappTitle: 'خدمة العملاء عبر واتساب',
+      whatsappValue: '+20 100 234 5678',
+      addressTitle: 'عنوان المطعم',
+      addressValue: 'شارع الجمهورية الرئيسي، وسط البلد — القاهرة، مصر',
+      hoursTitle: 'ساعات العمل الرسمية',
+      hoursValue: 'يومياً من الساعة 11:00 صباحاً وحتى 02:00 بعد منتصف الليل',
+      formTitle: 'أرسل لنا رسالة مباشرة',
+      nameLabel: 'الاسم الكامل',
+      phoneOrEmailLabel: 'رقم الهاتف أو البريد الإلكتروني',
+      subjectLabel: 'موضوع الرسالة',
+      messageLabel: 'نص الرسالة أو الاستفسار',
+      submitButton: 'إرسال الرسالة الآن',
+      successMessage: 'تم إرسال رسالتك بنجاح! سيتواصل معك فريق خدمة العملاء في أقرب وقت ممكن.',
+      validationError: 'يرجى ملء جميع الحقول المطلوبة والتأكد من صحة بيانات الاتصال.',
+    },
+    search: {
+      title: 'البحث في القائمة',
+      subtitle: 'ابحث عن وجبتك المفضلة بالاسم أو المكونات وتصفح خياراتنا الشهية بسهولة.',
+      placeholder: 'ابحث عن وجبة، مشاوي، سندوتش، شاورما...',
+      clear: 'مسح البحث',
+      quickTags: 'كلمات بحث شائعة:',
+      tagAll: 'الكل',
+      tagGrills: 'مشاوي',
+      tagShawarma: 'شاورما',
+      tagSandwiches: 'سندوتشات',
+      tagAppetizers: 'مقبلات',
+      tagDrinks: 'مشروبات',
+      resultsCount: 'تم العثور على {count} وجبة مطابقة',
+      emptyTitle: 'لم نجد أي وجبة تطابق بحثك',
+      emptySubtitle: 'جرب البحث بكلمات مختلفة أو تصفح الأقسام الكاملة من القائمة الرئيسية.',
+      browseAll: 'عرض كل الوجبات المتاحة',
+    },
+    wishlist: {
+      title: 'قائمتي المفضلة',
+      subtitle: 'الوجبات التي أحببتها ومحفوظة للوصول السريع إليها في أي وقت.',
+      itemsCount: '{count} وجبات محفوظة في المفضلة',
+      addAllToCart: 'إضافة الكل إلى السلة',
+      addAllSuccess: 'تمت إضافة جميع الأصناف المتوفرة إلى سلتك بنجاح!',
+      emptyTitle: 'قائمتك المفضلة فارغة حالياً',
+      emptySubtitle: 'انقر على رمز القلب الموجود بجانب أي وجبة في القائمة لحفظها هنا والوصول إليها بسرعة.',
+      browseMenu: 'استكشف القائمة وأضف وجباتك المفضلة',
+      remove: 'إزالة من المفضلة',
+    },
+    profile: {
+      title: 'حسابي وبياناتي',
+      greeting: 'أهلاً بك في باب الحارة',
+      guestBadge: 'حساب محلي آمن',
+      personalInfoTitle: 'البيانات الشخصية المحفوظة',
+      nameLabel: 'الاسم',
+      phoneLabel: 'رقم الهاتف',
+      defaultAddressTitle: 'عنوان التوصيل الافتراضي',
+      noSavedAddress: 'لم يتم حفظ عنوان توصيل بعد. يمكنك حفظ عنوانك لتسهيل عملية الطلب القادمة.',
+      totalOrdersLabel: 'إجمالي الطلبات المسجلة',
+      wishlistLabel: 'الوجبات المفضلة',
+      quickActionsTitle: 'روابط سريعة',
+      viewOrders: 'سجل طلباتي ومتابعتها',
+      viewWishlist: 'قائمتي المفضلة',
+      accountSettings: 'تعديل الإعدادات والعنوان',
+      startOrder: 'بدء طلب جديد الآن',
+    },
+    accountSettings: {
+      title: 'إعدادات الحساب',
+      subtitle: 'تعديل بيانات الاتصال وعنوان التوصيل المحفوظ على جهازك بكل سهولة.',
+      personalDetails: 'تعديل البيانات الشخصية',
+      name: 'الاسم الكامل',
+      phone: 'رقم الهاتف (صيغة مصرية +20)',
+      savedDeliveryAddress: 'عنوان التوصيل الافتراضي',
+      addressStreet: 'الشارع والمنطقة',
+      addressBuilding: 'رقم المبنى / العمارة',
+      addressFloor: 'رقم الطابق والشقة',
+      addressNotes: 'ملاحظات إضافية لتسهيل الوصول',
+      saveChanges: 'حفظ التعديلات',
+      savedSuccess: 'تم حفظ بياناتك بنجاح على جهازك!',
+      clearData: 'مسح البيانات المحفوظة محلياً',
+      clearConfirm: 'هل أنت متأكد من رغبتك في مسح كافة البيانات المحفوظة على هذا الجهاز؟',
+      clearedSuccess: 'تم مسح البيانات المحفوظة بنجاح.',
+    },
+    auth: {
+      signInTab: 'تسجيل الدخول',
+      signUpTab: 'إنشاء حساب جديد',
+      signInTitle: 'تسجيل الدخول إلى حسابك',
+      signUpTitle: 'إنشاء حساب مستخدم جديد',
+      phoneOrEmail: 'رقم الهاتف أو البريد الإلكتروني',
+      password: 'كلمة المرور',
+      name: 'الاسم الكامل',
+      rememberMe: 'تذكر بياناتي على هذا الجهاز',
+      forgotPassword: 'نسيت كلمة المرور؟',
+      signInSubmit: 'دخول إلى الحساب',
+      signUpSubmit: 'إنشاء الحساب ومتابعة الطلب',
+      continueAsGuest: 'المتابعة كضيف (بدون تسجيل)',
+      guestNotice: 'يمكنك إتمام أي طلب مباشرة كضيف دون الحاجة لإنشاء حساب.',
+      successNotice: 'تم تسجيل الدخول بنجاح! مرحباً بك في باب الحارة.',
+      validationError: 'يرجى التأكد من ملء كافة البيانات المطلوبة بشكل صحيح.',
+    },
+    orderDetails: {
+      title: 'تفاصيل وإيصال الطلب',
+      orderNumber: 'رقم الطلب',
+      orderDate: 'تاريخ وساعة الطلب',
+      fulfillmentType: 'نوع الاستلام والتوصيل',
+      deliveryAddress: 'عنوان التوصيل',
+      customerName: 'اسم العميل',
+      customerPhone: 'هاتف العميل',
+      assignedDriver: 'مندوب التوصيل المسؤول',
+      itemsTitle: 'الوجبات المطلوبة',
+      itemPrice: 'سعر الوحدة',
+      itemQuantity: 'الكمية',
+      itemTotal: 'الإجمالي',
+      liveTrackButton: 'متابعة حركة الطلب مباشرة',
+      reorderButton: 'إعادة طلب نفس الوجبات',
+      backToOrders: 'العودة لقائمة طلباتي',
+    },
+    footer: {
+      description:
+        'مطعم باب الحارة — عنوان الأصالة والجودة العالية في المشاوي والمأكولات الشامية على الفحم.',
+      quickLinksTitle: 'روابط هامة',
+      workingHoursTitle: 'ساعات العمل',
+      workingHoursValue: 'يومياً: 11:00 صباحاً – 02:00 بعد منتصف الليل',
+      contactTitle: 'اتصل بنا',
+      branchesTitle: 'فروعنا وتوصيلنا',
+      branchesValue: 'توصيل سريع لكافة المناطق المحيطة ووسط البلد',
+      copyright: 'جميع الحقوق محفوظة © مطعم باب الحارة. الطعم الشامي الأصيل.',
+    },
   },
   en: {
     brand: {
@@ -1714,6 +2099,15 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       cart: 'Cart',
       orders: 'My Orders',
       trackActiveOrder: 'Track your order',
+      menu: 'Menu',
+      about: 'About Us',
+      contact: 'Contact Us',
+      search: 'Search',
+      wishlist: 'Wishlist',
+      profile: 'My Profile',
+      accountSettings: 'Account Settings',
+      signIn: 'Sign In',
+      signUp: 'Sign Up',
     },
     common: {
       retry: 'Try again',
@@ -2574,6 +2968,194 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         loadFailed: 'Failed to load reporting and analytics data.',
         retry: 'Retry',
       },
+    },
+    home: {
+      heroEyebrow: 'Authentic Levantine Heritage',
+      heroTitle: 'Traditional Charcoal Grills & Specialties',
+      heroSubtitle:
+        'Savor authentic Levantine grilled dishes seasoned with traditional family marinades and 100% fresh daily meats, served with genuine hospitality.',
+      orderNow: 'Order Food Now',
+      exploreMenu: 'Explore Full Menu',
+      badgeFresh: '100% Fresh Daily Halal Meat',
+      highlightsTitle: 'Why Bab Al Hara?',
+      feature1Title: 'Fresh Meats Daily',
+      feature1Desc: 'We carefully source premium fresh local meats slaughtered daily under rigorous standards.',
+      feature2Title: 'Natural Charcoal Grilling',
+      feature2Desc: 'Every kebab and cut is slowly flame-grilled over natural charcoal embers for unmatched aroma.',
+      feature3Title: 'Express Hot Delivery',
+      feature3Desc: 'Delivered in specialized thermal containers ensuring your food arrives piping hot.',
+      feature4Title: 'Secret Family Marinades',
+      feature4Desc: 'Syrian spice blends perfected over generations giving an unforgettable taste.',
+      specialsTitle: 'Popular Signature Dishes',
+      specialsSubtitle: 'A curated selection of our most loved grills, sandwiches, and hot Levantine appetizers.',
+      aboutStoryTitle: 'The Bab Al Hara Story',
+      aboutStoryBody:
+        'Our journey started from a profound love for traditional Levantine gastronomy. At Bab Al Hara, we bring the culinary spirit of Old Damascus to your table with uncompromising quality and warm hospitality.',
+      readMore: 'Learn More About Us',
+      reviewsTitle: 'Guest Testimonials',
+      review1Text:
+        'The best mixed grill I have ever tasted! The meat is exceptionally tender, spices are balanced, and delivery was remarkably fast.',
+      review1Author: 'Ahmed M. — Loyal Customer',
+      review2Text:
+        'Authentic Syrian shawarma and appetizers that remind me of Damascus. Clean, hot, and professionally packaged.',
+      review2Author: 'Sara A. — Food Critic',
+      review3Text:
+        'Outstanding food and warm, attentive service. Generous family portions at very reasonable prices.',
+      review3Author: 'Mohamed I. — Frequent Guest',
+    },
+    about: {
+      eyebrow: 'Heritage & Vision',
+      title: 'About Us — Bab Al Hara',
+      subtitle:
+        'A passionate journey in Levantine culinary traditions, dedicated to serving authentic taste and generous hospitality.',
+      storyTitle: 'Levantine Charcoal Heritage',
+      storyParagraph1:
+        'Bab Al Hara was founded to embody the warm spirit of Syrian hospitality and the iconic flavors of Damascus historic quarters. We embarked with a clear mission: reviving the art of natural wood-charcoal grilling using the finest fresh meats and authentic spices.',
+      storyParagraph2:
+        'We do not simply prepare food; we create warm memories around your table. Our veteran master chefs craft tender kebabs, shish tawook, lamb chops, and shawarma sandwiches using 100% fresh daily local meats.',
+      valuesTitle: 'Our Core Principles',
+      value1Title: 'Uncompromising Quality',
+      value1Desc: 'Zero tolerance for substandard ingredients; rigorous daily inspection and selection.',
+      value2Title: 'Authenticity & Honesty',
+      value2Desc: 'Heritage recipes and natural spices without artificial flavor enhancers or additives.',
+      value3Title: 'Genuine Hospitality',
+      value3Desc: 'Attentive, swift service that makes every customer feel like a treasured family guest.',
+      statYears: '12+',
+      statYearsLabel: 'Years of Culinary Mastery',
+      statCustomers: '50,000+',
+      statCustomersLabel: 'Satisfied Meals Served',
+      statDishes: '35+',
+      statDishesLabel: 'Authentic Levantine Specialties',
+      ctaTitle: 'Ready to Experience Authentic Levantine Flavors?',
+      ctaButton: 'Browse Menu & Order Now',
+    },
+    contact: {
+      eyebrow: 'Get in Touch',
+      title: 'Contact Us — Bab Al Hara',
+      subtitle: 'We are here to answer your questions, handle custom inquiries, and assist you around the clock.',
+      phoneTitle: 'Direct Hotline',
+      phoneValue: '+20 100 234 5678',
+      whatsappTitle: 'WhatsApp Support',
+      whatsappValue: '+20 100 234 5678',
+      addressTitle: 'Restaurant Location',
+      addressValue: 'Main El-Gomhoureya St., Downtown — Cairo, Egypt',
+      hoursTitle: 'Opening Hours',
+      hoursValue: 'Daily: 11:00 AM – 02:00 AM (Midnight)',
+      formTitle: 'Send Us a Direct Message',
+      nameLabel: 'Full Name',
+      phoneOrEmailLabel: 'Phone Number or Email',
+      subjectLabel: 'Subject',
+      messageLabel: 'Your Message or Inquiry',
+      submitButton: 'Send Message Now',
+      successMessage: 'Your message has been sent successfully! Our team will respond shortly.',
+      validationError: 'Please complete all required fields with valid contact information.',
+    },
+    search: {
+      title: 'Search Our Menu',
+      subtitle: 'Find your favorite dishes by name or ingredients and explore delicious Levantine options.',
+      placeholder: 'Search for kebabs, grills, shawarma, sandwiches...',
+      clear: 'Clear search',
+      quickTags: 'Popular Searches:',
+      tagAll: 'All',
+      tagGrills: 'Grills',
+      tagShawarma: 'Shawarma',
+      tagSandwiches: 'Sandwiches',
+      tagAppetizers: 'Appetizers',
+      tagDrinks: 'Beverages',
+      resultsCount: 'Found {count} matching dishes',
+      emptyTitle: 'No dishes match your search',
+      emptySubtitle: 'Try using different keywords or browse our full categories on the main menu.',
+      browseAll: 'View All Available Dishes',
+    },
+    wishlist: {
+      title: 'My Wishlist',
+      subtitle: 'Your favorite dishes saved for quick and convenient ordering.',
+      itemsCount: '{count} saved favorite items',
+      addAllToCart: 'Add All to Cart',
+      addAllSuccess: 'All available favorites have been added to your cart!',
+      emptyTitle: 'Your wishlist is currently empty',
+      emptySubtitle: 'Click the heart icon on any menu item card to save your favorites here.',
+      browseMenu: 'Explore Menu & Add Favorites',
+      remove: 'Remove from Wishlist',
+    },
+    profile: {
+      title: 'My Profile & Details',
+      greeting: 'Welcome to Bab Al Hara',
+      guestBadge: 'Secure Local Profile',
+      personalInfoTitle: 'Saved Personal Details',
+      nameLabel: 'Full Name',
+      phoneLabel: 'Phone Number',
+      defaultAddressTitle: 'Default Delivery Address',
+      noSavedAddress: 'No default address saved yet. Save your address to expedite future orders.',
+      totalOrdersLabel: 'Total Recorded Orders',
+      wishlistLabel: 'Saved Favorites',
+      quickActionsTitle: 'Quick Links',
+      viewOrders: 'Order History & Live Tracking',
+      viewWishlist: 'My Wishlist',
+      accountSettings: 'Edit Profile & Settings',
+      startOrder: 'Start a New Order Now',
+    },
+    accountSettings: {
+      title: 'Account Settings',
+      subtitle: 'Update your contact details and default delivery address stored on this device.',
+      personalDetails: 'Edit Personal Information',
+      name: 'Full Name',
+      phone: 'Phone Number (+20 Egyptian format)',
+      savedDeliveryAddress: 'Default Delivery Address',
+      addressStreet: 'Street & District',
+      addressBuilding: 'Building / House Number',
+      addressFloor: 'Floor & Apartment',
+      addressNotes: 'Delivery Landmark / Notes',
+      saveChanges: 'Save Changes',
+      savedSuccess: 'Your details have been saved successfully on this device!',
+      clearData: 'Clear Locally Saved Data',
+      clearConfirm: 'Are you sure you want to clear all data saved locally on this browser?',
+      clearedSuccess: 'Locally saved data cleared successfully.',
+    },
+    auth: {
+      signInTab: 'Sign In',
+      signUpTab: 'Sign Up',
+      signInTitle: 'Sign In to Your Account',
+      signUpTitle: 'Create a New Account',
+      phoneOrEmail: 'Phone Number or Email',
+      password: 'Password',
+      name: 'Full Name',
+      rememberMe: 'Remember me on this device',
+      forgotPassword: 'Forgot password?',
+      signInSubmit: 'Sign In',
+      signUpSubmit: 'Sign Up & Continue',
+      continueAsGuest: 'Continue as Guest (No Registration)',
+      guestNotice: 'You can order immediately as a guest with no mandatory account creation.',
+      successNotice: 'Signed in successfully! Welcome to Bab Al Hara.',
+      validationError: 'Please ensure all required fields are filled out correctly.',
+    },
+    orderDetails: {
+      title: 'Order Details & Receipt',
+      orderNumber: 'Order Number',
+      orderDate: 'Date & Time',
+      fulfillmentType: 'Fulfillment Type',
+      deliveryAddress: 'Delivery Address',
+      customerName: 'Customer Name',
+      customerPhone: 'Customer Phone',
+      assignedDriver: 'Assigned Courier',
+      itemsTitle: 'Ordered Items',
+      itemPrice: 'Unit Price',
+      itemQuantity: 'Quantity',
+      itemTotal: 'Item Total',
+      liveTrackButton: 'Live Track Order Status',
+      reorderButton: 'Reorder These Items',
+      backToOrders: 'Back to My Orders',
+    },
+    footer: {
+      description:
+        'Bab Al Hara Restaurant — Premium authentic Levantine charcoal grills and heritage specialties.',
+      quickLinksTitle: 'Quick Links',
+      workingHoursTitle: 'Working Hours',
+      workingHoursValue: 'Daily: 11:00 AM – 02:00 AM',
+      contactTitle: 'Contact Us',
+      branchesTitle: 'Branches & Delivery',
+      branchesValue: 'Express delivery covering all nearby downtown zones',
+      copyright: 'All rights reserved © Bab Al Hara Restaurant. Authentic Levantine Taste.',
     },
   },
 };

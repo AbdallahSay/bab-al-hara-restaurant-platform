@@ -14,6 +14,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { formatMoney, localizedText } from '../../../core/i18n/formatters';
 import { LanguageService } from '../../../core/i18n/language.service';
+import { CustomerFooter } from '../../../shared/customer-footer/customer-footer';
 import { CustomerHeader } from '../../../shared/customer-header/customer-header';
 import { RestaurantPausedBanner } from '../../../shared/restaurant-paused-banner/restaurant-paused-banner';
 import { CartService } from '../cart/cart.service';
@@ -29,7 +30,7 @@ type AreaState = 'loading' | 'ready' | 'error';
 
 @Component({
   selector: 'app-checkout-page',
-  imports: [CustomerHeader, ReactiveFormsModule, RestaurantPausedBanner, RouterLink],
+  imports: [CustomerHeader, CustomerFooter, ReactiveFormsModule, RestaurantPausedBanner, RouterLink],
   templateUrl: './checkout-page.html',
   styleUrl: './checkout-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,70 @@
+<app-customer-header />
+
+<main class="profile-shell">
+  <div class="profile-container">
+    <header class="profile-hero">
+      <div class="profile-avatar" aria-hidden="true">
+        <span>{{ displayName().charAt(0) || '👤' }}</span>
+      </div>
+      <div class="profile-meta">
+        <span class="profile-badge">{{ copy().profile.guestBadge }}</span>
+        <h1 class="profile-title">{{ displayName() }}</h1>
+        <p class="profile-phone" dir="ltr">{{ displayPhone() }}</p>
+      </div>
+    </header>
+
+    <div class="profile-stats">
+      <div class="stat-card">
+        <strong class="stat-num">{{ totalOrdersCount() }}</strong>
+        <span class="stat-txt">{{ copy().profile.totalOrdersLabel }}</span>
+      </div>
+      <div class="stat-card">
+        <strong class="stat-num">{{ wishlistCount() }}</strong>
+        <span class="stat-txt">{{ copy().profile.wishlistLabel }}</span>
+      </div>
+    </div>
+
+    <div class="profile-sections">
+      <section class="section-card">
+        <div class="section-card__header">
+          <h2>{{ copy().profile.defaultAddressTitle }}</h2>
+          <a routerLink="/account-settings" class="edit-link">{{ copy().profile.accountSettings }}</a>
+        </div>
+        @if (savedAddress(); as addr) {
+          <div class="address-preview">
+            <span class="pin-icon" aria-hidden="true">📍</span>
+            <p>{{ addr }}</p>
+          </div>
+        } @else {
+          <p class="empty-text">{{ copy().profile.noSavedAddress }}</p>
+        }
+      </section>
+
+      <section class="section-card">
+        <div class="section-card__header">
+          <h2>{{ copy().profile.quickActionsTitle }}</h2>
+        </div>
+        <div class="quick-links-grid">
+          <a routerLink="/orders" class="quick-link-card">
+            <span class="ql-icon" aria-hidden="true">📋</span>
+            <span class="ql-title">{{ copy().profile.viewOrders }}</span>
+          </a>
+          <a routerLink="/wishlist" class="quick-link-card">
+            <span class="ql-icon" aria-hidden="true">❤️</span>
+            <span class="ql-title">{{ copy().profile.viewWishlist }}</span>
+          </a>
+          <a routerLink="/account-settings" class="quick-link-card">
+            <span class="ql-icon" aria-hidden="true">⚙️</span>
+            <span class="ql-title">{{ copy().profile.accountSettings }}</span>
+          </a>
+          <a routerLink="/" class="quick-link-card">
+            <span class="ql-icon" aria-hidden="true">🍽️</span>
+            <span class="ql-title">{{ copy().profile.startOrder }}</span>
+          </a>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<app-customer-footer />

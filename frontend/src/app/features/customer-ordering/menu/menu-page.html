@@ -1,98 +1,208 @@
-﻿<app-customer-header />
+<app-customer-header />
 
 <main class="menu-shell">
-  <app-restaurant-paused-banner />
+  <section class="home-hero">
+    <div class="home-hero__content">
+      <div class="badge-pill">
+        <span class="badge-dot" aria-hidden="true"></span>
+        <span>{{ copy().home.badgeFresh }}</span>
+      </div>
+      <p class="hero-eyebrow">{{ copy().home.heroEyebrow }}</p>
+      <h2 class="hero-title">{{ copy().home.heroTitle }}</h2>
+      <p class="hero-subtitle">{{ copy().home.heroSubtitle }}</p>
 
-  <section class="menu-intro" aria-labelledby="menu-title">
-    <p class="eyebrow">{{ copy().menu.eyebrow }}</p>
-    <h1 id="menu-title">{{ copy().menu.title }}</h1>
-    <p>{{ copy().menu.introduction }}</p>
+      <div class="hero-actions">
+        <a href="#menu-catalog" class="button button--primary button--lg">
+          {{ copy().home.orderNow }}
+        </a>
+        <a routerLink="/about" class="button button--secondary button--lg">
+          {{ copy().home.readMore }}
+        </a>
+      </div>
+    </div>
   </section>
 
-  @if (state() === 'loading') {
-    <section class="state-panel" role="status" aria-live="polite">
-      <span class="loader" aria-hidden="true"></span>
-      <p>{{ copy().menu.loading }}</p>
-    </section>
-  } @else if (state() === 'error') {
-    <section class="state-panel state-panel--error" role="alert">
-      <h2>{{ copy().menu.errorTitle }}</h2>
-      <p>{{ copy().menu.errorBody }}</p>
-      <button class="button button--primary" type="button" (click)="loadMenu()">
-        {{ copy().common.retry }}
-      </button>
-    </section>
-  } @else {
-    <nav class="category-nav" [attr.aria-label]="copy().menu.categoriesLabel">
-      <button
-        type="button"
-        [class.is-active]="selectedCategoryId() === null"
-        [attr.aria-pressed]="selectedCategoryId() === null"
-        (click)="selectCategory(null)"
-      >
-        {{ copy().menu.allCategories }}
-      </button>
-      @for (category of categories(); track category.id) {
-        <button
-          type="button"
-          [class.is-active]="selectedCategoryId() === category.id"
-          [attr.aria-pressed]="selectedCategoryId() === category.id"
-          (click)="selectCategory(category.id)"
-        >
-          {{ categoryName(category) }}
-        </button>
-      }
-    </nav>
+  <section class="highlights-section">
+    <div class="highlights-grid">
+      <article class="highlight-card">
+        <span class="hl-icon" aria-hidden="true">🥩</span>
+        <div class="hl-text">
+          <h3>{{ copy().home.feature1Title }}</h3>
+          <p>{{ copy().home.feature1Desc }}</p>
+        </div>
+      </article>
+      <article class="highlight-card">
+        <span class="hl-icon" aria-hidden="true">🔥</span>
+        <div class="hl-text">
+          <h3>{{ copy().home.feature2Title }}</h3>
+          <p>{{ copy().home.feature2Desc }}</p>
+        </div>
+      </article>
+      <article class="highlight-card">
+        <span class="hl-icon" aria-hidden="true">🛵</span>
+        <div class="hl-text">
+          <h3>{{ copy().home.feature3Title }}</h3>
+          <p>{{ copy().home.feature3Desc }}</p>
+        </div>
+      </article>
+      <article class="highlight-card">
+        <span class="hl-icon" aria-hidden="true">🌿</span>
+        <div class="hl-text">
+          <h3>{{ copy().home.feature4Title }}</h3>
+          <p>{{ copy().home.feature4Desc }}</p>
+        </div>
+      </article>
+    </div>
+  </section>
 
-    @if (visibleItems().length === 0) {
-      <section class="state-panel" role="status">
-        <p>{{ copy().menu.empty }}</p>
+  <section id="menu-catalog" class="catalog-section">
+    <app-restaurant-paused-banner />
+
+    <header class="menu-intro" aria-labelledby="menu-title">
+      <p class="eyebrow">{{ copy().menu.eyebrow }}</p>
+      <h1 id="menu-title" class="catalog-heading">{{ copy().menu.title }}</h1>
+      <p>{{ copy().menu.introduction }}</p>
+    </header>
+
+    @if (state() === 'loading') {
+      <section class="state-panel" role="status" aria-live="polite">
+        <span class="loader" aria-hidden="true"></span>
+        <p>{{ copy().menu.loading }}</p>
+      </section>
+    } @else if (state() === 'error') {
+      <section class="state-panel state-panel--error" role="alert">
+        <h2>{{ copy().menu.errorTitle }}</h2>
+        <p>{{ copy().menu.errorBody }}</p>
+        <button class="button button--primary" type="button" (click)="loadMenu()">
+          {{ copy().common.retry }}
+        </button>
       </section>
     } @else {
-      <section class="menu-grid" [attr.aria-label]="copy().menu.title">
-        @for (item of visibleItems(); track item.id) {
-          <article class="menu-item" [class.menu-item--unavailable]="!item.isAvailable">
-            <div class="menu-item__image-wrap">
-              <img
-                class="menu-item__image"
-                [src]="item.imageReference"
-                [alt]="itemName(item)"
-                width="640"
-                height="480"
-                loading="lazy"
-                decoding="async"
-                (error)="onImageError($event)"
-              />
-              @if (!item.isAvailable) {
-                <span class="availability-label">{{ copy().common.unavailable }}</span>
-              }
-            </div>
-            <div class="menu-item__body">
-              <div class="menu-item__heading">
-                <h2>{{ itemName(item) }}</h2>
-                <strong>{{ money(item.price) }}</strong>
-              </div>
-              <p>{{ itemDescription(item) }}</p>
-              <div class="menu-item__footer">
-                <small>
-                  {{ copy().menu.preparation }}: {{ item.preparationMinutes }}
-                  {{ copy().menu.minutes }}
-                </small>
-                <button
-                  class="button button--primary"
-                  type="button"
-                  [disabled]="!item.isAvailable"
-                  (click)="addToCart(item)"
-                >
-                  {{ getButtonText(item) }}
-                </button>
-              </div>
-            </div>
-          </article>
+      <nav class="category-nav" [attr.aria-label]="copy().menu.categoriesLabel">
+        <button
+          type="button"
+          [class.is-active]="selectedCategoryId() === null"
+          [attr.aria-pressed]="selectedCategoryId() === null"
+          (click)="selectCategory(null)"
+        >
+          {{ copy().menu.allCategories }}
+        </button>
+        @for (category of categories(); track category.id) {
+          <button
+            type="button"
+            [class.is-active]="selectedCategoryId() === category.id"
+            [attr.aria-pressed]="selectedCategoryId() === category.id"
+            (click)="selectCategory(category.id)"
+          >
+            {{ categoryName(category) }}
+          </button>
         }
-      </section>
+      </nav>
+
+      @if (visibleItems().length === 0) {
+        <section class="state-panel" role="status">
+          <p>{{ copy().menu.empty }}</p>
+        </section>
+      } @else {
+        <section class="menu-grid" [attr.aria-label]="copy().menu.title">
+          @for (item of visibleItems(); track item.id) {
+            <article class="menu-item" [class.menu-item--unavailable]="!item.isAvailable">
+              <div class="menu-item__image-wrap">
+                <img
+                  class="menu-item__image"
+                  [src]="item.imageReference"
+                  [alt]="itemName(item)"
+                  width="640"
+                  height="480"
+                  loading="lazy"
+                  decoding="async"
+                  (error)="onImageError($event)"
+                />
+                @if (!item.isAvailable) {
+                  <span class="availability-label">{{ copy().common.unavailable }}</span>
+                }
+              </div>
+              <div class="menu-item__body">
+                <div class="menu-item__heading">
+                  <h2>{{ itemName(item) }}</h2>
+                  <strong>{{ money(item.price) }}</strong>
+                </div>
+                <p>{{ itemDescription(item) }}</p>
+                <div class="menu-item__footer">
+                  <small>
+                    {{ copy().menu.preparation }}: {{ item.preparationMinutes }}
+                    {{ copy().menu.minutes }}
+                  </small>
+                  <div class="item-footer-actions">
+                    <button
+                      class="button button--primary"
+                      type="button"
+                      [disabled]="!item.isAvailable"
+                      (click)="addToCart(item)"
+                    >
+                      {{ getButtonText(item) }}
+                    </button>
+                    <button
+                      type="button"
+                      class="fav-toggle-btn"
+                      [class.is-fav]="isFavorite(item.id)"
+                      [attr.aria-label]="copy().brand.wishlist"
+                      (click)="toggleFavorite(item)"
+                    >
+                      {{ isFavorite(item.id) ? '❤️' : '🤍' }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          }
+        </section>
+      }
     }
-  }
+  </section>
+
+  <section class="reviews-section">
+    <div class="reviews-header">
+      <h2 class="reviews-title">{{ copy().home.reviewsTitle }}</h2>
+    </div>
+    <div class="reviews-grid">
+      <article class="review-card">
+        <div class="stars" aria-hidden="true">★★★★★</div>
+        <p class="review-text">"{{ copy().home.review1Text }}"</p>
+        <strong class="review-author">{{ copy().home.review1Author }}</strong>
+      </article>
+      <article class="review-card">
+        <div class="stars" aria-hidden="true">★★★★★</div>
+        <p class="review-text">"{{ copy().home.review2Text }}"</p>
+        <strong class="review-author">{{ copy().home.review2Author }}</strong>
+      </article>
+      <article class="review-card">
+        <div class="stars" aria-hidden="true">★★★★★</div>
+        <p class="review-text">"{{ copy().home.review3Text }}"</p>
+        <strong class="review-author">{{ copy().home.review3Author }}</strong>
+      </article>
+    </div>
+  </section>
+
+  <section class="story-preview-section">
+    <div class="story-preview-card">
+      <div class="story-text">
+        <h2>{{ copy().home.aboutStoryTitle }}</h2>
+        <p>{{ copy().home.aboutStoryBody }}</p>
+        <a routerLink="/about" class="button button--outline-light">
+          {{ copy().home.readMore }}
+        </a>
+      </div>
+      <div class="story-img-wrap">
+        <img
+          src="/images/menu/grilled-chicken.webp"
+          [alt]="copy().home.aboutStoryTitle"
+          class="story-preview-img"
+          loading="lazy"
+        />
+      </div>
+    </div>
+  </section>
 
   <p class="visually-hidden" role="status" aria-live="polite">{{ announcement() }}</p>
 </main>
@@ -103,3 +213,5 @@
     <strong>{{ money(cart.subtotal()) }}</strong>
   </a>
 }
+
+<app-customer-footer />
