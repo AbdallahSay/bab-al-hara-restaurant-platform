@@ -1,0 +1,1130 @@
+[
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 320,
+    "overflow": "FAIL (79px)",
+    "headings": "1 h1 (اختر طلبك) | 3 h2",
+    "smallTargets": "WARN (15 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-ar-w320.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 360,
+    "overflow": "FAIL (39px)",
+    "headings": "1 h1 (اختر طلبك) | 3 h2",
+    "smallTargets": "WARN (15 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-ar-w360.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 375,
+    "overflow": "FAIL (24px)",
+    "headings": "1 h1 (اختر طلبك) | 11 h2",
+    "smallTargets": "WARN (23 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-ar-w375.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 390,
+    "overflow": "FAIL (9px)",
+    "headings": "1 h1 (اختر طلبك) | 3 h2",
+    "smallTargets": "WARN (15 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-ar-w390.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 412,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (اختر طلبك) | 11 h2",
+    "smallTargets": "WARN (23 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-ar-w412.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 430,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (اختر طلبك) | 11 h2",
+    "smallTargets": "WARN (23 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-ar-w430.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 480,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (اختر طلبك) | 3 h2",
+    "smallTargets": "WARN (15 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-ar-w480.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 768,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (اختر طلبك) | 11 h2",
+    "smallTargets": "WARN (15 small targets)",
+    "samples": [
+      {
+        "text": "🤍",
+        "tag": "BUTTON",
+        "className": "fav-toggle-btn",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "text": "🤍",
+        "tag": "BUTTON",
+        "className": "fav-toggle-btn",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "text": "🤍",
+        "tag": "BUTTON",
+        "className": "fav-toggle-btn",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "text": "🤍",
+        "tag": "BUTTON",
+        "className": "fav-toggle-btn",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "text": "🤍",
+        "tag": "BUTTON",
+        "className": "fav-toggle-btn",
+        "width": 40,
+        "height": 40
+      }
+    ],
+    "filename": "before-customer-home-ar-w768.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 1024,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (اختر طلبك) | 3 h2",
+    "smallTargets": "WARN (8 small targets)",
+    "samples": [
+      {
+        "text": "بحث",
+        "tag": "A",
+        "className": "",
+        "width": 54,
+        "height": 39
+      },
+      {
+        "text": "ب\nباب الحارة\nمشاوي شامية",
+        "tag": "A",
+        "className": "brand",
+        "width": 285,
+        "height": 43
+      },
+      {
+        "text": "العودة إلى قائمة الطعام",
+        "tag": "A",
+        "className": "",
+        "width": 129,
+        "height": 31
+      },
+      {
+        "text": "بحث",
+        "tag": "A",
+        "className": "",
+        "width": 29,
+        "height": 31
+      },
+      {
+        "text": "المفضلة",
+        "tag": "A",
+        "className": "",
+        "width": 48,
+        "height": 31
+      }
+    ],
+    "filename": "before-customer-home-ar-w1024.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 1280,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (اختر طلبك) | 3 h2",
+    "smallTargets": "WARN (8 small targets)",
+    "samples": [
+      {
+        "text": "بحث",
+        "tag": "A",
+        "className": "",
+        "width": 54,
+        "height": 39
+      },
+      {
+        "text": "ب\nباب الحارة\nمشاوي شامية",
+        "tag": "A",
+        "className": "brand",
+        "width": 333,
+        "height": 43
+      },
+      {
+        "text": "العودة إلى قائمة الطعام",
+        "tag": "A",
+        "className": "",
+        "width": 129,
+        "height": 31
+      },
+      {
+        "text": "بحث",
+        "tag": "A",
+        "className": "",
+        "width": 29,
+        "height": 31
+      },
+      {
+        "text": "المفضلة",
+        "tag": "A",
+        "className": "",
+        "width": 48,
+        "height": 31
+      }
+    ],
+    "filename": "before-customer-home-ar-w1280.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 1440,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (اختر طلبك) | 11 h2",
+    "smallTargets": "WARN (16 small targets)",
+    "samples": [
+      {
+        "text": "بحث",
+        "tag": "A",
+        "className": "",
+        "width": 54,
+        "height": 39
+      },
+      {
+        "text": "🤍",
+        "tag": "BUTTON",
+        "className": "fav-toggle-btn",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "text": "🤍",
+        "tag": "BUTTON",
+        "className": "fav-toggle-btn",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "text": "🤍",
+        "tag": "BUTTON",
+        "className": "fav-toggle-btn",
+        "width": 40,
+        "height": 40
+      },
+      {
+        "text": "🤍",
+        "tag": "BUTTON",
+        "className": "fav-toggle-btn",
+        "width": 40,
+        "height": 40
+      }
+    ],
+    "filename": "before-customer-home-ar-w1440.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "ar",
+    "width": 1920,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (اختر طلبك) | 3 h2",
+    "smallTargets": "WARN (8 small targets)",
+    "samples": [
+      {
+        "text": "بحث",
+        "tag": "A",
+        "className": "",
+        "width": 54,
+        "height": 39
+      },
+      {
+        "text": "ب\nباب الحارة\nمشاوي شامية",
+        "tag": "A",
+        "className": "brand",
+        "width": 333,
+        "height": 43
+      },
+      {
+        "text": "العودة إلى قائمة الطعام",
+        "tag": "A",
+        "className": "",
+        "width": 129,
+        "height": 31
+      },
+      {
+        "text": "بحث",
+        "tag": "A",
+        "className": "",
+        "width": 29,
+        "height": 31
+      },
+      {
+        "text": "المفضلة",
+        "tag": "A",
+        "className": "",
+        "width": 48,
+        "height": 31
+      }
+    ],
+    "filename": "before-customer-home-ar-w1920.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 320,
+    "overflow": "FAIL (79px)",
+    "headings": "1 h1 (اختر طلبك) | 3 h2",
+    "smallTargets": "WARN (15 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-en-w320.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 360,
+    "overflow": "FAIL (34px)",
+    "headings": "1 h1 (Choose your meal) | 11 h2",
+    "smallTargets": "WARN (23 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-en-w360.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 375,
+    "overflow": "FAIL (19px)",
+    "headings": "1 h1 (Choose your meal) | 3 h2",
+    "smallTargets": "WARN (15 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-en-w375.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 390,
+    "overflow": "FAIL (4px)",
+    "headings": "1 h1 (Choose your meal) | 3 h2",
+    "smallTargets": "WARN (15 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-en-w390.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 412,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (Choose your meal) | 11 h2",
+    "smallTargets": "WARN (23 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-en-w412.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 430,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (Choose your meal) | 3 h2",
+    "smallTargets": "WARN (15 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-en-w430.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 480,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (Choose your meal) | 3 h2",
+    "smallTargets": "WARN (15 small targets)",
+    "samples": [
+      {
+        "text": "",
+        "tag": "BUTTON",
+        "className": "mobile-menu-toggle",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "ب",
+        "tag": "A",
+        "className": "brand",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link search-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link wishlist-link",
+        "width": 36,
+        "height": 36
+      },
+      {
+        "text": "",
+        "tag": "A",
+        "className": "icon-link profile-link",
+        "width": 36,
+        "height": 36
+      }
+    ],
+    "filename": "before-customer-home-en-w480.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 768,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (Choose your meal) | 3 h2",
+    "smallTargets": "WARN (7 small targets)",
+    "samples": [
+      {
+        "text": "ب\nBab Al Hara\nLevantine ",
+        "tag": "A",
+        "className": "brand",
+        "width": 340,
+        "height": 43
+      },
+      {
+        "text": "Return to the menu",
+        "tag": "A",
+        "className": "",
+        "width": 133,
+        "height": 31
+      },
+      {
+        "text": "Search",
+        "tag": "A",
+        "className": "",
+        "width": 46,
+        "height": 31
+      },
+      {
+        "text": "Wishlist",
+        "tag": "A",
+        "className": "",
+        "width": 52,
+        "height": 31
+      },
+      {
+        "text": "My Orders",
+        "tag": "A",
+        "className": "",
+        "width": 71,
+        "height": 31
+      }
+    ],
+    "filename": "before-customer-home-en-w768.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 1024,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (Choose your meal) | 3 h2",
+    "smallTargets": "WARN (8 small targets)",
+    "samples": [
+      {
+        "text": "Search",
+        "tag": "A",
+        "className": "",
+        "width": 71,
+        "height": 39
+      },
+      {
+        "text": "ب\nBab Al Hara\nLevantine ",
+        "tag": "A",
+        "className": "brand",
+        "width": 285,
+        "height": 43
+      },
+      {
+        "text": "Return to the menu",
+        "tag": "A",
+        "className": "",
+        "width": 133,
+        "height": 31
+      },
+      {
+        "text": "Search",
+        "tag": "A",
+        "className": "",
+        "width": 46,
+        "height": 31
+      },
+      {
+        "text": "Wishlist",
+        "tag": "A",
+        "className": "",
+        "width": 52,
+        "height": 31
+      }
+    ],
+    "filename": "before-customer-home-en-w1024.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 1280,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (Choose your meal) | 3 h2",
+    "smallTargets": "WARN (8 small targets)",
+    "samples": [
+      {
+        "text": "Search",
+        "tag": "A",
+        "className": "",
+        "width": 71,
+        "height": 39
+      },
+      {
+        "text": "ب\nBab Al Hara\nLevantine ",
+        "tag": "A",
+        "className": "brand",
+        "width": 333,
+        "height": 43
+      },
+      {
+        "text": "Return to the menu",
+        "tag": "A",
+        "className": "",
+        "width": 133,
+        "height": 31
+      },
+      {
+        "text": "Search",
+        "tag": "A",
+        "className": "",
+        "width": 46,
+        "height": 31
+      },
+      {
+        "text": "Wishlist",
+        "tag": "A",
+        "className": "",
+        "width": 52,
+        "height": 31
+      }
+    ],
+    "filename": "before-customer-home-en-w1280.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 1440,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (Choose your meal) | 3 h2",
+    "smallTargets": "WARN (8 small targets)",
+    "samples": [
+      {
+        "text": "Search",
+        "tag": "A",
+        "className": "",
+        "width": 71,
+        "height": 39
+      },
+      {
+        "text": "ب\nBab Al Hara\nLevantine ",
+        "tag": "A",
+        "className": "brand",
+        "width": 333,
+        "height": 43
+      },
+      {
+        "text": "Return to the menu",
+        "tag": "A",
+        "className": "",
+        "width": 133,
+        "height": 31
+      },
+      {
+        "text": "Search",
+        "tag": "A",
+        "className": "",
+        "width": 46,
+        "height": 31
+      },
+      {
+        "text": "Wishlist",
+        "tag": "A",
+        "className": "",
+        "width": 52,
+        "height": 31
+      }
+    ],
+    "filename": "before-customer-home-en-w1440.png"
+  },
+  {
+    "stage": "before",
+    "route": "home-menu",
+    "lang": "en",
+    "width": 1920,
+    "overflow": "PASS (0px)",
+    "headings": "1 h1 (Choose your meal) | 3 h2",
+    "smallTargets": "WARN (8 small targets)",
+    "samples": [
+      {
+        "text": "Search",
+        "tag": "A",
+        "className": "",
+        "width": 71,
+        "height": 39
+      },
+      {
+        "text": "ب\nBab Al Hara\nLevantine ",
+        "tag": "A",
+        "className": "brand",
+        "width": 333,
+        "height": 43
+      },
+      {
+        "text": "Return to the menu",
+        "tag": "A",
+        "className": "",
+        "width": 133,
+        "height": 31
+      },
+      {
+        "text": "Search",
+        "tag": "A",
+        "className": "",
+        "width": 46,
+        "height": 31
+      },
+      {
+        "text": "Wishlist",
+        "tag": "A",
+        "className": "",
+        "width": 52,
+        "height": 31
+      }
+    ],
+    "filename": "before-customer-home-en-w1920.png"
+  }
+]

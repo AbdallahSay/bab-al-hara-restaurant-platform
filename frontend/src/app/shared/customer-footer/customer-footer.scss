@@ -41,8 +41,10 @@
       color: #fff;
 
       &__mark {
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2.75rem;
+        height: 2.75rem;
+        min-width: 2.75rem;
+        min-height: 2.75rem;
         border-radius: var(--radius-md, 0.75rem);
         background: var(--color-primary, #ea580c);
         color: #fff;
@@ -107,7 +109,16 @@
       color: rgba(255, 255, 255, 0.75);
       text-decoration: none;
       font-size: 0.9rem;
-      transition: color 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      min-inline-size: 2.75rem;
+      min-block-size: 2.75rem;
+      padding-block: 0.25rem;
+      padding-inline: 0.5rem;
+      border-radius: var(--radius-sm, 0.5rem);
+      transition:
+        color 0.15s ease,
+        background 0.15s ease;
 
       &:hover {
         color: var(--color-primary, #ea580c);

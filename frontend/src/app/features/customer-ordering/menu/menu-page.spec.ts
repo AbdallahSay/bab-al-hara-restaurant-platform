@@ -54,7 +54,8 @@ describe('MenuPage', () => {
     const fixture = TestBed.createComponent(MenuPage);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('h1').textContent).toContain('اختر طلبك');
+    expect(fixture.nativeElement.querySelector('h1').textContent).toContain('مشاوي وأكلات شامية');
+    expect(fixture.nativeElement.querySelector('#menu-title').textContent).toContain('اختر طلبك');
     expect(fixture.nativeElement.textContent).toContain('سندوتش كفتة');
     expect(document.documentElement.dir).toBe('rtl');
   });
@@ -72,7 +73,10 @@ describe('MenuPage', () => {
     TestBed.flushEffects();
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('h1').textContent).toContain('Choose your meal');
+    expect(fixture.nativeElement.querySelector('h1').textContent).toContain('Charcoal Grills');
+    expect(fixture.nativeElement.querySelector('#menu-title').textContent).toContain(
+      'Choose your meal',
+    );
     expect(fixture.nativeElement.textContent).toContain('Kofta sandwich');
     expect(document.documentElement.dir).toBe('ltr');
   });

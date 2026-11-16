@@ -869,6 +869,8 @@ export interface UiCopy {
     readonly aboutStoryTitle: string;
     readonly aboutStoryBody: string;
     readonly readMore: string;
+    readonly badgeTopRated: string;
+    readonly badgeCharcoal: string;
     readonly reviewsTitle: string;
     readonly review1Text: string;
     readonly review1Author: string;
@@ -1926,16 +1928,18 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       aboutStoryBody:
         'بدأت رحلتنا من حب المطبخ الشامي الغني وتقاليده الأصيلة. في باب الحارة، نحرص على تقديم تجربة طعام استثنائية تجمع بين عبق دمشق القديمة وأعلى معايير الجودة والنظافة والخدمة الراقية.',
       readMore: 'تعرف أكثر علينا',
-      reviewsTitle: 'آراء زبائننا الكرام',
+      badgeTopRated: 'أفضل تقييم',
+      badgeCharcoal: 'شواء على الفحم الطبيعي',
+      reviewsTitle: 'معايير الجودة والضيافة الشامية',
       review1Text:
-        'أفضل مشكل مشاوي ذقته على الإطلاق! اللحم طري للغاية والتتبيلة موزونة بدقة فائقة، والتوصيل سريع جداً.',
-      review1Author: 'أحمد محمود — عميل مخلص',
+        'نعتمد أجود قطع اللحوم البلدية المذبوحة محلياً يومياً ونحضر كل طبق فور طلبه لضمان أعلى مستويات الطزاجة والنكهة.',
+      review1Author: 'لحوم طازجة يومياً 100%',
       review2Text:
-        'شاورما لحم ومقبلات سورية أصلية تذكرني بدمشق. نظافة واهتمام رائع بالتفاصيل وتغليف محكم وساخن.',
-      review2Author: 'سارة عبد الرحمن — ناقدة طعام',
+        'نطهو كافة أصناف المشاوي على جمر الفحم الطبيعي الخالص بدون نكهات صناعية لنضمن عبق ونكهة الشواء الشامي الأصيل.',
+      review2Author: 'شواء على الفحم الطبيعي',
       review3Text:
-        'الخدمة ممتازة وفريق العمل محترم وودود. وجبة عائلية متكاملة وسعر عادل مقابل الجودة العالية.',
-      review3Author: 'محمد إبراهيم — زائر متكرر',
+        'نلتزم بأعلى معايير الخدمة والتغليف الحراري لضمان وصول وجبتك ساخنة وطازجة، ونسعد دائماً بآرائكم وملاحظاتكم.',
+      review3Author: 'ضمان الجودة ورضا الضيوف',
     },
     about: {
       eyebrow: 'تاريخنا ورؤيتنا',
@@ -3004,16 +3008,18 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       aboutStoryBody:
         'Our journey started from a profound love for traditional Levantine gastronomy. At Bab Al Hara, we bring the culinary spirit of Old Damascus to your table with uncompromising quality and warm hospitality.',
       readMore: 'Learn More About Us',
-      reviewsTitle: 'Guest Testimonials',
+      badgeTopRated: 'Top Rated',
+      badgeCharcoal: 'Natural Charcoal Grills',
+      reviewsTitle: 'Our Quality & Hospitality Standards',
       review1Text:
-        'The best mixed grill I have ever tasted! The meat is exceptionally tender, spices are balanced, and delivery was remarkably fast.',
-      review1Author: 'Ahmed M. — Loyal Customer',
+        'We strictly source prime local fresh meats slaughtered daily, preparing every dish to order for peak flavor and tenderness.',
+      review1Author: '100% Daily Fresh Meats',
       review2Text:
-        'Authentic Syrian shawarma and appetizers that remind me of Damascus. Clean, hot, and professionally packaged.',
-      review2Author: 'Sara A. — Food Critic',
+        'Every skewer and grill cut is slowly roasted over natural wood-charcoal embers without artificial liquid smoke or additives.',
+      review2Author: 'Natural Charcoal Grilling',
       review3Text:
-        'Outstanding food and warm, attentive service. Generous family portions at very reasonable prices.',
-      review3Author: 'Mohamed I. — Frequent Guest',
+        'Delivered in thermal-sealed packaging to arrive piping hot at your doorstep. We take great pride in our guests satisfaction.',
+      review3Author: 'Guest Satisfaction Promise',
     },
     about: {
       eyebrow: 'Heritage & Vision',
