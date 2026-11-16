@@ -388,6 +388,7 @@ async function run() {
   const chromeProc = spawn(chromePath, [
     '--headless=new',
     `--remote-debugging-port=${cdpPort}`,
+    '--remote-debugging-address=127.0.0.1',
     '--disable-gpu',
     '--no-sandbox',
     '--disable-dev-shm-usage',
@@ -398,8 +399,22 @@ async function run() {
     'about:blank'
   ]);
 
-  await new Promise((r) => setTimeout(r, 2000));
-  const versionRes = await fetch(`http://127.0.0.1:${cdpPort}/json/version`).then((r) => r.json());
+  let versionRes = null;
+  const pollStart = Date.now();
+  while (Date.now() - pollStart < 15000) {
+    try {
+      const res = await fetch(`http://127.0.0.1:${cdpPort}/json/version`);
+      if (res.ok) {
+        versionRes = await res.json();
+        break;
+      }
+    } catch (e) {
+      await new Promise((r) => setTimeout(r, 400));
+    }
+  }
+  if (!versionRes) {
+    throw new Error(`Failed to connect to Chrome CDP at http://127.0.0.1:${cdpPort}/json/version after 15s`);
+  }
   const ws = new WebSocketClient(versionRes.webSocketDebuggerUrl, { maxPayload: 128 * 1024 * 1024 });
   await new Promise((r, rej) => {
     if (typeof ws.on === 'function') {
