@@ -117,7 +117,9 @@
       padding-block: 0.25rem;
       padding-inline: 0.5rem;
       border-radius: var(--radius-sm, 0.5rem);
-      transition: color 0.15s ease, background 0.15s ease;
+      transition:
+        color 0.15s ease,
+        background 0.15s ease;
 
       &:hover {
         color: var(--color-primary, #ea580c);

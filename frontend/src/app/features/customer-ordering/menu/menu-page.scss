@@ -713,7 +713,9 @@
     flex-direction: column;
     min-height: 248px;
     box-sizing: border-box;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s;
 
     &:hover {
       transform: translateY(-3px);
