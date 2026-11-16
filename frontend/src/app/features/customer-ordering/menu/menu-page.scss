@@ -175,14 +175,14 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
       border: 1px solid rgba(0, 0, 0, 0.05);
 
-      .badge-star {
+      .badge-icon {
         display: grid;
         place-items: center;
         width: 2rem;
         height: 2rem;
         border-radius: 50%;
-        background: #dcfce7;
-        color: #16a34a;
+        background: #fff7ed;
+        color: #ea580c;
         font-size: 1.1rem;
         line-height: 1;
       }
@@ -606,11 +606,10 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
     }
 
-    .stars {
-      color: #ea580c;
-      font-size: 1.1rem;
-      letter-spacing: 0.15rem;
+    .standard-icon {
+      font-size: 1.5rem;
       margin-bottom: 0.75rem;
+      line-height: 1;
     }
 
     .standard-title {

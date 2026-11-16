@@ -1,94 +1,105 @@
-# Visual Verification & Responsive QA: Customer Home & Menu (Phase 10A)
+# Visual Verification & Responsive QA: Customer Home & Menu (Phase 10A & 10A.1)
 
-This document contains the visual verification evidence, automated responsive testing suite, and before/after comparison matrix for **Phase 10A — Customer Home/Menu Figma Fidelity & Responsive QA** ([Issue #32](https://github.com/AbdallahSay/bab-al-hara-restaurant-platform/issues/32)).
-
----
-
-## 1. Executive Summary
-
-- **Visual Baseline:** Original Figma Page 1 desktop frames `69:789` (Customer Home 1280px) and `79:1294` (Customer Menu 1280px). Supplemental mobile frames at 320/390/430px served as structural guides.
-- **Tested Matrix:** 12 viewports (`320, 360, 375, 390, 412, 430, 480, 768, 1024, 1280, 1440, 1920px`) across both **Arabic RTL** and **English LTR** (24 full matrix audits).
-- **Core Results:**
-  - **Horizontal Overflow:** **0px across all 24 viewports** (resolved previous 79px overflow at 320px).
-  - **Heading Hierarchy:** **100% compliant WCAG hierarchy** (Single semantic `h1` hero heading followed by `h2` catalog heading; 0 skipped levels).
-  - **Touch Target Usability:** **All interactive touch targets >= 44x44 CSS px** (resolved 15 previous 36px/40px undersized buttons/links).
-  - **Brand & Content Authenticity:** Replaced fictitious 5-star customer testimonials with verified culinary commitments (100% daily fresh meats, natural charcoal grilling, guest satisfaction guarantee).
-  - **Hero Composition:** Modernized from text-only centered box to side-by-side image-led hero featuring authentic Bab Al Hara flagship mixed grill photography with floating badge, responsive 3-column catalog grid, and Figma-aligned benefit cards.
+This documentation provides the visual verification evidence, pixel-level Figma comparison, and automated responsive test suite for **Phase 10A / Phase 10A.1 — Customer Home/Menu Figma Fidelity & Responsive Acceptance** ([Issue #32](https://github.com/AbdallahSay/bab-al-hara-restaurant-platform/issues/32), [PR #33](https://github.com/AbdallahSay/bab-al-hara-restaurant-platform/pull/33)).
 
 ---
 
-## 2. Discrepancies Resolved (Issue #32)
+## 1. Executive Summary & Review Findings Resolution
 
-| # | Discrepancy Documented in Issue #32 | Resolution | Verification Status |
+In response to independent visual acceptance review findings ([comment 6914290083](https://github.com/AbdallahSay/bab-al-hara-restaurant-platform/pull/33#issuecomment-6914290083)), this update delivers:
+
+1. **Populated Menu Catalog**: All screenshots capture the fully loaded catalog displaying real products, authentic dish images (`/images/menu/*.webp`), category chips, prep times, prices, and Add to Cart buttons. No loading skeletons or spinners in acceptance screenshots.
+2. **Complete Removal of Unsupported Marketing Claims**:
+   - Removed all `100%` numeric claims in Arabic & English (`100% Fresh Daily Halal Meat`, `لحوم طازجة 100% يومياً`, `100%` in stats). Replaced with factual descriptions (`أطباق طازجة محضرة بعناية` / `Freshly Prepared Levantine Dishes`).
+   - Removed unevidenced `Top Rated` / `أفضل تقييم` ranking labels. Replaced with authentic culinary descriptors (`طبق مميز` / `House Specialty`).
+   - Removed decorative 5-star ratings (`★★★★★` / `.stars`) that could imply unverified customer reviews. Replaced with culinary category iconography (`🥩`, `🔥`, `🤝`).
+   - Removed unverified delivery speed and meat sourcing claims.
+3. **Deterministic Automated QA Runner (`docs/visual-verification/run_qa.js`)**:
+   - Replaced fragile fixed sleeps with deterministic polling (`waitForCatalogReady`).
+   - Uses Chrome DevTools Protocol (CDP) request interception to serve authentic product fixtures offline or in CI without reliance on external network endpoints.
+   - Separate verification and screenshots for Populated Catalog, Mobile Drawer Navigation Open, Floating Cart CTA, Empty State, and Error & Retry Recovery.
+   - Detects runtime exceptions and console errors, and exits with a non-zero code on any failure.
+4. **Pixel-Level Figma Fidelity**:
+   - Original Home `69:789`: Side-by-side hero with authentic Levantine mixed-grill photo and flame badge, 4 benefit cards, values section, and Damascus story preview.
+   - Original Menu `79:1294`: Active/inactive category pills, 3-column desktop product grid, card hover lift, and touch-target compliant buttons.
+
+---
+
+## 2. Intentional Adaptations vs. Original Figma Reference
+
+The original Figma concept art represents *FreshBite*, an exploratory American fast-food burger template. The following intentional adaptations align the design with Bab Al Hara's authentic identity and production architecture:
+
+| Design Dimension | Original Figma Reference (`69:789` & `79:1294`) | Bab Al Hara Implementation | Justification |
 |---|---|---|---|
-| **1** | **Hero Composition**: Figma Home hero uses copy on one side + large food photo with floating star badge. Code had centered text-only gradient box. | Replaced with responsive side-by-side layout featuring authentic Bab Al Hara grilled meat photograph (`/images/menu/mixed-grill.webp`), floating star badge, glowing gradient background, and dual CTA buttons. Stacks cleanly on mobile. | **PASS** |
-| **2** | **Heading Hierarchy**: `menu-page.html` had `h2` before `h1`, violating accessible document structure. | Corrected `.hero-title` to semantic `h1` and catalog title to `h2#menu-title`. | **PASS** (1 `h1`, 4 `h2`s) |
-| **3** | **Small Touch Targets**: Header actions/drawer toggle were 36x36px and menu wishlist button was 40x40px, failing WCAG 2.5.5 / 2.5.8 (>=44x44px). | Sized all touch targets (brand logo, search link, wishlist button, cart button, mobile toggle, language buttons, footer links) to minimum `2.75rem` (44x44px). | **PASS** (0 small targets) |
-| **4** | **Static Reviews / Authenticity**: Fabricated 5-star customer reviews and fictitious names in translations. | Replaced with authentic restaurant culinary commitments (Daily Fresh Meats, Traditional Charcoal Grilling, Hospitality Guarantee) while retaining the Figma 3-card layout. | **PASS** |
-| **5** | **Layout & Category Navigation**: Category chips & product grid alignment with Figma. | Styled category chips with horizontal scrollbar hide, active pill state, card hover lift effect, and 3-column product grid at desktop viewports. | **PASS** |
-| **6** | **QA Evidence Accessibility**: Previous claims lacked accessible browser screenshots on GitHub. | Full suite of 24 BEFORE screenshots and 24 AFTER screenshots committed directly to `docs/visual-verification/` with reproducible runner script. | **PASS** |
+| **Branding & Theme** | Generic "FreshBite" fast-food brand with bright orange burger aesthetics. | Authentic Bab Al Hara brand identity: Damascus grilled meats, Levantine typography, warm charcoal & amber palette (`#ea580c`, `#241b1d`, `#fff7ed`). | Respects authentic Syrian restaurant brand guidelines and real establishment identity. |
+| **Route Architecture** | Separate `/home` and `/menu` pages in Figma desktop mockups. | Unified Customer Home + Menu single-page experience (`/`) with smooth anchor jumping (`#menu-catalog`) and persistent catalog access. | Eliminates unnecessary customer navigation friction, allowing immediate food discovery and ordering directly from the hero CTA. |
+| **Imagery** | Stock concept photos of double cheeseburgers and fries. | Authentic Bab Al Hara culinary photography: Mixed grill ([mixed-grill.webp](/images/menu/mixed-grill.webp)), charcoal chicken ([grilled-chicken.webp](/images/menu/grilled-chicken.webp)), kofta, hummus, and fattoush. | Consumer protection: never display images of products the restaurant does not serve. |
+| **Benefits Section** | 3 generic cards ("Fast Delivery", "Fresh Food", "24/7 Support"). | 4 authentic Levantine craft cards: Traditional Marinades, Natural Charcoal Grilling, Fresh Upon Order, and Warm Hospitality. | Accurately represents the kitchen's authentic cooking methods and hospitality traditions. |
+| **Catalog Currency & Pricing** | Fictitious USD `$12.99` pricing. | Authentic Egyptian Pound (`EGP`) pricing directly integrated with backend catalog API and cart calculation engine. | Production financial integrity and authentic locale formatting (`ar-EG` and `en-EG`). |
+| **Ratings & Testimonials** | Fictitious five-star customer reviews with stock avatar photos. | Core Culinary & Hospitality Values cards without fabricated names, photos, or unverified star ratings. | Complies with legal and ethical advertising guidelines prohibiting fake user testimonials. |
 
 ---
 
-## 3. Responsive Verification Matrix (BEFORE vs AFTER)
+## 3. Comprehensive Visual Acceptance Matrix
 
-### Arabic (RTL)
-
-| Viewport | Figma Reference | BEFORE Overflow | AFTER Overflow | BEFORE Headings | AFTER Headings | BEFORE Targets <44px | AFTER Targets <44px | AFTER Screenshot |
+| Figma Node | Route / Section | Language | Viewport | Tested State | Expected Rendering | Actual Rendering | Result | Screenshot Evidence |
 |---|---|---|---|---|---|---|---|---|
-| **320px** | Mobile draft (`2028:3118`) | FAIL (79px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-ar-w320.png](./after-fixes/after-customer-home-ar-w320.png) |
-| **360px** | Mobile common | FAIL (40px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-ar-w360.png](./after-fixes/after-customer-home-ar-w360.png) |
-| **375px** | iPhone SE / Mini | FAIL (25px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-ar-w375.png](./after-fixes/after-customer-home-ar-w375.png) |
-| **390px** | iPhone 13/14/15 | FAIL (10px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-ar-w390.png](./after-fixes/after-customer-home-ar-w390.png) |
-| **412px** | Pixel / Galaxy | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-ar-w412.png](./after-fixes/after-customer-home-ar-w412.png) |
-| **430px** | iPhone Pro Max | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-ar-w430.png](./after-fixes/after-customer-home-ar-w430.png) |
-| **480px** | Phablet / Landscape | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-ar-w480.png](./after-fixes/after-customer-home-ar-w480.png) |
-| **768px** | Tablet Portrait | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 11 small | **0 (PASS >=44px)** | [after-ar-w768.png](./after-fixes/after-customer-home-ar-w768.png) |
-| **1024px** | Tablet Landscape | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 4 small | **0 (PASS >=44px)** | [after-ar-w1024.png](./after-fixes/after-customer-home-ar-w1024.png) |
-| **1280px** | Desktop (`69:789`, `79:1294`) | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 4 small | **0 (PASS >=44px)** | [after-ar-w1280.png](./after-fixes/after-customer-home-ar-w1280.png) |
-| **1440px** | Large Desktop | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 4 small | **0 (PASS >=44px)** | [after-ar-w1440.png](./after-fixes/after-customer-home-ar-w1440.png) |
-| **1920px** | Full HD Ultrawide | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 4 small | **0 (PASS >=44px)** | [after-ar-w1920.png](./after-fixes/after-customer-home-ar-w1920.png) |
+| `69:789` | Home / Hero + Catalog | AR | 320px | Populated Menu | Stacks vertically, food photo visible, 8 items loaded, 0px overflow, targets >=44px | Clean stack, mixed grill photo, 8 cards with prices & Add buttons, 0px overflow | **PASS** | [after-customer-home-ar-w320.png](./after-fixes/after-customer-home-ar-w320.png) |
+| `69:789` | Home / Hero + Catalog | AR | 360px | Populated Menu | Mobile layout, 0px overflow, 8 items, 5 category chips | Perfectly rendered, 0px overflow, targets >=44px | **PASS** | [after-customer-home-ar-w360.png](./after-fixes/after-customer-home-ar-w360.png) |
+| `69:789` | Home / Hero + Catalog | AR | 375px | Populated Menu | iPhone SE layout, 0px overflow, 8 items loaded | Complete items, images loaded, 0px overflow | **PASS** | [after-customer-home-ar-w375.png](./after-fixes/after-customer-home-ar-w375.png) |
+| `69:789` | Home / Hero + Catalog | AR | 390px | Populated Menu | iPhone 13/14 layout, 0px overflow, 8 items loaded | Clean typography, 0px overflow, all targets >=44px | **PASS** | [after-customer-home-ar-w390.png](./after-fixes/after-customer-home-ar-w390.png) |
+| `69:789` | Home / Hero + Catalog | AR | 412px | Populated Menu | Android common, 0px overflow, 8 items loaded | Clean cards and chips, 0px overflow | **PASS** | [after-customer-home-ar-w412.png](./after-fixes/after-customer-home-ar-w412.png) |
+| `69:789` | Home / Hero + Catalog | AR | 430px | Populated Menu | iPhone Pro Max, 0px overflow, 8 items loaded | Crisp images, 0px overflow, targets >=44px | **PASS** | [after-customer-home-ar-w430.png](./after-fixes/after-customer-home-ar-w430.png) |
+| `69:789` | Home / Hero + Catalog | AR | 480px | Populated Menu | Large mobile / landscape, 0px overflow | Balanced grid, 0px overflow | **PASS** | [after-customer-home-ar-w480.png](./after-fixes/after-customer-home-ar-w480.png) |
+| `69:789` | Home / Hero + Catalog | AR | 768px | Populated Menu | 2-column catalog grid, benefits 2x2, 0px overflow | 2-column items, 2x2 benefits, 0px overflow | **PASS** | [after-customer-home-ar-w768.png](./after-fixes/after-customer-home-ar-w768.png) |
+| `69:789` | Home / Hero + Catalog | AR | 1024px | Populated Menu | Tablet landscape, side-by-side hero, 0px overflow | Side-by-side hero, 2-col catalog, 0px overflow | **PASS** | [after-customer-home-ar-w1024.png](./after-fixes/after-customer-home-ar-w1024.png) |
+| `69:789` | Home / Hero (Fold) | AR | 1280px | Desktop First Fold | Side-by-side hero, mixed grill photo, floating flame badge, desktop nav | Matched Figma 69:789 proportions and typography | **PASS** | [after-customer-home-ar-w1280-fold.png](./after-fixes/after-customer-home-ar-w1280-fold.png) |
+| `79:1294` | Menu / Catalog Grid | AR | 1280px | Populated 3-Col Grid | 3-column product cards, category chips, prices, wishlist buttons | 3-column grid, 8 items, 5 chips, all targets >=44px | **PASS** | [after-customer-home-ar-w1280.png](./after-fixes/after-customer-home-ar-w1280.png) |
+| `69:789` | Home / Hero + Catalog | AR | 1440px | Populated Desktop | High-res desktop, 3-col grid, 0px overflow | Centered content shell, 3-col cards, 0px overflow | **PASS** | [after-customer-home-ar-w1440.png](./after-fixes/after-customer-home-ar-w1440.png) |
+| `69:789` | Home / Hero + Catalog | AR | 1920px | Populated Ultrawide | Max content width constraint, 0px overflow | Maximum 75rem container, sharp display, 0px overflow | **PASS** | [after-customer-home-ar-w1920.png](./after-fixes/after-customer-home-ar-w1920.png) |
+| `69:789` | Home / Hero + Catalog | EN | 320px | Populated Menu | English LTR mobile, 0px overflow, 8 items loaded | Clean LTR layout, 0px overflow, targets >=44px | **PASS** | [after-customer-home-en-w320.png](./after-fixes/after-customer-home-en-w320.png) |
+| `69:789` | Home / Hero + Catalog | EN | 360px | Populated Menu | English LTR compact, 0px overflow, 8 items loaded | Complete English titles & descriptions, 0px overflow | **PASS** | [after-customer-home-en-w360.png](./after-fixes/after-customer-home-en-w360.png) |
+| `69:789` | Home / Hero + Catalog | EN | 375px | Populated Menu | iPhone SE English, 0px overflow, 8 items loaded | Clean cards and chips, 0px overflow | **PASS** | [after-customer-home-en-w375.png](./after-fixes/after-customer-home-en-w375.png) |
+| `69:789` | Home / Hero + Catalog | EN | 390px | Populated Menu | iPhone 13 English, 0px overflow, 8 items loaded | Standardized 44px buttons, 0px overflow | **PASS** | [after-customer-home-en-w390.png](./after-fixes/after-customer-home-en-w390.png) |
+| `69:789` | Home / Hero + Catalog | EN | 412px | Populated Menu | Android English, 0px overflow, 8 items loaded | Sharp fonts, 0px overflow | **PASS** | [after-customer-home-en-w412.png](./after-fixes/after-customer-home-en-w412.png) |
+| `69:789` | Home / Hero + Catalog | EN | 430px | Populated Menu | iPhone Pro Max English, 0px overflow | Full item cards, 0px overflow | **PASS** | [after-customer-home-en-w430.png](./after-fixes/after-customer-home-en-w430.png) |
+| `69:789` | Home / Hero + Catalog | EN | 480px | Populated Menu | Large mobile English, 0px overflow | Proportional cards, 0px overflow | **PASS** | [after-customer-home-en-w480.png](./after-fixes/after-customer-home-en-w480.png) |
+| `69:789` | Home / Hero + Catalog | EN | 768px | Populated Menu | 2-col catalog English, 0px overflow | 2-column cards, 0px overflow | **PASS** | [after-customer-home-en-w768.png](./after-fixes/after-customer-home-en-w768.png) |
+| `69:789` | Home / Hero + Catalog | EN | 1024px | Populated Menu | Tablet landscape English, 0px overflow | Side-by-side hero, 0px overflow | **PASS** | [after-customer-home-en-w1024.png](./after-fixes/after-customer-home-en-w1024.png) |
+| `69:789` | Home / Hero (Fold) | EN | 1280px | Desktop First Fold | Side-by-side hero English, flame badge, LTR nav | Matched Figma 69:789 proportions in English | **PASS** | [after-customer-home-en-w1280-fold.png](./after-fixes/after-customer-home-en-w1280-fold.png) |
+| `79:1294` | Menu / Catalog Grid | EN | 1280px | Populated 3-Col Grid | 3-column product cards English, category chips | 3-column grid, 8 items, English prices & actions | **PASS** | [after-customer-home-en-w1280.png](./after-fixes/after-customer-home-en-w1280.png) |
+| `69:789` | Home / Hero + Catalog | EN | 1440px | Populated Desktop | High-res desktop English, 0px overflow | Clean typography, 3-col grid, 0px overflow | **PASS** | [after-customer-home-en-w1440.png](./after-fixes/after-customer-home-en-w1440.png) |
+| `69:789` | Home / Hero + Catalog | EN | 1920px | Populated Ultrawide | Ultrawide English, 0px overflow | Centered shell, 0px overflow | **PASS** | [after-customer-home-en-w1920.png](./after-fixes/after-customer-home-en-w1920.png) |
+| — | Shared Header / Drawer | AR | 320px | Mobile Drawer Open | Drawer slides down, navigation links accessible | All 7 drawer links visible with icons, 44px targets | **PASS** | [after-mobile-drawer-ar-w320.png](./after-fixes/after-mobile-drawer-ar-w320.png) |
+| — | Shared Header / Drawer | EN | 390px | Mobile Drawer Open | English drawer links accessible | Clean English navigation labels and icons | **PASS** | [after-mobile-drawer-en-w390.png](./after-fixes/after-mobile-drawer-en-w390.png) |
+| — | Shared Header / Drawer | AR | 430px | Mobile Drawer Open | Arabic drawer on large phone | Clean layout, full-width tap targets | **PASS** | [after-mobile-drawer-ar-w430.png](./after-fixes/after-mobile-drawer-ar-w430.png) |
+| — | Menu / Mobile Cart Bar | AR | 320px | Cart Populated | Floating bottom cart bar visible with item count and subtotal | Floating bar rendered: `عرض السلة · 1 (295.00 ج.م)` | **PASS** | [after-floating-cart-ar-w320.png](./after-fixes/after-floating-cart-ar-w320.png) |
+| — | Menu / Mobile Cart Bar | EN | 390px | Cart Populated | Floating bottom cart bar visible in English | Floating bar rendered: `View Cart · 2 (590.00 EGP)` | **PASS** | [after-floating-cart-en-w390.png](./after-fixes/after-floating-cart-en-w390.png) |
+| `79:1294` | Menu / Empty Catalog | AR | 1280px | Empty State | Categories rendered, clean empty message panel | Rendered message: "لا توجد أصناف متاحة في القائمة الآن." | **PASS** | [after-catalog-empty-ar-w1280.png](./after-fixes/after-catalog-empty-ar-w1280.png) |
+| `79:1294` | Menu / Error & Retry | AR | 1280px | Error + Recovery | Error alert with retry CTA; clicking retry restores items | Error panel rendered, retry restores all 8 items cleanly | **PASS** | [after-catalog-error-ar-w1280.png](./after-fixes/after-catalog-error-ar-w1280.png) |
 
 ---
 
-### English (LTR)
+## 4. How Reviewers Can Reproduce the QA Audit
 
-| Viewport | Figma Reference | BEFORE Overflow | AFTER Overflow | BEFORE Headings | AFTER Headings | BEFORE Targets <44px | AFTER Targets <44px | AFTER Screenshot |
-|---|---|---|---|---|---|---|---|---|
-| **320px** | Mobile draft | FAIL (79px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-en-w320.png](./after-fixes/after-customer-home-en-w320.png) |
-| **360px** | Mobile common | FAIL (40px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-en-w360.png](./after-fixes/after-customer-home-en-w360.png) |
-| **375px** | iPhone SE / Mini | FAIL (25px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-en-w375.png](./after-fixes/after-customer-home-en-w375.png) |
-| **390px** | iPhone 13/14/15 | FAIL (10px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-en-w390.png](./after-fixes/after-customer-home-en-w390.png) |
-| **412px** | Pixel / Galaxy | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-en-w412.png](./after-fixes/after-customer-home-en-w412.png) |
-| **430px** | iPhone Pro Max | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-en-w430.png](./after-fixes/after-customer-home-en-w430.png) |
-| **480px** | Phablet / Landscape | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 15 small | **0 (PASS >=44px)** | [after-en-w480.png](./after-fixes/after-customer-home-en-w480.png) |
-| **768px** | Tablet Portrait | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 11 small | **0 (PASS >=44px)** | [after-en-w768.png](./after-fixes/after-customer-home-en-w768.png) |
-| **1024px** | Tablet Landscape | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 4 small | **0 (PASS >=44px)** | [after-en-w1024.png](./after-fixes/after-customer-home-en-w1024.png) |
-| **1280px** | Desktop (`69:789`, `79:1294`) | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 4 small | **0 (PASS >=44px)** | [after-en-w1280.png](./after-fixes/after-customer-home-en-w1280.png) |
-| **1440px** | Large Desktop | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 4 small | **0 (PASS >=44px)** | [after-en-w1440.png](./after-fixes/after-customer-home-en-w1440.png) |
-| **1920px** | Full HD Ultrawide | PASS (0px) | **PASS (0px)** | 1 h1 / 3 h2 (skipped) | **1 h1 / 4 h2 (valid)** | 4 small | **0 (PASS >=44px)** | [after-en-w1920.png](./after-fixes/after-customer-home-en-w1920.png) |
-
----
-
-## 4. How to Run the Automated QA Audit
-
-To run the full visual and responsive audit on any environment:
-
-1. Ensure the frontend server is running:
+1. **Start the frontend application:**
    ```bash
    cd frontend
    npm start
    ```
 
-2. Run the audit script:
+2. **Execute the automated Chrome visual & responsive test:**
    ```bash
    node docs/visual-verification/run_qa.js
    ```
 
 The script will:
-- Check all 12 viewports in both Arabic and English.
-- Evaluate horizontal overflow (`scrollWidth <= clientWidth`).
-- Validate heading hierarchy (1 `h1`).
-- Measure computed hit rectangles for buttons and links (>= 44x44px).
-- Save full-page screenshots to `docs/visual-verification/latest-run/`.
-- Generate `qa-audit-results.json` and exit with code `0` on success.
+- Spin up headless Chrome via CDP.
+- Intercept and fulfill `/api/menu/categories`, `/api/menu/items`, and `/api/restaurant/status` with verified project fixtures.
+- Wait for Angular rendering stability and product card image resolution.
+- Verify horizontal overflow (`scrollWidth <= clientWidth`).
+- Validate document heading hierarchy (single `h1`).
+- Measure computed hit rectangles for touch targets (>= 44x44 CSS px).
+- Test all special interaction states (Mobile Drawer, Floating Cart, Empty State, Error Recovery).
+- Save all screenshots to `docs/visual-verification/after-fixes/` and output `after-audit-results.json`.
+- Exit with code `0` on 100% pass, or code `1` if any acceptance condition is not met.
