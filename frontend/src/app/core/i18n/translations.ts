@@ -1917,7 +1917,8 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       feature4Title: 'تتبيلات عائلية سرية',
       feature4Desc: 'خلطات بهارات سورية توارثتها أجيال الطهاة لتمنحك مذاقاً فريداً لا ينسى.',
       specialsTitle: 'أطباقنا المميزة الأكثر طلباً',
-      specialsSubtitle: 'تشكيلة مختارة من أشهى أطباق المشاوي والسندوتشات والمقبلات التي حازت ثقة زبائننا.',
+      specialsSubtitle:
+        'تشكيلة مختارة من أشهى أطباق المشاوي والسندوتشات والمقبلات التي حازت ثقة زبائننا.',
       aboutStoryTitle: 'قصة باب الحارة',
       aboutStoryBody:
         'بدأت رحلتنا من حب المطبخ الشامي الغني وتقاليده الأصيلة. في باب الحارة، نحرص على تقديم تجربة طعام استثنائية تجمع بين عبق دمشق القديمة وأعلى معايير الجودة والنظافة والخدمة الراقية.',
@@ -2004,7 +2005,8 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       addAllToCart: 'إضافة الكل إلى السلة',
       addAllSuccess: 'تمت إضافة جميع الأصناف المتوفرة إلى سلتك بنجاح!',
       emptyTitle: 'قائمتك المفضلة فارغة حالياً',
-      emptySubtitle: 'انقر على رمز القلب الموجود بجانب أي وجبة في القائمة لحفظها هنا والوصول إليها بسرعة.',
+      emptySubtitle:
+        'انقر على رمز القلب الموجود بجانب أي وجبة في القائمة لحفظها هنا والوصول إليها بسرعة.',
       browseMenu: 'استكشف القائمة وأضف وجباتك المفضلة',
       remove: 'إزالة من المفضلة',
     },
@@ -2979,15 +2981,19 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
       badgeFresh: '100% Fresh Daily Halal Meat',
       highlightsTitle: 'Why Bab Al Hara?',
       feature1Title: 'Fresh Meats Daily',
-      feature1Desc: 'We carefully source premium fresh local meats slaughtered daily under rigorous standards.',
+      feature1Desc:
+        'We carefully source premium fresh local meats slaughtered daily under rigorous standards.',
       feature2Title: 'Natural Charcoal Grilling',
-      feature2Desc: 'Every kebab and cut is slowly flame-grilled over natural charcoal embers for unmatched aroma.',
+      feature2Desc:
+        'Every kebab and cut is slowly flame-grilled over natural charcoal embers for unmatched aroma.',
       feature3Title: 'Express Hot Delivery',
-      feature3Desc: 'Delivered in specialized thermal containers ensuring your food arrives piping hot.',
+      feature3Desc:
+        'Delivered in specialized thermal containers ensuring your food arrives piping hot.',
       feature4Title: 'Secret Family Marinades',
       feature4Desc: 'Syrian spice blends perfected over generations giving an unforgettable taste.',
       specialsTitle: 'Popular Signature Dishes',
-      specialsSubtitle: 'A curated selection of our most loved grills, sandwiches, and hot Levantine appetizers.',
+      specialsSubtitle:
+        'A curated selection of our most loved grills, sandwiches, and hot Levantine appetizers.',
       aboutStoryTitle: 'The Bab Al Hara Story',
       aboutStoryBody:
         'Our journey started from a profound love for traditional Levantine gastronomy. At Bab Al Hara, we bring the culinary spirit of Old Damascus to your table with uncompromising quality and warm hospitality.',
@@ -3015,11 +3021,14 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
         'We do not simply prepare food; we create warm memories around your table. Our veteran master chefs craft tender kebabs, shish tawook, lamb chops, and shawarma sandwiches using 100% fresh daily local meats.',
       valuesTitle: 'Our Core Principles',
       value1Title: 'Uncompromising Quality',
-      value1Desc: 'Zero tolerance for substandard ingredients; rigorous daily inspection and selection.',
+      value1Desc:
+        'Zero tolerance for substandard ingredients; rigorous daily inspection and selection.',
       value2Title: 'Authenticity & Honesty',
-      value2Desc: 'Heritage recipes and natural spices without artificial flavor enhancers or additives.',
+      value2Desc:
+        'Heritage recipes and natural spices without artificial flavor enhancers or additives.',
       value3Title: 'Genuine Hospitality',
-      value3Desc: 'Attentive, swift service that makes every customer feel like a treasured family guest.',
+      value3Desc:
+        'Attentive, swift service that makes every customer feel like a treasured family guest.',
       statYears: '12+',
       statYearsLabel: 'Years of Culinary Mastery',
       statCustomers: '50,000+',
@@ -3032,7 +3041,8 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
     contact: {
       eyebrow: 'Get in Touch',
       title: 'Contact Us — Bab Al Hara',
-      subtitle: 'We are here to answer your questions, handle custom inquiries, and assist you around the clock.',
+      subtitle:
+        'We are here to answer your questions, handle custom inquiries, and assist you around the clock.',
       phoneTitle: 'Direct Hotline',
       phoneValue: '+20 100 234 5678',
       whatsappTitle: 'WhatsApp Support',
@@ -3052,7 +3062,8 @@ export const UI_COPY: Readonly<Record<Language, UiCopy>> = {
     },
     search: {
       title: 'Search Our Menu',
-      subtitle: 'Find your favorite dishes by name or ingredients and explore delicious Levantine options.',
+      subtitle:
+        'Find your favorite dishes by name or ingredients and explore delicious Levantine options.',
       placeholder: 'Search for kebabs, grills, shawarma, sandwiches...',
       clear: 'Clear search',
       quickTags: 'Popular Searches:',

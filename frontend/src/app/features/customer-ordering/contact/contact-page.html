@@ -14,7 +14,11 @@
           <div class="info-icon" aria-hidden="true">📞</div>
           <div class="info-text">
             <h3>{{ copy().contact.phoneTitle }}</h3>
-            <p><a [href]="'tel:' + copy().contact.phoneValue" dir="ltr">{{ copy().contact.phoneValue }}</a></p>
+            <p>
+              <a [href]="'tel:' + copy().contact.phoneValue" dir="ltr">{{
+                copy().contact.phoneValue
+              }}</a>
+            </p>
           </div>
         </div>
 
@@ -22,7 +26,15 @@
           <div class="info-icon" aria-hidden="true">💬</div>
           <div class="info-text">
             <h3>{{ copy().contact.whatsappTitle }}</h3>
-            <p><a [href]="'https://wa.me/' + copy().contact.whatsappValue" target="_blank" rel="noopener" dir="ltr">{{ copy().contact.whatsappValue }}</a></p>
+            <p>
+              <a
+                [href]="'https://wa.me/' + copy().contact.whatsappValue"
+                target="_blank"
+                rel="noopener"
+                dir="ltr"
+                >{{ copy().contact.whatsappValue }}</a
+              >
+            </p>
           </div>
         </div>
 

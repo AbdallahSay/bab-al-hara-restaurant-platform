@@ -46,14 +46,16 @@ export class SearchPage implements OnInit {
 
     if (tag) {
       items = items.filter((item) => {
-        const text = `${item.nameAr} ${item.nameEn} ${item.descriptionAr} ${item.descriptionEn}`.toLowerCase();
+        const text =
+          `${item.nameAr} ${item.nameEn} ${item.descriptionAr} ${item.descriptionEn}`.toLowerCase();
         return text.includes(tag.toLowerCase());
       });
     }
 
     if (query) {
       items = items.filter((item) => {
-        const text = `${item.nameAr} ${item.nameEn} ${item.descriptionAr} ${item.descriptionEn}`.toLowerCase();
+        const text =
+          `${item.nameAr} ${item.nameEn} ${item.descriptionAr} ${item.descriptionEn}`.toLowerCase();
         return text.includes(query);
       });
     }

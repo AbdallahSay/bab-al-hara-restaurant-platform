@@ -18,9 +18,7 @@
     </header>
 
     @if (toastMessage(); as msg) {
-      <div class="wishlist-toast" role="status" aria-live="polite">
-        <span>✓</span> {{ msg }}
-      </div>
+      <div class="wishlist-toast" role="status" aria-live="polite"><span>✓</span> {{ msg }}</div>
     }
 
     @if (loading()) {

@@ -57,7 +57,8 @@ export class CustomerAuthPage {
     this.errorMessage.set(null);
 
     // Save profile details locally so user profile reflects authenticated info
-    const resolvedName = this.name().trim() || this.identifier().trim().split('@')[0] || 'عميل باب الحارة';
+    const resolvedName =
+      this.name().trim() || this.identifier().trim().split('@')[0] || 'عميل باب الحارة';
     this.contactService.save({
       name: resolvedName,
       phone: this.identifier().trim(),

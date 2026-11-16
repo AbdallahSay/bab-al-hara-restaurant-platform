@@ -63,9 +63,7 @@
         </h2>
 
         @if (successMessage(); as sMsg) {
-          <div class="auth-alert auth-alert--success" role="status">
-            <span>✓</span> {{ sMsg }}
-          </div>
+          <div class="auth-alert auth-alert--success" role="status"><span>✓</span> {{ sMsg }}</div>
         }
 
         @if (errorMessage(); as eMsg) {

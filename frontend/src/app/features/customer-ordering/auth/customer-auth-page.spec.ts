@@ -13,8 +13,7 @@ describe('CustomerAuthPage', () => {
       providers: [provideRouter([])],
     }).compileComponents();
 
-    const fixture: ComponentFixture<CustomerAuthPage> =
-      TestBed.createComponent(CustomerAuthPage);
+    const fixture: ComponentFixture<CustomerAuthPage> = TestBed.createComponent(CustomerAuthPage);
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;

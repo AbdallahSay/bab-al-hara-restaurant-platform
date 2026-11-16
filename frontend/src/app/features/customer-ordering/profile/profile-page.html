@@ -28,7 +28,9 @@
       <section class="section-card">
         <div class="section-card__header">
           <h2>{{ copy().profile.defaultAddressTitle }}</h2>
-          <a routerLink="/account-settings" class="edit-link">{{ copy().profile.accountSettings }}</a>
+          <a routerLink="/account-settings" class="edit-link">{{
+            copy().profile.accountSettings
+          }}</a>
         </div>
         @if (savedAddress(); as addr) {
           <div class="address-preview">

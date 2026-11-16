@@ -53,8 +53,7 @@ describe('OrderDetailsPage', () => {
       ],
     }).compileComponents();
 
-    const fixture: ComponentFixture<OrderDetailsPage> =
-      TestBed.createComponent(OrderDetailsPage);
+    const fixture: ComponentFixture<OrderDetailsPage> = TestBed.createComponent(OrderDetailsPage);
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;

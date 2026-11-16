@@ -42,9 +42,13 @@
                 <div class="item-row">
                   <div class="item-row__info">
                     <strong class="item-name">{{ itemName(item) }}</strong>
-                    <span class="item-meta">{{ item.quantity }} × {{ item.unitPrice }} {{ copy().common.currency }}</span>
+                    <span class="item-meta"
+                      >{{ item.quantity }} × {{ item.unitPrice }} {{ copy().common.currency }}</span
+                    >
                   </div>
-                  <strong class="item-total">{{ item.lineTotal }} {{ copy().common.currency }}</strong>
+                  <strong class="item-total"
+                    >{{ item.lineTotal }} {{ copy().common.currency }}</strong
+                  >
                 </div>
               }
             </div>
@@ -73,7 +77,9 @@
             <h2 class="card-title">{{ copy().orderDetails.fulfillmentType }}</h2>
             <div class="meta-row">
               <span class="meta-label">{{ copy().orderDetails.fulfillmentType }}:</span>
-              <strong>{{ ord.orderType === 'Delivery' ? copy().common.delivery : copy().common.takeaway }}</strong>
+              <strong>{{
+                ord.orderType === 'Delivery' ? copy().common.delivery : copy().common.takeaway
+              }}</strong>
             </div>
 
             @if (ord.orderType === 'Delivery' && ord.address) {
@@ -90,7 +96,11 @@
           </section>
 
           <section class="details-card actions-card">
-            <button type="button" class="button button--primary button--full" (click)="onReorder(ord)">
+            <button
+              type="button"
+              class="button button--primary button--full"
+              (click)="onReorder(ord)"
+            >
               {{ copy().orderDetails.reorderButton }}
             </button>
             <a routerLink="/orders" class="button button--secondary button--full">

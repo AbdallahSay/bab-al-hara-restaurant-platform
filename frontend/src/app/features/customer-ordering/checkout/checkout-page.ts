@@ -30,7 +30,13 @@ type AreaState = 'loading' | 'ready' | 'error';
 
 @Component({
   selector: 'app-checkout-page',
-  imports: [CustomerHeader, CustomerFooter, ReactiveFormsModule, RestaurantPausedBanner, RouterLink],
+  imports: [
+    CustomerHeader,
+    CustomerFooter,
+    ReactiveFormsModule,
+    RestaurantPausedBanner,
+    RouterLink,
+  ],
   templateUrl: './checkout-page.html',
   styleUrl: './checkout-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -49,10 +49,7 @@ describe('WishlistPage', () => {
 
     await TestBed.configureTestingModule({
       imports: [WishlistPage],
-      providers: [
-        provideRouter([]),
-        { provide: CustomerApiService, useValue: apiMock },
-      ],
+      providers: [provideRouter([]), { provide: CustomerApiService, useValue: apiMock }],
     }).compileComponents();
 
     wishlistService = TestBed.inject(WishlistService);

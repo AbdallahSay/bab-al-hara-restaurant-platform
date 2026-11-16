@@ -74,9 +74,7 @@
     </header>
 
     @if (toastMessage(); as msg) {
-      <div class="search-toast" role="status" aria-live="polite">
-        <span>✓</span> {{ msg }}
-      </div>
+      <div class="search-toast" role="status" aria-live="polite"><span>✓</span> {{ msg }}</div>
     }
 
     @if (loading()) {

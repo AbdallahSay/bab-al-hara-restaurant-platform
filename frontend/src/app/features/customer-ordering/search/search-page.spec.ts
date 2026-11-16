@@ -47,10 +47,7 @@ describe('SearchPage', () => {
 
     await TestBed.configureTestingModule({
       imports: [SearchPage],
-      providers: [
-        provideRouter([]),
-        { provide: CustomerApiService, useValue: apiMock },
-      ],
+      providers: [provideRouter([]), { provide: CustomerApiService, useValue: apiMock }],
     }).compileComponents();
   });
 

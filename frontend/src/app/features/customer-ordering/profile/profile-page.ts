@@ -27,7 +27,9 @@ export class ProfilePage {
 
   protected readonly displayName = computed(() => {
     const contact = this.contactService.profile();
-    return contact?.name || (this.language.current() === 'ar' ? 'ضيف باب الحارة' : 'Bab Al Hara Guest');
+    return (
+      contact?.name || (this.language.current() === 'ar' ? 'ضيف باب الحارة' : 'Bab Al Hara Guest')
+    );
   });
 
   protected readonly displayPhone = computed(() => {

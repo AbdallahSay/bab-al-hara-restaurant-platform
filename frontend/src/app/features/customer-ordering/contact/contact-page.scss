@@ -154,7 +154,9 @@
       font-size: 0.95rem;
       color: var(--color-ink, #241b1d);
       background: #fff;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
 
       &:focus {
         outline: none;
