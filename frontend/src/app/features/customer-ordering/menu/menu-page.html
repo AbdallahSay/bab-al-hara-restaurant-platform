@@ -2,37 +2,42 @@
 
 <main class="menu-shell">
   <!-- 1. Figma 69:789 Home Hero Section (Clean White Page, Dominant Food Visual) -->
-  <section class="home-hero">
+  <section class="home-hero" aria-label="Hero">
     <div class="home-hero__container">
       <div class="home-hero__content">
         <div class="badge-pill">
           <span class="badge-icon" aria-hidden="true">🛵</span>
           <span>{{ copy().home.badgeFresh }}</span>
         </div>
-        <p class="hero-eyebrow">{{ copy().home.heroEyebrow }}</p>
-        <h1 class="hero-title">{{ copy().home.heroTitle }}</h1>
-        <p class="hero-subtitle">{{ copy().home.heroSubtitle }}</p>
+        <h1 class="hero-title">
+          @if (language.current() === 'ar') {
+            <span>مشاوي وأكلات شامية</span>
+            <span class="hero-title__highlight">على أصولها</span>
+          } @else {
+            <span>Traditional Charcoal Grills</span>
+            <span class="hero-title__highlight">& Specialties</span>
+          }
+        </h1>
+        <p class="hero-tagline">{{ copy().home.heroEyebrow }}</p>
+        <p class="hero-description">{{ copy().home.heroSubtitle }}</p>
 
         <div class="hero-actions">
-          <a href="#menu-catalog" class="button button--primary button--lg hero-cta-btn">
+          <a href="#menu-catalog" class="button button--primary hero-cta-btn">
             <span class="btn-icon" aria-hidden="true">🍽️</span>
             <span>{{ copy().home.orderNow }}</span>
-          </a>
-          <a routerLink="/about" class="button button--secondary button--lg">
-            <span>{{ copy().home.readMore }}</span>
           </a>
         </div>
       </div>
 
       <div class="home-hero__visual">
         <div class="hero-glow-bg" aria-hidden="true"></div>
-        <div class="hero-image-card">
+        <div class="hero-image-wrap">
           <img
             src="/images/menu/mixed-grill.webp"
             [alt]="copy().home.heroTitle"
             class="hero-food-img"
-            width="640"
-            height="560"
+            width="576"
+            height="576"
             loading="eager"
             fetchpriority="high"
           />

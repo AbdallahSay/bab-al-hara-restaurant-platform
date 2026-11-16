@@ -1,6 +1,62 @@
-# Visual Verification & Responsive QA: Customer Home & Menu (Phase 10A.4)
+# Visual Verification & Responsive QA: Customer Home & Menu (Phase 10A.5)
 
-This documentation provides the visual verification evidence, quantitative Figma-to-code comparison, and automated responsive test suite for **Phase 10A.4 — Figma-First Visual Reconstruction** ([Issue #32](https://github.com/AbdallahSay/bab-al-hara-restaurant-platform/issues/32), [PR #33](https://github.com/AbdallahSay/bab-al-hara-restaurant-platform/pull/33)).
+This documentation provides the visual verification evidence, quantitative Figma-to-code comparison, element-by-element geometry validation, and automated responsive test suite for **Phase 10A.5 — Exact Figma Hero Reconstruction** ([Issue #32](https://github.com/AbdallahSay/bab-al-hara-restaurant-platform/issues/32), [PR #33](https://github.com/AbdallahSay/bab-al-hara-restaurant-platform/pull/33)).
+
+---
+
+## 0. Phase 10A.5: Exact Figma Hero Reconstruction (Owner Review Remediation)
+
+In response to product owner review ([comment #6925474023](https://github.com/AbdallahSay/bab-al-hara-restaurant-platform/pull/33#issuecomment-6925474023)), Phase 10A.5 delivers a **mathematically exact pixel-level reconstruction** of the approved Figma Home Hero (Node `69:789` / Component `77:1741`) at 1280px reference desktop:
+
+### Exact 1280px Reference Geometry & Deviation Table
+
+All element coordinates are measured in real browser rendering (Chrome CDP, 1280px viewport) against original Figma reference node `77:1741` coordinates:
+
+#### English LTR Deviation Table (1280px)
+
+| Element | Figma Target X | Browser Actual X | ΔX | Figma Target Y | Browser Actual Y | ΔY | Figma Target W | Browser Actual W | ΔW | Figma Target H | Browser Actual H | ΔH | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Hero Section** (`77:1741`) | 0 | 0 | **0px** | 177 | 177 | **0px** | 1280 | 1280 | **0px** | 720 | 720 | **0px** | **PASS (0px)** |
+| **Copy Column** (`77:1743`) | 65 | 65 | **0px** | 294 | 294 | **0px** | 576 | 576 | **0px** | 486 | 486 | **0px** | **PASS (0px)** |
+| **Delivery Badge** (`77:1744`) | 65 | 65 | **0px** | 294 | 294 | **0px** | 258 | 258 | **0px** | 36 | 36 | **0px** | **PASS (0px)** |
+| **H1 Headline** (`77:1750`) | 65 | 65 | **0px** | 362 | 362 | **0px** | 576 | 576 | **0px** | 159 | 159 | **0px** | **PASS (0px)** |
+| **Secondary Tagline** (`77:1752`) | 65 | 65 | **0px** | 553 | 553 | **0px** | 576 | 576 | **0px** | 32 | 32 | **0px** | **PASS (0px)** |
+| **Description** (`77:1754`) | 65 | 65 | **0px** | 617 | 617 | **0px** | 576 | 576 | **0px** | 59 | 59 | **0px** | **PASS (0px)** |
+| **Single Primary CTA** (`77:1756`) | 65 | 65 | **0px** | 708 | 708 | **0px** | 359 | 359 | **0px** | 72 | 72 | **0px** | **PASS (0px)** |
+| **Visual Column** (`77:1761`) | 641 | 641 | **0px** | 177 | 177 | **0px** | 576 | 576 | **0px** | 720 | 720 | **0px** | **PASS (0px)** |
+| **Food Photo** (`77:1763`) | 641 | 641 | **0px** | 249 | 249 | **0px** | 576 | 576 | **0px** | 576 | 576 | **0px** | **PASS (0px)** |
+| **Floating Badge** (`77:1764`) | 1023 | 1023 | **0px** | 257 | 257 | **0px** | 194 | 194 | **0px** | 80 | 80 | **0px** | **PASS (0px)** |
+| **Badge Icon Box** | 1039 | 1039 | **0px** | 273 | 273 | **0px** | 48 | 48 | **0px** | 48 | 48 | **0px** | **PASS (0px)** |
+| **Background Glow** (`77:1762`) | 476 | 476 | **0px** | 194 | 194 | **0px** | 787 | 787 | **0px** | 770 | 770 | **0px** | **PASS (0px)** |
+
+#### Arabic RTL Mirrored Deviation Table (1280px)
+
+| Element | Target Mirrored X | Browser Actual X | ΔX | Target Y | Browser Actual Y | ΔY | Target W | Actual W | ΔW | Target H | Actual H | ΔH | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Hero Section** | 0 | 0 | **0px** | 177 | 177 | **0px** | 1280 | 1280 | **0px** | 720 | 720 | **0px** | **PASS (0px)** |
+| **Copy Column** | 639 | 639 | **0px** | 294 | 294 | **0px** | 576 | 576 | **0px** | 486 | 486 | **0px** | **PASS (0px)** |
+| **Delivery Badge** | 957 | 957 | **0px** | 294 | 294 | **0px** | 258 | 258 | **0px** | 36 | 36 | **0px** | **PASS (0px)** |
+| **H1 Headline** | 639 | 639 | **0px** | 362 | 362 | **0px** | 576 | 576 | **0px** | 159 | 159 | **0px** | **PASS (0px)** |
+| **Secondary Tagline** | 639 | 639 | **0px** | 553 | 553 | **0px** | 576 | 576 | **0px** | 32 | 32 | **0px** | **PASS (0px)** |
+| **Description** | 639 | 639 | **0px** | 617 | 617 | **0px** | 576 | 576 | **0px** | 59 | 59 | **0px** | **PASS (0px)** |
+| **Single Primary CTA** | 856 | 856 | **0px** | 708 | 708 | **0px** | 359 | 359 | **0px** | 72 | 72 | **0px** | **PASS (0px)** |
+| **Visual Column** | 63 | 63 | **0px** | 177 | 177 | **0px** | 576 | 576 | **0px** | 720 | 720 | **0px** | **PASS (0px)** |
+| **Food Photo** | 63 | 63 | **0px** | 249 | 249 | **0px** | 576 | 576 | **0px** | 576 | 576 | **0px** | **PASS (0px)** |
+| **Floating Badge** | 63 | 63 | **0px** | 257 | 257 | **0px** | 194 | 194 | **0px** | 80 | 80 | **0px** | **PASS (0px)** |
+| **Badge Icon Box** | 193 | 193 | **0px** | 273 | 273 | **0px** | 48 | 48 | **0px** | 48 | 48 | **0px** | **PASS (0px)** |
+| **Background Glow** | -42 | -42 | **0px** | 194 | 194 | **0px** | 787 | 787 | **0px** | 770 | 770 | **0px** | **PASS (0px)** |
+
+### Visual Artifacts Generated
+
+1. **Semi-Transparent 50% Overlay (`hero-semi-transparent-overlay-1280.png`)**:
+   Direct pixel-for-pixel overlay of the rendered browser Hero onto the original Figma Reference at 1280px, demonstrating alignment of text baselines, margins, button dimensions, photo positioning, and floating badge placement.
+2. **Labeled Side-by-Side 3-Panel Comparison (`figma-vs-browser-hero-exact-1280.png`)**:
+   Side-by-side labeled comparison of:
+   - Panel 1: Original Figma Reference (`69:789`)
+   - Panel 2: Bab Al Hara Browser (English LTR) — Δ = 0px
+   - Panel 3: Bab Al Hara Browser (Arabic RTL) — Mirrored Δ = 0px
+3. **Automated Verification Runner (`generate_hero_verification.js`)**:
+   Deterministic headless script measuring all bounding boxes via Chrome CDP and exporting numerical delta reports to [`hero-geometry-verification-results.json`](./after-fixes/hero-geometry-verification-results.json).
 
 ---
 

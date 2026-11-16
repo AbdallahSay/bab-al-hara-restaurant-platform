@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-16T18:13:51.602Z",
+  "timestamp": "2026-11-16T18:58:16.089Z",
   "modeA_fixtureQA": {
     "summary": "Deterministic responsive & visual verification across 12 viewports x 2 locales (24 combinations) + special states",
     "totalCombinations": 24,
@@ -15,11 +15,11 @@
         "width": 320,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -39,11 +39,11 @@
         "width": 360,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -63,11 +63,11 @@
         "width": 375,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -87,11 +87,11 @@
         "width": 390,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -111,11 +111,11 @@
         "width": 412,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -135,11 +135,11 @@
         "width": 430,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -159,11 +159,11 @@
         "width": 480,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -183,11 +183,11 @@
         "width": 768,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شاميةعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شاميةعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -207,11 +207,11 @@
         "width": 1024,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شامية\nعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شامية\nعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -231,11 +231,11 @@
         "width": 1280,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شامية\nعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شامية\nعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -255,11 +255,11 @@
         "width": 1440,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شامية\nعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شامية\nعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -279,11 +279,11 @@
         "width": 1920,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (مشاوي وأكلات شامية على أصولها)",
+        "headings": "1 h1 (مشاوي وأكلات شامية\nعلى أصولها)",
         "verifiedLocale": {
           "lang": "ar",
           "dir": "rtl",
-          "h1Text": "مشاوي وأكلات شامية على أصولها",
+          "h1Text": "مشاوي وأكلات شامية\nعلى أصولها",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -303,11 +303,11 @@
         "width": 320,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -327,11 +327,11 @@
         "width": 360,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -351,11 +351,11 @@
         "width": 375,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -375,11 +375,11 @@
         "width": 390,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -399,11 +399,11 @@
         "width": 412,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -423,11 +423,11 @@
         "width": 430,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -447,11 +447,11 @@
         "width": 480,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -471,11 +471,11 @@
         "width": 768,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -495,11 +495,11 @@
         "width": 1024,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills\n& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills\n& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -519,11 +519,11 @@
         "width": 1280,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills\n& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills\n& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -543,11 +543,11 @@
         "width": 1440,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills\n& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills\n& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -567,11 +567,11 @@
         "width": 1920,
         "result": "PASS",
         "overflow": "PASS (0px)",
-        "headings": "1 h1 (Traditional Charcoal Grills & Specialties)",
+        "headings": "1 h1 (Traditional Charcoal Grills\n& Specialties)",
         "verifiedLocale": {
           "lang": "en",
           "dir": "ltr",
-          "h1Text": "Traditional Charcoal Grills & Specialties",
+          "h1Text": "Traditional Charcoal Grills\n& Specialties",
           "status": "VERIFIED"
         },
         "imagesStatus": "PASS (9 verified loaded)",
@@ -656,19 +656,19 @@
       "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-home-ar-w1280-fold.png",
       "format": "png",
       "width": 1280,
-      "height": 1162,
+      "height": 1386,
       "channels": 3,
-      "sizeBytes": 645762,
-      "sha256": "f268cccfbdc2fe0bfdcd82a231eb14fa016eeeb0a39d2c7559e3bdca67d1b240"
+      "sizeBytes": 807301,
+      "sha256": "810cc3e3c974be50e73e5b68d173ebdda20b7c9a53259d17dd060f8a8ed9e5ca"
     },
     "browserHomeFoldEn": {
       "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-home-en-w1280-fold.png",
       "format": "png",
       "width": 1280,
-      "height": 1178,
+      "height": 1402,
       "channels": 3,
-      "sizeBytes": 632191,
-      "sha256": "2dfe20075d23bf6b06868055644c3daa6635149490072dba1124dbde6b4f4ec9"
+      "sizeBytes": 788923,
+      "sha256": "7d5742af78672d46980a12a50e3d85ca187927a763c36040e00016930633d1fa"
     },
     "browserMenuAr": {
       "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-menu-ar-w1280.png",
@@ -676,8 +676,8 @@
       "width": 1280,
       "height": 1925,
       "channels": 3,
-      "sizeBytes": 1009143,
-      "sha256": "1129357a9281ff9c11036c62497eaca4180fdef3ce8236148fba16c6fdab68f9"
+      "sizeBytes": 1009140,
+      "sha256": "3dc807b424b9f6c8f624ce521f2d7d492bf53a2cf57ad7796b1b24bad77a5872"
     },
     "browserMenuEn": {
       "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\after-customer-menu-en-w1280.png",
@@ -693,16 +693,16 @@
       "format": "png",
       "width": 1888,
       "height": 781,
-      "sizeBytes": 907085,
-      "sha256": "b56348409ba446eb69185ed6813ca7afa6e1a521c73ae07ea1ce5815a68e022f"
+      "sizeBytes": 971181,
+      "sha256": "68c56e688f44557a6064d0e12d1b7d3c7b5ae7d49e42db655d02c3db298ccd74"
     },
     "comparisonMenu": {
       "path": "E:\\bab-al-hara-production-bootstrap\\bab-al-hara-restaurant-platform\\docs\\visual-verification\\after-fixes\\figma-vs-browser-menu-1280.png",
       "format": "png",
       "width": 1888,
       "height": 1361,
-      "sizeBytes": 1253401,
-      "sha256": "89553e6fe1ebbea48aa9840c95d0d87fef1e418d9c7eb637f509bf6f3f84f8ec"
+      "sizeBytes": 1253372,
+      "sha256": "3e12fe1c371b108208591d83ede8cd97219f54930dc3b25ba26ba8a2f9727d12"
     }
   },
   "figmaFidelityAssessment": {
