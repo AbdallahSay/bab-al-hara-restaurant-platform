@@ -11,6 +11,12 @@ export const routes: Routes = [
     title: 'Bab Al Hara | باب الحارة',
   },
   {
+    path: 'menu',
+    loadComponent: () =>
+      import('./features/customer-ordering/menu/menu-page').then((component) => component.MenuPage),
+    title: 'Menu | قائمة الطعام | Bab Al Hara',
+  },
+  {
     path: 'cart',
     loadComponent: () =>
       import('./features/customer-ordering/cart/cart-page').then((component) => component.CartPage),

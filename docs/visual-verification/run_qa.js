@@ -1421,14 +1421,14 @@ async function run() {
       col2BadgeColor: '#16a34a',
       col2Buffer: pHome2,
       col2SpecsTitle: 'Bab Al Hara Implementation (Arabic RTL):',
-      col2SpecsLine1: 'Authentic Syrian mixed-grill visual, Levantine typography, 4 craft benefit cards.',
+      col2SpecsLine1: 'Authentic Syrian mixed-grill visual, open clean white canvas, 3 benefit cards (298x319, rx 40px).',
       col2SpecsLine2: 'dir="rtl", lang="ar", 0px horizontal overflow, >=44px touch targets.',
       col3Title: '3. Bab Al Hara Browser (English LTR)',
       col3Tag: 'Mode A Fixture',
       col3BadgeColor: '#2563eb',
       col3Buffer: pHome3,
       col3SpecsTitle: 'Bab Al Hara Implementation (English LTR):',
-      col3SpecsLine1: 'Symmetrical LTR hero composition, authentic English typography & copy.',
+      col3SpecsLine1: 'Symmetrical LTR hero composition, open clean white canvas, 3 benefit cards.',
       col3SpecsLine2: 'dir="ltr", lang="en", 0px horizontal overflow, >=44px touch targets.',
       footerText: 'Strict Quality Gate: All 3 Panels Verified Present • Validated Hashes & Dimensions • Genuine Bilingual Evidence',
       outputPath: homeCompPath,
@@ -1455,7 +1455,7 @@ async function run() {
       .resize(menuTargetW, menuTargetH, {
         fit: 'contain',
         position: 'top',
-        background: { r: 250, g: 246, b: 240, alpha: 1 }
+        background: { r: 255, g: 255, b: 255, alpha: 1 }
       })
       .toBuffer();
 
@@ -1463,7 +1463,7 @@ async function run() {
       .resize(menuTargetW, menuTargetH, {
         fit: 'contain',
         position: 'top',
-        background: { r: 250, g: 246, b: 240, alpha: 1 }
+        background: { r: 255, g: 255, b: 255, alpha: 1 }
       })
       .toBuffer();
 
@@ -1475,21 +1475,21 @@ async function run() {
       col1BadgeColor: '#ea580c',
       col1Buffer: pMenu1,
       col1SpecsTitle: 'Figma Menu Specifications (FreshBite):',
-      col1SpecsLine1: '3-column product cards, category pill filters, wishlist heart icon top-end.',
+      col1SpecsLine1: '3-column outlined product cards, category pill filters, wishlist heart icon top-end.',
       col1SpecsLine2: 'Full orange Add to Cart button, star rating, fixed price in EGP, review link.',
       col2Title: '2. Bab Al Hara Populated Catalog (Arabic RTL)',
       col2Tag: 'Populated AR (8 Items)',
       col2BadgeColor: '#16a34a',
       col2Buffer: pMenu2,
       col2SpecsTitle: 'Bab Al Hara Implementation (Arabic RTL):',
-      col2SpecsLine1: '3-column grid, 8 authentic Syrian dishes, loaded webp photos, Arabic currency.',
+      col2SpecsLine1: 'Clean white background, 3-column outlined cards (294x472, rx 12px), 8 authentic dishes.',
       col2SpecsLine2: '44px Add to Cart touch targets, prep time badge, wishlist toggle, 0px overflow.',
       col3Title: '3. Bab Al Hara Populated Catalog (English LTR)',
       col3Tag: 'Populated EN (8 Items)',
       col3BadgeColor: '#2563eb',
       col3Buffer: pMenu3,
       col3SpecsTitle: 'Bab Al Hara Implementation (English LTR):',
-      col3SpecsLine1: 'Complete English dish titles & descriptions, formatted English prices (EGP).',
+      col3SpecsLine1: 'Clean white background, 3-column outlined cards (294x472, rx 12px), category pills.',
       col3SpecsLine2: 'Category chips, wishlist toggle, 44px Add to Cart touch targets, 0px overflow.',
       footerText: 'Strict Quality Gate: Populated Catalog Verified • 8 Dish Cards Loaded • All Product Photos Decoded • 3-Col Desktop Grid',
       outputPath: menuCompPath,

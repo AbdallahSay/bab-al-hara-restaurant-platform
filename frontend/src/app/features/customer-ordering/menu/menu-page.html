@@ -1,11 +1,12 @@
 <app-customer-header />
 
 <main class="menu-shell">
+  <!-- 1. Figma 69:789 Home Hero Section (Clean White Page, Dominant Food Visual) -->
   <section class="home-hero">
     <div class="home-hero__container">
       <div class="home-hero__content">
         <div class="badge-pill">
-          <span class="badge-dot" aria-hidden="true"></span>
+          <span class="badge-icon" aria-hidden="true">🛵</span>
           <span>{{ copy().home.badgeFresh }}</span>
         </div>
         <p class="hero-eyebrow">{{ copy().home.heroEyebrow }}</p>
@@ -24,18 +25,21 @@
       </div>
 
       <div class="home-hero__visual">
+        <div class="hero-glow-bg" aria-hidden="true"></div>
         <div class="hero-image-card">
           <img
             src="/images/menu/mixed-grill.webp"
             [alt]="copy().home.heroTitle"
             class="hero-food-img"
             width="640"
-            height="480"
+            height="560"
             loading="eager"
             fetchpriority="high"
           />
           <div class="hero-floating-badge" aria-hidden="true">
-            <span class="badge-icon">🔥</span>
+            <div class="badge-icon-box">
+              <span class="badge-icon">🌿</span>
+            </div>
             <div class="badge-text">
               <strong>{{ copy().home.badgeTopRated }}</strong>
               <small>{{ copy().home.badgeCharcoal }}</small>
@@ -46,6 +50,7 @@
     </div>
   </section>
 
+  <!-- 2. Figma 69:789 Why Choose Us / Highlights Section (Exactly 3 Benefit Cards) -->
   <section class="highlights-section" aria-labelledby="highlights-title">
     <div class="section-intro">
       <p class="eyebrow">{{ copy().home.highlightsTitle }}</p>
@@ -53,16 +58,17 @@
     </div>
     <div class="highlights-grid">
       <article class="highlight-card">
-        <div class="hl-icon-wrap" aria-hidden="true">
-          <span class="hl-icon">🥩</span>
+        <div class="hl-squircle" aria-hidden="true">
+          <span class="hl-icon">⏱️</span>
         </div>
         <div class="hl-text">
           <h3>{{ copy().home.feature1Title }}</h3>
           <p>{{ copy().home.feature1Desc }}</p>
         </div>
       </article>
+
       <article class="highlight-card">
-        <div class="hl-icon-wrap" aria-hidden="true">
+        <div class="hl-squircle" aria-hidden="true">
           <span class="hl-icon">🔥</span>
         </div>
         <div class="hl-text">
@@ -70,27 +76,20 @@
           <p>{{ copy().home.feature2Desc }}</p>
         </div>
       </article>
+
       <article class="highlight-card">
-        <div class="hl-icon-wrap" aria-hidden="true">
-          <span class="hl-icon">🛵</span>
+        <div class="hl-squircle" aria-hidden="true">
+          <span class="hl-icon">🛡️</span>
         </div>
         <div class="hl-text">
           <h3>{{ copy().home.feature3Title }}</h3>
           <p>{{ copy().home.feature3Desc }}</p>
         </div>
       </article>
-      <article class="highlight-card">
-        <div class="hl-icon-wrap" aria-hidden="true">
-          <span class="hl-icon">🌿</span>
-        </div>
-        <div class="hl-text">
-          <h3>{{ copy().home.feature4Title }}</h3>
-          <p>{{ copy().home.feature4Desc }}</p>
-        </div>
-      </article>
     </div>
   </section>
 
+  <!-- 3. Figma 79:1294 Menu Catalog Section (Category Pills + 3-Column Outlined Cards) -->
   <section id="menu-catalog" class="catalog-section" aria-labelledby="menu-title">
     <app-restaurant-paused-banner />
 
@@ -114,9 +113,11 @@
         </button>
       </section>
     } @else {
+      <!-- Figma 79:1294 Category Pills -->
       <nav class="category-nav" [attr.aria-label]="copy().menu.categoriesLabel">
         <button
           type="button"
+          class="category-chip"
           [class.is-active]="selectedCategoryId() === null"
           [attr.aria-pressed]="selectedCategoryId() === null"
           (click)="selectCategory(null)"
@@ -126,6 +127,7 @@
         @for (category of categories(); track category.id) {
           <button
             type="button"
+            class="category-chip"
             [class.is-active]="selectedCategoryId() === category.id"
             [attr.aria-pressed]="selectedCategoryId() === category.id"
             (click)="selectCategory(category.id)"
@@ -140,6 +142,7 @@
           <p>{{ copy().menu.empty }}</p>
         </section>
       } @else {
+        <!-- Figma 79:1294 3-Column Outlined Product Cards Grid -->
         <section class="menu-grid" [attr.aria-label]="copy().menu.title">
           @for (item of visibleItems(); track item.id) {
             <article class="menu-item" [class.menu-item--unavailable]="!item.isAvailable">
@@ -148,8 +151,8 @@
                   class="menu-item__image"
                   [src]="item.imageReference"
                   [alt]="itemName(item)"
-                  width="640"
-                  height="480"
+                  width="292"
+                  height="192"
                   loading="lazy"
                   decoding="async"
                   (error)="onImageError($event)"
@@ -158,17 +161,22 @@
                   <span class="availability-label">{{ copy().common.unavailable }}</span>
                 }
               </div>
+
               <div class="menu-item__body">
                 <div class="menu-item__heading">
                   <h3>{{ itemName(item) }}</h3>
                   <strong class="item-price">{{ money(item.price) }}</strong>
                 </div>
-                <p class="item-desc">{{ itemDescription(item) }}</p>
-                <div class="menu-item__footer">
+
+                <div class="menu-item__meta">
                   <small class="prep-time">
-                    ⏱️ {{ copy().menu.preparation }}: {{ item.preparationMinutes }}
-                    {{ copy().menu.minutes }}
+                    ⏱️ {{ copy().menu.preparation }}: {{ item.preparationMinutes }} {{ copy().menu.minutes }}
                   </small>
+                </div>
+
+                <p class="item-desc">{{ itemDescription(item) }}</p>
+
+                <div class="menu-item__actions">
                   <button
                     class="button button--primary add-cart-btn"
                     type="button"
@@ -179,6 +187,8 @@
                   </button>
                 </div>
               </div>
+
+              <!-- Floating Wishlist Heart Button -->
               <button
                 type="button"
                 class="fav-toggle-btn"
@@ -195,6 +205,7 @@
     }
   </section>
 
+  <!-- 4. Figma 69:789 Authentic Reviews / Values Section (4 Outlined Cards) -->
   <section class="reviews-section" aria-labelledby="standards-title">
     <div class="reviews-header">
       <p class="eyebrow">{{ copy().home.badgeFresh }}</p>
@@ -202,23 +213,29 @@
     </div>
     <div class="reviews-grid">
       <article class="review-card">
-        <div class="standard-icon" aria-hidden="true">🥩</div>
+        <div class="standard-icon-box" aria-hidden="true">🥩</div>
         <h3 class="standard-title">{{ copy().home.review1Author }}</h3>
         <p class="review-text">{{ copy().home.review1Text }}</p>
       </article>
       <article class="review-card">
-        <div class="standard-icon" aria-hidden="true">🔥</div>
+        <div class="standard-icon-box" aria-hidden="true">🔥</div>
         <h3 class="standard-title">{{ copy().home.review2Author }}</h3>
         <p class="review-text">{{ copy().home.review2Text }}</p>
       </article>
       <article class="review-card">
-        <div class="standard-icon" aria-hidden="true">🤝</div>
+        <div class="standard-icon-box" aria-hidden="true">🤝</div>
         <h3 class="standard-title">{{ copy().home.review3Author }}</h3>
         <p class="review-text">{{ copy().home.review3Text }}</p>
+      </article>
+      <article class="review-card">
+        <div class="standard-icon-box" aria-hidden="true">🌿</div>
+        <h3 class="standard-title">{{ copy().home.feature4Title }}</h3>
+        <p class="review-text">{{ copy().home.feature4Desc }}</p>
       </article>
     </div>
   </section>
 
+  <!-- 5. Story Preview Section -->
   <section class="story-preview-section">
     <div class="story-preview-card">
       <div class="story-text">
